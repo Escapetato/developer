@@ -1,7 +1,7 @@
 ---
 name: Default template
 about: 기본 템플릿
-title: ''
+title: ex. [FEAT] Map Setting
 labels: ''
 assignees: ''
 
