@@ -15,3 +15,4 @@ MonoBehaviour:
   itemName: red_apple
   description: 
   itemIcon: {fileID: 21300000, guid: da7129ed6a246f048a49d8d97de2d2d4, type: 3}
+  itemCategory: Crop
