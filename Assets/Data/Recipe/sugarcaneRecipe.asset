@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d03ab3bb4aaf9e54ea50e8c2207288ec, type: 3}
-  m_Name: green_apple
+  m_Script: {fileID: 11500000, guid: 0d62a0d0d094bdb4e8b43638dcebb818, type: 3}
+  m_Name: sugarcaneRecipe
   m_EditorClassIdentifier: 
-  itemName: green_apple
-  description: 
-  itemIcon: {fileID: 21300000, guid: c1d0e6764d9c5f8458571840fb1d57d3, type: 3}
+  material: {fileID: 0}
+  potion: {fileID: 0}
+  resultItem: {fileID: 0}
+  evolutionCost: 100
+  successChance: 0.7

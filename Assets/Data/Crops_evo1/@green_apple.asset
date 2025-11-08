@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d03ab3bb4aaf9e54ea50e8c2207288ec, type: 3}
-  m_Name: green_apple
+  m_Name: '@green_apple'
   m_EditorClassIdentifier: 
   itemName: green_apple
   description: 
