@@ -139,16 +139,25 @@ public class ResearchLab : MonoBehaviour
         potionSlot.ClearSlot();
         PoingManager.Instance.DecreasePoing(currentRecipe.evolutionCost);
 
-        // 5-5. 결과 처리
+        // 결과 처리
         if (isRecipeCorrect)
         {
+            // [성공]
             ItemData newItem = currentRecipe.resultItem;
-            // '결과 슬롯'이 없으므로, 일단 인벤토리에 바로 추가
-            InventoryManager.Instance.AddItem(newItem, 1);
-            UIManager.Instance.ShowAlertPopup("진화 성공: " + newItem.itemName);
+
+            // 1. [삭제] 인벤토리에 바로 추가하는 로직 삭제
+            // InventoryManager.Instance.AddItem(newItem, 1); 
+
+            // 2. [삭제] 연구실 결과 슬롯에 보여주는 로직 삭제
+            // (새 팝업이 보여줄 것이므로)
+            // resultSlot.SetItem(newItem, 1); 
+
+            UIManager.Instance.ShowItemAcquiredPopup(newItem);
         }
         else
         {
+            // [실패]
+            // resultSlot.ClearSlot(); // (결과 슬롯이 없다면 이 줄도 삭제)
             UIManager.Instance.ShowAlertPopup("진화 실패... (재료/포잉 모두 소멸됨)");
         }
     }

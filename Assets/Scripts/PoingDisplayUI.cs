@@ -30,6 +30,6 @@ public class PoingDisplayUI : MonoBehaviour
     // 함수 내용
     private void UpdatePoingText(int newPoingAmount)
     {
-        poingText.text = "P : " + newPoingAmount.ToString();
+        poingText.text = "" + newPoingAmount.ToString();
     }
 }

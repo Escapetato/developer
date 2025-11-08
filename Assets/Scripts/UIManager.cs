@@ -18,6 +18,12 @@ public class UIManager : MonoBehaviour
     public Text alertMessageText;
     public Button alertCloseButton; // "확인" 버튼
 
+    [Header("Item Acquired Popup")]
+    public GameObject itemAcquiredPopup;
+    public Image itemAcquiredIcon;
+    public Text itemAcquiredNameText;
+    public Button itemAcquiredConfirmButton; // "확인" 버튼
+
     void Awake()
     {
         if (Instance == null)
@@ -37,6 +43,9 @@ public class UIManager : MonoBehaviour
 
         if (alertPopup != null)
             alertPopup.SetActive(false); // 알림창도 꺼둠
+
+        if (itemAcquiredPopup != null)
+            itemAcquiredPopup.SetActive(false);
     }
 
     // 모든 팝업을 닫는 함수
@@ -66,6 +75,28 @@ public class UIManager : MonoBehaviour
         alertPopup.SetActive(true);
     }
     // --- 버튼과 연결할 함수들 ---
+
+    public void ShowItemAcquiredPopup(ItemData item)
+    {
+        // 3a. 아이콘과 이름 텍스트를 설정
+        itemAcquiredIcon.sprite = item.itemIcon;
+        itemAcquiredNameText.text = item.itemName + " (획득)";
+        itemAcquiredIcon.color = Color.white; // (투명도 복구)
+
+        // 3b. "확인" 버튼이 눌렸을 때의 행동을 설정
+        itemAcquiredConfirmButton.onClick.RemoveAllListeners();
+        itemAcquiredConfirmButton.onClick.AddListener(() => {
+
+            // 1. 인벤토리에 아이템 추가
+            InventoryManager.Instance.AddItem(item, 1);
+
+            // 2. 팝업 닫기
+            itemAcquiredPopup.SetActive(false);
+        });
+
+        // 3c. 팝업을 켠다
+        itemAcquiredPopup.SetActive(true);
+    }
 
     // 인벤토리 팝업 열기 함수
     public void OpenInventoryPopup()
