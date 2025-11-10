@@ -44,16 +44,11 @@ public class SeedPopup : MonoBehaviour
         int count = kv.Value;
 
         GameObject btn = Instantiate(seedButtonPrefab, buttonContainer);
-        Debug.Log("버튼 생성: " + btn.name);
         spawnedButtons.Add(btn);
 
         Transform icon = btn.transform.Find("Icon");
         Transform name = btn.transform.Find("Name");
         Transform cnt = btn.transform.Find("Count");
-
-        Debug.Log("Icon: " + icon);
-        Debug.Log("Name: " + name);
-        Debug.Log("Count: " + cnt);
 
         if (icon != null) icon.GetComponent<Image>().sprite = seed.icon;
         if (name != null) name.GetComponent<TextMeshProUGUI>().text = seed.seedName;

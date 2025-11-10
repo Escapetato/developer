@@ -6,15 +6,38 @@ public class Field : MonoBehaviour
 {
     public enum FieldState { Empty, Planted, Growing, Ready }
     public FieldState state = FieldState.Empty;
+    public Sprite emptySprite;
+    public Sprite plantedSprite;
+    public Sprite growingSprite;
+    public Sprite readySprite;
 
     public Transform plantAnchor;
+    public SpriteRenderer fieldImage;
     private SeedData plantedSeed;
     private GameObject plantInstance;
 
+    private void Start()
+    {
+        UpdateFieldVisual();
+    }
+
     private void OnMouseDown()
     {
-        FarmManager.Instance.OnFieldClicked(this);
-        Debug.Log("밭 클릭");
+        if (state == FieldState.Empty)
+        {
+            FarmManager.Instance.OnFieldClicked(this);
+            Debug.Log("빈 밭 클릭");
+        }
+        else if (state == FieldState.Ready)
+        {
+            FarmManager.Instance.OnFieldClicked(this);
+            Debug.Log("수확 가능");
+        }
+        else
+        {
+            FarmManager.Instance.OnFieldClicked(this);
+            Debug.Log("성장 중...");
+        }
     }
 
     public void Plant(SeedData seed)
@@ -22,6 +45,7 @@ public class Field : MonoBehaviour
         if (state != FieldState.Empty) return;
         plantedSeed = seed;
         state = FieldState.Planted;
+        UpdateFieldVisual();
 
         if (seed.plantPrefab != null && plantAnchor != null)
         {
@@ -33,6 +57,7 @@ public class Field : MonoBehaviour
     private IEnumerator GrowRoutine(float growTime)
     {
         state = FieldState.Growing;
+        UpdateFieldVisual();
         float t = 0;
         while (t < growTime)
         {
@@ -43,8 +68,9 @@ public class Field : MonoBehaviour
                 plantInstance.transform.localScale = Vector3.one * scale;
                 yield return null;
             }
-            state = FieldState.Ready;
         }
+        state = FieldState.Ready;
+        UpdateFieldVisual();
     }
 
     public void Harvest()
@@ -54,6 +80,24 @@ public class Field : MonoBehaviour
         plantInstance = null;
         plantedSeed = null;
         state = FieldState.Empty;
+        UpdateFieldVisual();
+    }
+
+    private void UpdateFieldVisual()
+    {
+        if (fieldImage == null) return;
+
+        switch (state)
+        {
+            case FieldState.Empty:
+                fieldImage.sprite = emptySprite; break;
+            case FieldState.Planted:
+                fieldImage.sprite = plantedSprite; break;
+            case FieldState.Growing:
+                fieldImage.sprite = growingSprite; break;
+            case FieldState.Ready:
+                fieldImage.sprite = readySprite; break;
+        }
     }
     public bool IsEmpty() => state == FieldState.Empty;
     public bool IsReady() => state == FieldState.Ready;
