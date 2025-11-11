@@ -36,7 +36,12 @@ public class Seed_InventoryManager : MonoBehaviour
     {
         if (!HasSeed(seed)) return false;
         seedCounts[seed]--;
-        return true;
+
+        if (seedCounts[seed] <= 0)
+        {
+            seedCounts.Remove(seed);
+        }
+        return true; 
     }
 
     public int GetSeedCount(SeedData seed)
