@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 public class QuestManager : MonoBehaviour
@@ -25,20 +25,15 @@ public class QuestManager : MonoBehaviour
         Instance = this;
     }
 
-    // 초기화 -> 세이브 데이터 불러오기로 추후 수정 
+    // ⚠️ 초기화 -> 세이브 데이터 불러오기로 추후 수정 
     private void Start()
     {
         BuildQuestLists();     
-        InitializeQuestStates(); 
+        InitializeQuestStates();
 
-        UnityEngine.Debug.Log($"[QuestManager] 메인 {mainQuests.Count}, 서브 {subQuests.Count}, 일일 {dailyQuests.Count} 개 분류 완료");
+        OpenInitialSlots(); // 메인1, 서브2, 일일3 오픈 
 
-        foreach (var q in allQuestList)
-        {
-            if (q == null) continue;
-            UnityEngine.Debug.Log($"[QuestManager] 초기 상태 확인 - key={q.key}, type={q.type}, state={q.state}, current={q.currentCount}, reward={q.rewardClaimed}");
-        }
-
+        Debug.Log($"[QuestManager] 초기 슬롯 오픈 완료 - 메인 Active={CountActive(mainQuests)}, 서브 Active={CountActive(subQuests)}, 일일 Active={CountActive(dailyQuests)}");
     }
 
     // 퀘스트 타입 분류 
@@ -67,6 +62,11 @@ public class QuestManager : MonoBehaviour
                     break;
             }
         }
+
+        // key 기준 오름차순 정렬 
+        mainQuests.Sort((a, b) => a.key.CompareTo(b.key));
+        subQuests.Sort((a, b) => a.key.CompareTo(b.key));
+        dailyQuests.Sort((a, b) => a.key.CompareTo(b.key));
     }
 
     // 모든 퀘스트의 런타임 상태 초기화 
@@ -76,9 +76,140 @@ public class QuestManager : MonoBehaviour
         {
             if (q == null) continue;
 
+            // ⚠️ 테스트 코드 - Closed 제외 
+            if (q.state == QuestState.Closed)
+                continue;
+
             q.state = QuestState.Locked;
             q.currentCount = 0;
             q.rewardClaimed = false;
         }
+    }
+
+    // 초기 퀘스트 슬롯 오픈 
+    private void OpenInitialSlots()
+    {
+        MainQuestSlot();
+        SubQuestSlot(2);
+        RandomDailyQuestSlot(3);
+    }
+
+    // 메인 퀘스트 슬롯 관리
+    // 1. Closed 가 아닌 메인 퀘스트가 있다면 유지 
+    // 2. 없다면 Locked 중 가장 작은 key 값의 퀘스트 1개 오픈 
+    private void MainQuestSlot()
+    {
+        foreach (var q in mainQuests)
+        {
+            if (q.state == QuestState.Active || q.state == QuestState.Completed)
+            {
+                Debug.Log($"[QuestManager] 기존 메인 퀘스트 유지: key={q.key}, title={q.title}, state={q.state}");
+                return;
+            }
+        }
+
+        foreach (var q in mainQuests)
+        {
+            if (q.state == QuestState.Locked)
+            {
+                q.state = QuestState.Active;
+                Debug.Log($"[QuestManager] 메인 퀘스트 새로 오픈: key={q.key}, title={q.title}");
+                return;
+            }
+        }
+
+        Debug.Log("[QuestManager] 열 수 있는 메인 퀘스트가 없습니다.");
+    }
+
+
+    // 서브 퀘스트 슬롯 관리
+    private void SubQuestSlot(int targetCount)
+    {
+        int openCount = 0;
+
+        foreach (var q in subQuests)
+        {
+            if (q.state == QuestState.Active || q.state == QuestState.Completed)
+                openCount++;
+        }
+
+        foreach (var q in subQuests)
+        {
+            if (openCount >= targetCount)
+                break;
+
+            if (q.state == QuestState.Locked)
+            {
+                q.state = QuestState.Active;
+                openCount++;
+                Debug.Log($"[QuestManager] 서브 퀘스트 오픈: key={q.key}, title={q.title}");
+            }
+        }
+
+        Debug.Log($"[QuestManager] 서브 퀘스트 슬롯 상태: 진행중 {openCount}/{targetCount}");
+    }
+
+
+    // 일일 퀘스트 
+    // 하루 기준으로 전부 리셋, 랜덤으로 오픈 
+    private void RandomDailyQuestSlot(int targetCount)
+    {
+        // 리셋 
+        foreach (var q in dailyQuests)
+        {
+            if (q == null) continue;
+
+            q.state = QuestState.Locked;
+            q.currentCount = 0;
+            q.rewardClaimed = false;
+        }
+
+        // 목록 생성 
+        List<QuestData> candidates = new List<QuestData>();
+        foreach (var q in dailyQuests)
+        {
+            if (q != null)
+                candidates.Add(q);
+        }
+
+        if (candidates.Count == 0)
+        {
+            Debug.Log("[QuestManager] 일일 퀘스트 후보가 없습니다.");
+            return;
+        }
+
+        int toOpen = Mathf.Min(targetCount, candidates.Count);
+
+        // 랜덤 오픈 
+        for (int i = 0; i < toOpen; i++)
+        {
+            int index = UnityEngine.Random.Range(0, candidates.Count); 
+            QuestData q = candidates[index];
+
+            q.state = QuestState.Active;
+            Debug.Log($"[QuestManager] 오늘의 일일 퀘스트 오픈: key={q.key}, title={q.title}");
+
+            candidates.RemoveAt(index); // 중복 방지 
+        }
+
+        Debug.Log($"[QuestManager] 오늘 일일 퀘스트 개수: {toOpen}/{targetCount}");
+    }
+
+    // 퀘스트 개수 세기 
+    private int CountActive(List<QuestData> list)
+    {
+        int cnt = 0;
+
+        foreach (var q in list)
+        {
+            if (q == null) continue;
+
+            if (q.state == QuestState.Active || q.state == QuestState.Completed)
+            {
+                cnt++;
+            }
+        }
+
+        return cnt;
     }
 }
