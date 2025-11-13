@@ -1,8 +1,8 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// ¸ğµç ¾ÆÀÌÅÛ(ÀÛ¹°, ¾¾¾Ñ, Æ÷¼Ç µî)ÀÇ ±âº» Á¤º¸
+// ëª¨ë“  ì•„ì´í…œ(ì‘ë¬¼, ì”¨ì•—, í¬ì…˜ ë“±)ì˜ ê¸°ë³¸ ì •ë³´
 [CreateAssetMenu(fileName = "NewItem", menuName = "Data/Item Data")]
 public class ItemData : ScriptableObject
 {
@@ -11,4 +11,5 @@ public class ItemData : ScriptableObject
     public Sprite itemIcon;
 
     public string itemCategory;
+    public int price; // ì•„ì´í…œì˜ êµ¬ë§¤ ê°€ê²©
 }

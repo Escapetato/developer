@@ -1,36 +1,36 @@
-using System.Collections.Generic; // List, Dictionary
+ï»¿using System.Collections.Generic; // List, Dictionary
 using UnityEngine;
 using UnityEngine.UI; // Text
 
 // ResearchLab.cs
 public class ResearchLab : MonoBehaviour
 {
-    // 1. [Ãß°¡] ½Ì±ÛÅæ ¼³Á¤ (ItemSlotÀÌ Á¢±ÙÇØ¾ß ÇÔ)
+    // 1. [ì¶”ê°€] ì‹±ê¸€í†¤ ì„¤ì • (ItemSlotì´ ì ‘ê·¼í•´ì•¼ í•¨)
     public static ResearchLab Instance { get; private set; }
 
     [Header("1. Evolution Recipe")]
     public EvolutionRecipe currentRecipe;
 
-    [Header("2. Mixer Slots (¿ŞÂÊ È¥ÇÕ±â)")]
-    public ItemSlot materialSlot; // (Inspector¿¡¼­ 'È¥ÇÕ±â'ÀÇ Ã¹ ¹øÂ° ½½·Ô ¿¬°á)
-    public ItemSlot potionSlot;   // (Inspector¿¡¼­ 'È¥ÇÕ±â'ÀÇ µÎ ¹øÂ° ½½·Ô ¿¬°á)
+    [Header("2. Mixer Slots (ì™¼ìª½ í˜¼í•©ê¸°)")]
+    public ItemSlot materialSlot; // (Inspectorì—ì„œ 'í˜¼í•©ê¸°'ì˜ ì²« ë²ˆì§¸ ìŠ¬ë¡¯ ì—°ê²°)
+    public ItemSlot potionSlot;   // (Inspectorì—ì„œ 'í˜¼í•©ê¸°'ì˜ ë‘ ë²ˆì§¸ ìŠ¬ë¡¯ ì—°ê²°)
 
-    [Header("3. Inventory Grid (¿À¸¥ÂÊ ±×¸®µå)")]
-    public Transform slotParent;  // (Inspector¿¡¼­ 9Ä­ ±×¸®µåÀÇ ºÎ¸ğÀÎ 'Grid_Panel' ¿¬°á)
+    [Header("3. Inventory Grid (ì˜¤ë¥¸ìª½ ê·¸ë¦¬ë“œ)")]
+    public Transform slotParent;  // (Inspectorì—ì„œ 9ì¹¸ ê·¸ë¦¬ë“œì˜ ë¶€ëª¨ì¸ 'Grid_Panel' ì—°ê²°)
     private List<ItemSlot> inventorySlots;
-    private string currentCategory = "All"; // ÇöÀç ¼±ÅÃµÈ Ä«Å×°í¸®
+    private string currentCategory = "All"; // í˜„ì¬ ì„ íƒëœ ì¹´í…Œê³ ë¦¬
 
-    // (InventoryUI¿¡¼­ °¡Á®¿Â ·ÎÁ÷)
+    // (InventoryUIì—ì„œ ê°€ì ¸ì˜¨ ë¡œì§)
     public ItemData selectedItem { get; private set; }
     public ItemSlot selectedSlot { get; private set; }
 
     void Awake()
     {
-        // 1-1. ½Ì±ÛÅæ
+        // 1-1. ì‹±ê¸€í†¤
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        // 3-1. ¿À¸¥ÂÊ ±×¸®µåÀÇ 9°³ ½½·ÔÀ» Ã£¾Æ ¸®½ºÆ®¿¡ ´ãÀ½
+        // 3-1. ì˜¤ë¥¸ìª½ ê·¸ë¦¬ë“œì˜ 9ê°œ ìŠ¬ë¡¯ì„ ì°¾ì•„ ë¦¬ìŠ¤íŠ¸ì— ë‹´ìŒ
         inventorySlots = new List<ItemSlot>();
         if (slotParent != null)
         {
@@ -50,7 +50,7 @@ public class ResearchLab : MonoBehaviour
         InventoryManager.Instance.OnInventoryChanged -= RedrawInventory;
     }
 
-    // 4-1. [Ãß°¡] ½½·Ô ¼±ÅÃ ÇÔ¼ö (InventoryUI¿¡¼­ º¹»ç)
+    // 4-1. [ì¶”ê°€] ìŠ¬ë¡¯ ì„ íƒ í•¨ìˆ˜ (InventoryUIì—ì„œ ë³µì‚¬)
     public void SelectSlot(ItemSlot slot)
     {
         if (selectedSlot != null)
@@ -66,7 +66,7 @@ public class ResearchLab : MonoBehaviour
         }
     }
 
-    // 4-2. [Ãß°¡] ¼±ÅÃ ÇØÁ¦ ÇÔ¼ö (InventoryUI¿¡¼­ º¹»ç)
+    // 4-2. [ì¶”ê°€] ì„ íƒ í•´ì œ í•¨ìˆ˜ (InventoryUIì—ì„œ ë³µì‚¬)
     public void ClearSelection()
     {
         if (selectedSlot != null)
@@ -77,23 +77,23 @@ public class ResearchLab : MonoBehaviour
         selectedSlot = null;
     }
 
-    // 3-5. [Ãß°¡] Ä«Å×°í¸® ¹öÆ°µéÀÌ È£ÃâÇÒ ÇÔ¼ö
+    // 3-5. [ì¶”ê°€] ì¹´í…Œê³ ë¦¬ ë²„íŠ¼ë“¤ì´ í˜¸ì¶œí•  í•¨ìˆ˜
     public void SetCategory(string category)
     {
         currentCategory = category;
-        ClearSelection(); // Ä«Å×°í¸® ¹Ù²Ù¸é ¼±ÅÃ ÇØÁ¦
-        RedrawInventory(); // ÀÎº¥Åä¸® ´Ù½Ã ±×¸®±â
+        ClearSelection(); // ì¹´í…Œê³ ë¦¬ ë°”ê¾¸ë©´ ì„ íƒ í•´ì œ
+        RedrawInventory(); // ì¸ë²¤í† ë¦¬ ë‹¤ì‹œ ê·¸ë¦¬ê¸°
     }
 
-    // 3-6. [Ãß°¡] ÀÎº¥Åä¸® ´Ù½Ã ±×¸®±â (InventoryUI¿¡¼­ º¹»ç)
+    // 3-6. [ì¶”ê°€] ì¸ë²¤í† ë¦¬ ë‹¤ì‹œ ê·¸ë¦¬ê¸° (InventoryUIì—ì„œ ë³µì‚¬)
     private void RedrawInventory()
     {
         Dictionary<ItemData, int> allItems = InventoryManager.Instance.items;
-        int i = 0; // UI ½½·Ô ÀÎµ¦½º
+        int i = 0; // UI ìŠ¬ë¡¯ ì¸ë±ìŠ¤
 
         foreach (KeyValuePair<ItemData, int> itemPair in allItems)
         {
-            // [ÇÊÅÍ¸µ]
+            // [í•„í„°ë§]
             if (currentCategory == "All" || itemPair.Key.itemCategory == currentCategory)
             {
                 if (i < inventorySlots.Count)
@@ -113,52 +113,52 @@ public class ResearchLab : MonoBehaviour
         }
     }
 
-    // 5. 'ÁøÈ­' ¹öÆ°ÀÌ È£ÃâÇÒ ÇÔ¼ö (ÀÌÁ¦ ¿ŞÂÊ È¥ÇÕ±â ½½·ÔÀ» ÂüÁ¶)
+    // 5. 'ì§„í™”' ë²„íŠ¼ì´ í˜¸ì¶œí•  í•¨ìˆ˜ (ì´ì œ ì™¼ìª½ í˜¼í•©ê¸° ìŠ¬ë¡¯ì„ ì°¸ì¡°)
     public void OnEvolutionButtonClick()
     {
-        // 5-1. ¿ŞÂÊ 'È¥ÇÕ±â' ½½·Ô¿¡ Àç·á°¡ ´Ù Ã¡´ÂÁö È®ÀÎ
+        // 5-1. ì™¼ìª½ 'í˜¼í•©ê¸°' ìŠ¬ë¡¯ì— ì¬ë£Œê°€ ë‹¤ ì°¼ëŠ”ì§€ í™•ì¸
         if (materialSlot.item == null || potionSlot.item == null)
         {
-            UIManager.Instance.ShowAlertPopup("Àç·á°¡ ºÎÁ·ÇÕ´Ï´Ù!");
+            UIManager.Instance.ShowAlertPopup("ì¬ë£Œê°€ ë¶€ì¡±í•©ë‹ˆë‹¤!");
             return;
         }
 
-        // 5-2. Æ÷À×(Poing) È®ÀÎ
+        // 5-2. í¬ì‰(Poing) í™•ì¸
         if (!PoingManager.Instance.HasEnoughPoing(currentRecipe.evolutionCost))
         {
-            UIManager.Instance.ShowAlertPopup("Æ÷À×ÀÌ ºÎÁ·ÇÕ´Ï´Ù!");
+            UIManager.Instance.ShowAlertPopup("í¬ì‰ì´ ë¶€ì¡±í•©ë‹ˆë‹¤!");
             return;
         }
 
-        // 5-3. ·¹½ÃÇÇ ÀÏÄ¡ °Ë»ç
+        // 5-3. ë ˆì‹œí”¼ ì¼ì¹˜ ê²€ì‚¬
         bool isRecipeCorrect = (materialSlot.item == currentRecipe.material) &&
                                (potionSlot.item == currentRecipe.potion);
 
-        // 5-4. Àç·á ¹× Æ÷À× ¼Ò¸ê
+        // 5-4. ì¬ë£Œ ë° í¬ì‰ ì†Œë©¸
         materialSlot.ClearSlot();
         potionSlot.ClearSlot();
         PoingManager.Instance.DecreasePoing(currentRecipe.evolutionCost);
 
-        // °á°ú Ã³¸®
+        // ê²°ê³¼ ì²˜ë¦¬
         if (isRecipeCorrect)
         {
-            // [¼º°ø]
+            // [ì„±ê³µ]
             ItemData newItem = currentRecipe.resultItem;
 
-            // 1. [»èÁ¦] ÀÎº¥Åä¸®¿¡ ¹Ù·Î Ãß°¡ÇÏ´Â ·ÎÁ÷ »èÁ¦
+            // 1. [ì‚­ì œ] ì¸ë²¤í† ë¦¬ì— ë°”ë¡œ ì¶”ê°€í•˜ëŠ” ë¡œì§ ì‚­ì œ
             // InventoryManager.Instance.AddItem(newItem, 1); 
 
-            // 2. [»èÁ¦] ¿¬±¸½Ç °á°ú ½½·Ô¿¡ º¸¿©ÁÖ´Â ·ÎÁ÷ »èÁ¦
-            // (»õ ÆË¾÷ÀÌ º¸¿©ÁÙ °ÍÀÌ¹Ç·Î)
+            // 2. [ì‚­ì œ] ì—°êµ¬ì‹¤ ê²°ê³¼ ìŠ¬ë¡¯ì— ë³´ì—¬ì£¼ëŠ” ë¡œì§ ì‚­ì œ
+            // (ìƒˆ íŒì—…ì´ ë³´ì—¬ì¤„ ê²ƒì´ë¯€ë¡œ)
             // resultSlot.SetItem(newItem, 1); 
 
             UIManager.Instance.ShowItemAcquiredPopup(newItem);
         }
         else
         {
-            // [½ÇÆĞ]
-            // resultSlot.ClearSlot(); // (°á°ú ½½·ÔÀÌ ¾ø´Ù¸é ÀÌ ÁÙµµ »èÁ¦)
-            UIManager.Instance.ShowAlertPopup("ÁøÈ­ ½ÇÆĞ... (Àç·á/Æ÷À× ¸ğµÎ ¼Ò¸êµÊ)");
+            // [ì‹¤íŒ¨]
+            // resultSlot.ClearSlot(); // (ê²°ê³¼ ìŠ¬ë¡¯ì´ ì—†ë‹¤ë©´ ì´ ì¤„ë„ ì‚­ì œ)
+            UIManager.Instance.ShowAlertPopup("ì§„í™” ì‹¤íŒ¨... (ì¬ë£Œ/í¬ì‰ ëª¨ë‘ ì†Œë©¸ë¨)");
         }
     }
 }
