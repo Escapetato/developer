@@ -1,7 +1,7 @@
-using System;
+using System.Collections;
 using UnityEngine;
 
-[Serializable] 
+[System.Serializable] 
 public enum QuestType
 {
     Main, 
@@ -9,7 +9,7 @@ public enum QuestType
     Daily   
 }
 
-[Serializable] 
+[System.Serializable] 
 public enum QuestState
 {
     Locked, 
@@ -18,7 +18,8 @@ public enum QuestState
     Closed    
 }
 
-[Serializable] 
+// 퀘스트 데이터 구조 정의
+[System.Serializable] 
 public class QuestData
 {
     [Header("기본 정보")]
