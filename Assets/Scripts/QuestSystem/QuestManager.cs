@@ -62,15 +62,10 @@ public class QuestManager : MonoBehaviour
             return;
         }
 
-        if (questDatabase.quests == null || questDatabase.quests.Count == 0)
-        {
-            Debug.LogWarning("[QuestManager] QuestDatabase에 등록된 퀘스트가 없습니다.");
-            return;
-        }
-
         foreach (var q in questDatabase.quests)
         {
             if (q == null) continue;
+            if (q.state == QuestState.Closed) continue;
             allQuestList.Add(q);   
         }
 
@@ -116,10 +111,6 @@ public class QuestManager : MonoBehaviour
         foreach (var q in allQuestList)
         {
             if (q == null) continue;
-
-            // 테스트 코드 - Closed 제외 
-            if (q.state == QuestState.Closed)
-                continue;
 
             q.state = QuestState.Locked;
             q.currentCount = 0;
