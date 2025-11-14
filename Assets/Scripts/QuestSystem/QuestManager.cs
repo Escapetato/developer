@@ -1,19 +1,26 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance { get; private set; }
 
-    [Header("원본 퀘스트 리스트")]
+    [Header("퀘스트 데이터베이스 (정적 데이터)")]
+    public QuestDatabase questDatabase;
+
+    [Header("원본 퀘스트 리스트 (런타임용)")]
     public List<QuestData> allQuestList = new List<QuestData>();
 
     [Header("타입별 퀘스트 리스트")]
     public List<QuestData> mainQuests = new List<QuestData>();
     public List<QuestData> subQuests = new List<QuestData>();
     public List<QuestData> dailyQuests = new List<QuestData>();
+
+    // 한 플레이 세션에서 한 번만 초기화 
+    private bool initialized = false;
 
     private void Awake()
     {
@@ -23,20 +30,54 @@ public class QuestManager : MonoBehaviour
             return;
         }
         Instance = this;
+        DontDestroyOnLoad(transform.root.gameObject); // 씬이 바뀌어도 유지 
+
+        InitializeIfNeeded();
     }
 
-    // ⚠️ 초기화 -> 세이브 데이터 불러오기로 추후 수정 
-    private void Start()
+    private void InitializeIfNeeded()
     {
-        BuildQuestLists();     
-        InitializeQuestStates();
+        if (initialized) return;
+        initialized = true;
 
-        OpenInitialSlots(); // 메인1, 서브2, 일일3 오픈 
+        LoadFromDatabase();    
+        BuildQuestLists();    
+        InitializeQuestStates();  
+        OpenInitialSlots();      
 
-        Debug.Log($"[QuestManager] 초기 슬롯 오픈 완료 - 메인 Active={CountActive(mainQuests)}, 서브 Active={CountActive(subQuests)}, 일일 Active={CountActive(dailyQuests)}");
+        Debug.Log($"[QuestManager] 초기 슬롯 오픈 완료 - " +
+                  $"메인 Active={CountActive(mainQuests)}, " +
+                  $"서브 Active={CountActive(subQuests)}, " +
+                  $"일일 Active={CountActive(dailyQuests)}");
     }
 
-    // 퀘스트 타입 분류 
+    // DB에서 퀘스트 정보 가져오기 
+    private void LoadFromDatabase()
+    {
+        allQuestList.Clear();
+
+        if (questDatabase == null)
+        {
+            Debug.LogWarning("[QuestManager] QuestDatabase가 연결되지 않았습니다. Inspector를 확인하세요.");
+            return;
+        }
+
+        if (questDatabase.quests == null || questDatabase.quests.Count == 0)
+        {
+            Debug.LogWarning("[QuestManager] QuestDatabase에 등록된 퀘스트가 없습니다.");
+            return;
+        }
+
+        foreach (var q in questDatabase.quests)
+        {
+            if (q == null) continue;
+            allQuestList.Add(q);   
+        }
+
+        Debug.Log($"[QuestManager] QuestDatabase에서 {allQuestList.Count}개 퀘스트 로드.");
+    }
+
+    // 퀘스트 타입 분류 + KEY 기준 오름차순 정렬  
     private void BuildQuestLists()
     {
         mainQuests.Clear();
@@ -63,20 +104,20 @@ public class QuestManager : MonoBehaviour
             }
         }
 
-        // key 기준 오름차순 정렬 
         mainQuests.Sort((a, b) => a.key.CompareTo(b.key));
         subQuests.Sort((a, b) => a.key.CompareTo(b.key));
         dailyQuests.Sort((a, b) => a.key.CompareTo(b.key));
     }
 
     // 모든 퀘스트의 런타임 상태 초기화 
+    // 추후 세이브 불러오기로 수정 필요 
     private void InitializeQuestStates()
     {
         foreach (var q in allQuestList)
         {
             if (q == null) continue;
 
-            // ⚠️ 테스트 코드 - Closed 제외 
+            // 테스트 코드 - Closed 제외 
             if (q.state == QuestState.Closed)
                 continue;
 
@@ -195,7 +236,7 @@ public class QuestManager : MonoBehaviour
         Debug.Log($"[QuestManager] 오늘 일일 퀘스트 개수: {toOpen}/{targetCount}");
     }
 
-    // 퀘스트 개수 세기 
+    // 퀘스트 개수 세기 (Active, Completed)
     private int CountActive(List<QuestData> list)
     {
         int cnt = 0;
@@ -205,9 +246,7 @@ public class QuestManager : MonoBehaviour
             if (q == null) continue;
 
             if (q.state == QuestState.Active || q.state == QuestState.Completed)
-            {
                 cnt++;
-            }
         }
 
         return cnt;
