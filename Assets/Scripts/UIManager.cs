@@ -29,6 +29,11 @@ public class UIManager : MonoBehaviour
     public GameObject seedPopup;
     private Field currentField; // [추가] 씨앗을 심을 밭
 
+    [Header("Main UI Elements")]
+    public RectTransform poingBarRect; // 메인 Poing UI (Poing_Bar_Background)
+    public Transform poingBarOriginalParent; // Poing UI의 원래 부모 (Canvas)
+    public Transform storePoingTargetParent; // 상점 팝업 안의 새 위치 (우측 상단)
+
     void Awake()
     {
         if (Instance == null)
@@ -38,6 +43,12 @@ public class UIManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+
+        // [추가] 게임 시작 시 Poing UI의 원래 부모를 기억
+        if (poingBarRect != null)
+        {
+            poingBarOriginalParent = poingBarRect.parent;
         }
     }
 
@@ -58,17 +69,19 @@ public class UIManager : MonoBehaviour
     // 모든 팝업을 닫는 함수
     public void CloseAllPopups()
     {
-        // null이 아닌지 확인하고
+        // (기존 팝업 닫기)
         if (inventoryPopup != null)
             inventoryPopup.SetActive(false);
-
         if (researchLabPopup != null)
             researchLabPopup.SetActive(false);
+        if (seedPopup != null)
+            seedPopup.SetActive(false);
 
-        if (seedPopup != null) seedPopup.SetActive(false); // [추가]
-
-        if (storePopup != null) // [!!! 2. 이 줄이 추가되었습니다 !!!]
+        if (storePopup != null)
             storePopup.SetActive(false);
+
+        // [추가] 팝업 닫을 때 Poing UI를 원래 위치로 복구
+        ResetPoingUIPosition();
     }
 
     public void ShowAlertPopup(string message)
@@ -129,17 +142,20 @@ public class UIManager : MonoBehaviour
     {
         CloseAllPopups(); // 다른 걸 먼저 닫고
         storePopup.SetActive(true); // 상점만 연다
+
+        // [추가] 상점을 열 때 Poing UI를 상점 안으로 이동
+        MovePoingUIToStore();
     }
 
     public void OpenSeedPopup(Field field)
-    {
-        CloseAllPopups(); // 다른 팝업 닫기
-        currentField = field; // 심을 밭 기억
-        seedPopup.SetActive(true);
+        {
+            CloseAllPopups(); // 다른 팝업 닫기
+            currentField = field; // 심을 밭 기억
+            seedPopup.SetActive(true);
 
-        // [추가] 팝업을 켤 때마다 버튼 새로고침
-        seedPopup.GetComponent<SeedPopupUI>().RefreshButtons(field);
-    }
+            // [추가] 팝업을 켤 때마다 버튼 새로고침
+            seedPopup.GetComponent<SeedPopupUI>().RefreshButtons(field);
+        }
 
     // [추가] SeedPopupUI가 심을 밭을 물어볼 함수
     public Field GetCurrentField()
@@ -147,4 +163,36 @@ public class UIManager : MonoBehaviour
         return currentField;
     }
 
+// Poing UI를 상점으로 옮기는 함수
+    private void MovePoingUIToStore()
+    {
+        if (poingBarRect == null || storePoingTargetParent == null) return;
+
+        // 1. Poing UI의 부모를 '상점 팝업 안'으로 변경
+        poingBarRect.SetParent(storePoingTargetParent);
+        
+        // 2. 앵커/위치/크기를 상점 우측 상단에 맞게 강제 설정
+        poingBarRect.anchorMin = new Vector2(1, 1); // (우측 상단)
+        poingBarRect.anchorMax = new Vector2(1, 1); // (우측 상단)
+        poingBarRect.pivot = new Vector2(1, 1);     // (기준점)
+        poingBarRect.anchoredPosition = new Vector2(-50, -50); // (우측 상단 여백 예시)
+        poingBarRect.localScale = Vector3.one; // 크기 1로
+    }
+
+    // Poing UI를 원래 위치로 복구하는 함수
+    private void ResetPoingUIPosition()
+    {
+        if (poingBarRect == null || poingBarOriginalParent == null) return;
+
+        // 1. Poing UI의 부모를 '원래 부모' (Canvas)로 변경
+        poingBarRect.SetParent(poingBarOriginalParent);
+        
+        // 2. 원래 앵커/위치/크기로 복구
+        // (주의: 이 값들은 Poing_Bar_Background의 원래 RectTransform 값이어야 함)
+        poingBarRect.anchorMin = new Vector2(0, 1); // (좌측 상단 예시)
+        poingBarRect.anchorMax = new Vector2(0, 1); // (좌측 상단 예시)
+        poingBarRect.pivot = new Vector2(0, 1);     // (기준점)
+        poingBarRect.anchoredPosition = new Vector2(50, -50); // (원래 여백 예시)
+        poingBarRect.localScale = Vector3.one; // 크기 1로
+    }
 }

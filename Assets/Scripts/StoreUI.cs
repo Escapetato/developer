@@ -26,6 +26,10 @@ public class StoreUI : MonoBehaviour
     public Text detailPriceText;
     public Button purchaseButton;
 
+    [Header("Category Buttons")]
+    public List<CategoryButton> categoryButtons; // (Inspector에서 'CategoryButton' 스크립트 연결)
+    public CategoryButton defaultCategoryButton; // (Inspector에서 'Seed' 버튼 연결)
+
     private string currentCategory = "All";
 
     void Awake()
@@ -42,12 +46,31 @@ public class StoreUI : MonoBehaviour
 
     void OnEnable()
     {
-        SetCategory("Seed");
+        if (defaultCategoryButton != null)
+        {
+            SetCategory(defaultCategoryButton);
+        }
+        else if (categoryButtons != null && categoryButtons.Count > 0)
+        {
+            SetCategory(categoryButtons[0]);
+        }
     }
 
-    public void SetCategory(string category)
+    public void SetCategory(CategoryButton clickedButton)
     {
-        currentCategory = category;
+        // 3a. 모든 카테고리 버튼을 '선택 해제' 상태로
+        foreach (CategoryButton btn in categoryButtons)
+        {
+            btn.SetSelected(false);
+        }
+
+        // 3b. '클릭된' 버튼만 '선택' 상태로 변경
+        clickedButton.SetSelected(true);
+
+        // 3c. 클릭된 버튼의 'categoryName'을 현재 카테고리로 사용
+        currentCategory = clickedButton.categoryName;
+
+        // 3d. 상점 다시 그리기
         ClearSelection();
         RedrawStore();
     }

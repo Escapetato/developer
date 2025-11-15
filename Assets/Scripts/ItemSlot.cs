@@ -2,29 +2,52 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-
 public enum SlotType { Inventory, Material, Result, Lab_Inventory, Store }
 
-public class ItemSlot : MonoBehaviour, IPointerClickHandler 
+public class ItemSlot : MonoBehaviour, IPointerClickHandler
 {
-    public ItemData item; // 이 슬롯이 현재 가지고 있는 아이템 정보
-    public SlotType slotType; // [추가] Inspector에서 설정할 슬롯 타입
+    [Header("Core Info")]
+    public ItemData item;
+    public SlotType slotType;
 
-    private Image itemIcon;
+    [Header("UI Components (Must be connected)")]
+
+    public Image itemIconDisplay; // (Inspector에서 'Item_Icon_Image' 자식 연결)
+    public Image slotBackground;  // (Inspector에서 '자기 자신'의 Image 컴포넌트 연결)
     public Text quantityText;
-
     public Image selectionBorder;
+
+    [Header("Selection Sprites (Must be connected)")]
+
+    public Sprite selectedSprite; // 선택됐을 때의 '진한' 스프라이트
+    private Sprite defaultSprite; // 원래 '연한' 스프라이트 (자동 저장)
 
     void Awake()
     {
-        itemIcon = GetComponent<Image>();
-
+        // 1. 자식에서 Price_Text (QuantityText) 찾기
         if (quantityText == null)
         {
-            quantityText = GetComponentInChildren<Text>();
+            quantityText = GetComponentInChildren<Text>(true);
         }
 
-        // [추가] 선택 테두리가 있다면 처음엔 숨김
+        // 2. 자식에서 SelectionBorder 찾기
+        if (selectionBorder == null && transform.Find("SelectionBorder") != null)
+        {
+            selectionBorder = transform.Find("SelectionBorder").GetComponent<Image>();
+        }
+
+        // 3. 배경 이미지 찾기 및 원래 스프라이트 저장
+        if (slotBackground == null)
+        {
+            // '부모'의 Image는 배경
+            slotBackground = GetComponent<Image>();
+        }
+
+        if (slotBackground != null)
+        {
+            defaultSprite = slotBackground.sprite; // 원래 스프라이트 저장
+        }
+
         if (selectionBorder != null)
         {
             selectionBorder.gameObject.SetActive(false);
@@ -40,8 +63,11 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     public void SetItem(ItemData newItem, int quantity)
     {
         item = newItem;
-        itemIcon.sprite = item.itemIcon;
-        itemIcon.color = Color.white;
+
+        // '자식'의 아이콘을 변경
+        itemIconDisplay.sprite = newItem.itemIcon;
+        itemIconDisplay.color = Color.white;
+        itemIconDisplay.gameObject.SetActive(true); // 켜기
 
         if (quantityText != null)
         {
@@ -55,8 +81,12 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     {
         item = null;
 
-        itemIcon.sprite = null;
-        itemIcon.color = Color.white;
+        // '자식'의 아이콘만 숨김
+        if (itemIconDisplay != null)
+        {
+            itemIconDisplay.sprite = null;
+            itemIconDisplay.gameObject.SetActive(false); // 끄기
+        }
 
         if (quantityText != null)
         {
@@ -68,6 +98,28 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
         {
             selectionBorder.gameObject.SetActive(false);
         }
+
+        if (slotBackground != null)
+        {
+            slotBackground.sprite = defaultSprite;
+        }
+    }
+
+    // 상점 슬롯 전용: 아이템과 '가격'을 설정
+    public void SetStoreSlot(ItemData newItem)
+    {
+        item = newItem;
+
+        // '자식'의 아이콘을 변경
+        itemIconDisplay.sprite = newItem.itemIcon;
+        itemIconDisplay.color = Color.white;
+        itemIconDisplay.gameObject.SetActive(true); // 켜기
+
+        if (quantityText != null)
+        {
+            quantityText.text = "P: " + newItem.price.ToString();
+            quantityText.gameObject.SetActive(true);
+        }
     }
 
     public void SetSelected(bool isSelected)
@@ -76,22 +128,41 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
         {
             selectionBorder.gameObject.SetActive(isSelected);
         }
+
+        // 배경 스프라이트(이미지) 변경
+        if (slotBackground != null)
+        {
+            if (isSelected)
+            {
+                slotBackground.sprite = selectedSprite; // 선택됨 (진한 이미지)
+            }
+            else
+            {
+                slotBackground.sprite = defaultSprite; // 선택 해제 (원래 이미지)
+            }
+        }
     }
 
-
-    // 슬롯이 클릭되었을 때 호출되는 함수
+    // (이전 '더블 클릭' 로직이 포함된 완전한 버전)
     public void OnPointerClick(PointerEventData eventData)
     {
-        // 1. '메인 인벤토리' 슬롯을 클릭했을 때 (기존과 동일)
+        // 1. '메인 인벤토리' 슬롯
         if (slotType == SlotType.Inventory)
         {
-            // 한 번 클릭: 선택
             if (eventData.clickCount == 1)
             {
                 InventoryUI.Instance.SelectSlot(this);
             }
         }
-        // 2. '연구실 안의 인벤토리' 슬롯을 클릭했을 때
+        // 1-A. '상점' 슬롯
+        else if (slotType == SlotType.Store)
+        {
+            if (eventData.clickCount == 1)
+            {
+                StoreUI.Instance.SelectSlot(this);
+            }
+        }
+        // 2. '연구실 안의 인벤토리' 슬롯
         else if (slotType == SlotType.Lab_Inventory)
         {
             // 2a. 한 번 클릭 (선택)
@@ -105,24 +176,21 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
                 ResearchLab lab = ResearchLab.Instance;
                 ItemData itemToMove = this.item;
 
-                // 2c. 아이템 카테고리에 따라 적절한 혼합기 슬롯에 배치
                 if (itemToMove.itemCategory == "Crop" && lab.materialSlot.item == null)
                 {
-                    // 작물이면 '재료' 슬롯에 배치
                     lab.materialSlot.SetItem(itemToMove, 1);
                     InventoryManager.Instance.RemoveItem(itemToMove, 1);
                     lab.ClearSelection();
                 }
                 else if (itemToMove.itemCategory == "Potion" && lab.potionSlot.item == null)
                 {
-                    // 포션이면 '포션' 슬롯에 배치
                     lab.potionSlot.SetItem(itemToMove, 1);
                     InventoryManager.Instance.RemoveItem(itemToMove, 1);
                     lab.ClearSelection();
                 }
             }
         }
-        // 3. '연구실 재료' 슬롯 (왼쪽 혼합기)을 클릭했을 때
+        // 3. '연구실 재료' 슬롯 (왼쪽 혼합기)
         else if (slotType == SlotType.Material)
         {
             if (this.item != null)
@@ -134,7 +202,7 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
                     ResearchLab.Instance.ClearSelection();
             }
         }
-        // 4. '결과' 슬롯 (기존과 동일)
+        // 4. '결과' 슬롯
         else if (slotType == SlotType.Result)
         {
             if (this.item != null)
@@ -142,21 +210,6 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
                 InventoryManager.Instance.AddItem(this.item, 1);
                 this.ClearSlot();
             }
-        }
-    }
-
-    // 상점 슬롯 전용: 아이템과 '가격'을 설정
-    public void SetStoreSlot(ItemData newItem)
-    {
-        item = newItem;
-        itemIcon.sprite = item.itemIcon;
-        itemIcon.color = Color.white;
-
-        if (quantityText != null)
-        {
-            // 수량(x1) 대신 가격을 표시
-            quantityText.text = "" + item.price.ToString();
-            quantityText.gameObject.SetActive(true);
         }
     }
 }

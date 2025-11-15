@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uB9C8\uB298 \uC528\uC557"
   description: 
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 21300000, guid: d0c05b9125ed56349a5385e1a77547b7, type: 3}
   itemCategory: Seed
   price: 300
   plantPrefab: {fileID: 0}
