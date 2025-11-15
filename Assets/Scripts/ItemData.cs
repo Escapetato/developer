@@ -12,4 +12,10 @@ public class ItemData : ScriptableObject
 
     public string itemCategory;
     public int price; // 아이템의 구매 가격
+
+    [Header("Seed-Specific Info")] // (구분용 헤더)
+    public GameObject plantPrefab;
+    public float growTime;
+
+    public ItemData harvestItem;
 }

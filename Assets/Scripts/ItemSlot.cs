@@ -125,7 +125,6 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
         // 3. '연구실 재료' 슬롯 (왼쪽 혼합기)을 클릭했을 때
         else if (slotType == SlotType.Material)
         {
-            // [!!! 수정 !!!]
             if (this.item != null)
             {
                 InventoryManager.Instance.AddItem(this.item, 1);
