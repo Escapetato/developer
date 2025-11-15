@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 
-public enum SlotType { Inventory, Material, Result, Lab_Inventory }
+public enum SlotType { Inventory, Material, Result, Lab_Inventory, Store }
 
 public class ItemSlot : MonoBehaviour, IPointerClickHandler 
 {
