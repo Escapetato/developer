@@ -56,70 +56,53 @@ public class StoreUI : MonoBehaviour
     {
         int i = 0; // 슬롯 인덱스
 
-        // 1. [추가] 탭을 바꿀 때마다 일단 모든 슬롯을 비움
+        // 1. 탭을 바꿀 때마다 일단 모든 슬롯을 비움
         for (int j = 0; j < slots.Count; j++)
         {
             slots[j].ClearSlot();
         }
 
-        // 2. "Seed" 탭은 '잠금' 기능이 있는 특수 로직 사용
+        if (storeDB == null) return;
+
+        // 2. '상점 DB'의 모든 아이템을 검사
+        foreach (ItemData item in storeDB.itemsForSale)
+        {
+            if (i >= slots.Count) break;
+
+            // 3. [필터링] 아이템 카테고리가 현재 탭과 일치하는가?
+            if (item.itemCategory == currentCategory)
+            {
+                // 4. 잠금 확인
+                // (GameProgressionManager의 함수 이름 변경 반영)
+                if (GameProgressionManager.Instance.IsItemUnlocked(item))
+                {
+                    // 4a. 해금됐으면: 진짜 아이템을 보여 줌
+                    slots[i].SetStoreSlot(item);
+                }
+                else
+                {
+                    // 4b. 잠겼으면: '물음표' 씨앗을 보여줌
+                    // (주의: lockedSeedItem 에셋이 Tool에도 사용됨
+                    //  Tool용 lockedItem을 따로 만들어도 됨)
+                    slots[i].SetStoreSlot(lockedSeedItem);
+                }
+                i++;
+            }
+        }
+
+        // '씨앗' 탭일 때만 '랜덤 씨앗'을 마지막에 추가
         if (currentCategory == "Seed")
         {
-            if (storeDB != null)
-            {
-                // (기존 'Seed' 탭 로직은 그대로 둡니다)
-                foreach (ItemData seed in storeDB.itemsForSale)
-                {
-                    if (i >= slots.Count) break;
-                    if (seed.itemCategory != "Seed") continue;
-
-                    if (GameProgressionManager.Instance.IsSeedUnlocked(seed))
-                    {
-                        slots[i].SetStoreSlot(seed);
-                    }
-                    else
-                    {
-                        slots[i].SetStoreSlot(lockedSeedItem);
-                    }
-                    i++;
-                }
-            }
             if (i < slots.Count && randomSeedItem != null)
             {
                 slots[i].SetStoreSlot(randomSeedItem);
                 i++;
             }
         }
-        // 3. 그 외 모든 탭("Tool", "Potion" 등) 로직
-        else
-        {
-            if (storeDB != null)
-            {
-                // '상점 DB'의 모든 아이템을 검사
-                foreach (ItemData item in storeDB.itemsForSale)
-                {
-                    if (i >= slots.Count) break;
-
-                    // 3a. [필터링] 아이템 카테고리가 현재 탭과 일치하는가?
-                    if (item.itemCategory == currentCategory)
-                    {
-                        // 일치하면 슬롯에 표시
-                        slots[i].SetStoreSlot(item);
-
-                        if (selectedSlot == slots[i])
-                        {
-                            selectedSlot.SetSelected(true);
-                        }
-                        i++;
-                    }
-                }
-            }
-        }
 
         ClearSelection();
     }
 
-    // 슬롯 선택 함수
     public void SelectSlot(ItemSlot slot)
     {
         if (selectedSlot != null) selectedSlot.SetSelected(false);
@@ -130,21 +113,22 @@ public class StoreUI : MonoBehaviour
             return;
         }
 
-        selectedItem = slot.item; // 슬롯이 보여주는 아이템 (물음표, 랜덤, 진짜)
+        selectedItem = slot.item;
         selectedSlot = slot;
         selectedSlot.SetSelected(true);
 
-        // 5b. '물음표'를 클릭했는가?
+        // '물음표'를 클릭했는가?
         if (selectedItem == lockedSeedItem)
         {
-            UpdateDetailPanel(lockedSeedItem, false); // 구매 불가
+            // 물음표 자체의 가격(300)을 표시하되 구매는 막음
+            UpdateDetailPanel(lockedSeedItem, false);
         }
-        // 5c. '랜덤 씨앗'을 클릭했는가?
+        // 2. '랜덤 씨앗'을 클릭했는가?
         else if (selectedItem == randomSeedItem)
         {
             UpdateDetailPanel(randomSeedItem, true); // 구매 가능
         }
-        // 5d. '해금된 씨앗'을 클릭했는가?
+        // 3. '해금된 아이템' (도구, 포션, 씨앗 등)을 클릭했는가?
         else
         {
             UpdateDetailPanel(selectedItem, true); // 구매 가능

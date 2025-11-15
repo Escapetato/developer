@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d03ab3bb4aaf9e54ea50e8c2207288ec, type: 3}
-  m_Name: thunder
+  m_Name: Tool_Trowel
   m_EditorClassIdentifier: 
-  itemName: "\uBC88\uAC1C \uC5D0\uB108\uC9C0"
+  itemName: "\uBAA8\uC885\uC0BD"
   description: 
   itemIcon: {fileID: 0}
-  itemCategory: Potion
-  price: 150
+  itemCategory: Tool
+  price: 300
   plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
-  toolTier: 0
+  toolTier: 3
   growthReductionPercent: 0.25

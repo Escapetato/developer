@@ -12,4 +12,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cddf5f3003f9b14191c77af0724f25c, type: 3}
   m_Name: StoreDB
   m_EditorClassIdentifier: 
-  itemsForSale: []
+  itemsForSale:
+  - {fileID: 11400000, guid: 9f6b5ecc7de7da94aae4f15b60e19f5d, type: 2}
+  - {fileID: 11400000, guid: dcfb69a9af18e9e4fb690b5db3124344, type: 2}
+  - {fileID: 11400000, guid: 165382755a2f6684cb91d6ee842877eb, type: 2}
+  - {fileID: 11400000, guid: 2f7f40b2408e9a14fbdb500f84d2c07e, type: 2}
+  - {fileID: 11400000, guid: 5db3220998e18c043b7549410641f8af, type: 2}
+  - {fileID: 11400000, guid: 03655b8bd4ed71349ab29c7241662f49, type: 2}
+  - {fileID: 11400000, guid: 4ae26c0249f0ea94c858feb050fc4528, type: 2}
+  - {fileID: 11400000, guid: 7f042aa655193ce4bb50c74cbb64d5a2, type: 2}
+  - {fileID: 11400000, guid: 69d52f45f3dbce046a0667d4a6f36275, type: 2}
+  - {fileID: 11400000, guid: 7abee0038aca19a4ca280f408482bb11, type: 2}
+  - {fileID: 11400000, guid: c750a806cdddfa54db1a5ac00afb8b69, type: 2}
+  - {fileID: 11400000, guid: 4eeadc65370f02c42bb3f879f533e9ab, type: 2}
+  - {fileID: 11400000, guid: c1edb44d15c8f3a4199d472ece42d97c, type: 2}
+  - {fileID: 11400000, guid: cf50d8519e8d7564cb4a5e8007ce4d50, type: 2}
+  - {fileID: 11400000, guid: 45a83d0d29381c64da960d03d796908f, type: 2}
+  - {fileID: 11400000, guid: 78430ef49a53a804bbdec4d89d7d0962, type: 2}
+  - {fileID: 11400000, guid: ecdc859f7660ad84c91f3122abf59b71, type: 2}
+  - {fileID: 11400000, guid: fc160dc35553f0b4f91068d055162ab8, type: 2}
+  - {fileID: 11400000, guid: 1f64bd9698d9c5440afbed9a4950fc52, type: 2}
+  - {fileID: 11400000, guid: 4c6bfb90f2c7f044ba65e58180c3d860, type: 2}
+  - {fileID: 11400000, guid: 937a18249d2f73e47b9332aa4e592597, type: 2}
+  - {fileID: 11400000, guid: 5b1de8934242f6b43b72dbbbe2c7018a, type: 2}
+  - {fileID: 11400000, guid: 60ac3b5c96f1f8049ac28a767ca6ff7f, type: 2}
+  - {fileID: 11400000, guid: 6deaf2a4e67777d4c9119edc844bebd3, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}

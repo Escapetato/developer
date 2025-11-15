@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d03ab3bb4aaf9e54ea50e8c2207288ec, type: 3}
-  m_Name: thunder
+  m_Name: Theme_Winter
   m_EditorClassIdentifier: 
-  itemName: "\uBC88\uAC1C \uC5D0\uB108\uC9C0"
-  description: 
+  itemName: "\uACA8\uC6B8 \uC124\uC6D0"
+  description: Theme
   itemIcon: {fileID: 0}
-  itemCategory: Potion
-  price: 150
+  itemCategory: 
+  price: 35000
   plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}

@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d03ab3bb4aaf9e54ea50e8c2207288ec, type: 3}
-  m_Name: thunder
+  m_Name: Seed_Potato
   m_EditorClassIdentifier: 
-  itemName: "\uBC88\uAC1C \uC5D0\uB108\uC9C0"
+  itemName: "\uAC10\uC790 \uC528\uC557"
   description: 
   itemIcon: {fileID: 0}
-  itemCategory: Potion
-  price: 150
+  itemCategory: Seed
+  price: 300
   plantPrefab: {fileID: 0}
   growTime: 0
-  harvestItem: {fileID: 0}
+  harvestItem: {fileID: 11400000, guid: 48d7f29a3bd99d842b1450283f0823e4, type: 2}
   requiredToolTier: 1
   toolTier: 0
   growthReductionPercent: 0.25
