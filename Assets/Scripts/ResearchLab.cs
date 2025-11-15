@@ -98,7 +98,7 @@ public class ResearchLab : MonoBehaviour
             {
                 if (i < inventorySlots.Count)
                 {
-                    inventorySlots[i].SetItem(itemPair.Key, itemPair.Value);
+                    inventorySlots[i].SetSlot(itemPair.Key, itemPair.Value);
                     if (selectedSlot == inventorySlots[i])
                     {
                         selectedSlot.SetSelected(true);
@@ -144,13 +144,6 @@ public class ResearchLab : MonoBehaviour
         {
             // [성공]
             ItemData newItem = currentRecipe.resultItem;
-
-            // 1. [삭제] 인벤토리에 바로 추가하는 로직 삭제
-            // InventoryManager.Instance.AddItem(newItem, 1); 
-
-            // 2. [삭제] 연구실 결과 슬롯에 보여주는 로직 삭제
-            // (새 팝업이 보여줄 것이므로)
-            // resultSlot.SetItem(newItem, 1); 
 
             UIManager.Instance.ShowItemAcquiredPopup(newItem);
         }

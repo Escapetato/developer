@@ -100,14 +100,14 @@ public class StoreUI : MonoBehaviour
                 if (GameProgressionManager.Instance.IsItemUnlocked(item))
                 {
                     // 4a. 해금됐으면: 진짜 아이템을 보여 줌
-                    slots[i].SetStoreSlot(item);
+                    slots[i].SetSlot(item); // SetStoreSlot -> SetSlot
                 }
                 else
                 {
                     // 4b. 잠겼으면: '물음표' 씨앗을 보여줌
                     // (주의: lockedSeedItem 에셋이 Tool에도 사용됨
                     //  Tool용 lockedItem을 따로 만들어도 됨)
-                    slots[i].SetStoreSlot(lockedSeedItem);
+                    slots[i].SetSlot(lockedSeedItem);
                 }
                 i++;
             }
@@ -118,7 +118,7 @@ public class StoreUI : MonoBehaviour
         {
             if (i < slots.Count && randomSeedItem != null)
             {
-                slots[i].SetStoreSlot(randomSeedItem);
+                slots[i].SetSlot(randomSeedItem);
                 i++;
             }
         }

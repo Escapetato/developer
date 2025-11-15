@@ -12,7 +12,7 @@ public class UIManager : MonoBehaviour
     public GameObject inventoryPopup;
     public GameObject researchLabPopup;
     public GameObject storePopup;
-    // (나중에 상점, 도감 등 여기에 추가)
+    // 도감 등 여기에 추가
 
     [Header("Alert Popup")]
     public GameObject alertPopup;
@@ -30,9 +30,8 @@ public class UIManager : MonoBehaviour
     private Field currentField; // [추가] 씨앗을 심을 밭
 
     [Header("Main UI Elements")]
-    public RectTransform poingBarRect; // 메인 Poing UI (Poing_Bar_Background)
-    public Transform poingBarOriginalParent; // Poing UI의 원래 부모 (Canvas)
-    public Transform storePoingTargetParent; // 상점 팝업 안의 새 위치 (우측 상단)
+    public RectTransform poingBarRect;
+    public Transform poingBarOriginalParent;
 
     void Awake()
     {
@@ -123,76 +122,71 @@ public class UIManager : MonoBehaviour
         itemAcquiredPopup.SetActive(true);
     }
 
+    // --- 버튼과 연결할 함수들 ---
+
     // 인벤토리 팝업 열기 함수
     public void OpenInventoryPopup()
     {
-        CloseAllPopups(); // 다른 걸 먼저 닫고
-        inventoryPopup.SetActive(true); // 인벤토리만
+        CloseAllPopups();
+        inventoryPopup.SetActive(true);
+
+        MovePoingUIToPopup(inventoryPopup.transform);
     }
 
     // 연구실 팝업 열기 함수
     public void OpenResearchLabPopup()
     {
-        CloseAllPopups(); // 다른 걸 먼저 닫고
-        researchLabPopup.SetActive(true); // 연구실만
+        CloseAllPopups();
+        researchLabPopup.SetActive(true);
+        // (연구실은 Poing UI를 옮기지 않음)
     }
 
     // 상점 팝업 열기 함수
     public void OpenStorePopup()
     {
-        CloseAllPopups(); // 다른 걸 먼저 닫고
-        storePopup.SetActive(true); // 상점만 연다
+        CloseAllPopups();
+        storePopup.SetActive(true);
 
-        // [추가] 상점을 열 때 Poing UI를 상점 안으로 이동
-        MovePoingUIToStore();
+        MovePoingUIToPopup(storePopup.transform);
     }
 
     public void OpenSeedPopup(Field field)
-        {
-            CloseAllPopups(); // 다른 팝업 닫기
-            currentField = field; // 심을 밭 기억
-            seedPopup.SetActive(true);
+    {
+        CloseAllPopups();
+        currentField = field;
+        seedPopup.SetActive(true);
+        seedPopup.GetComponent<SeedPopupUI>().RefreshButtons(field);
+    }
 
-            // [추가] 팝업을 켤 때마다 버튼 새로고침
-            seedPopup.GetComponent<SeedPopupUI>().RefreshButtons(field);
-        }
-
-    // [추가] SeedPopupUI가 심을 밭을 물어볼 함수
     public Field GetCurrentField()
     {
         return currentField;
     }
 
-// Poing UI를 상점으로 옮기는 함수
-    private void MovePoingUIToStore()
+    private void MovePoingUIToPopup(Transform targetParent)
     {
-        if (poingBarRect == null || storePoingTargetParent == null) return;
+        if (poingBarRect == null || targetParent == null) return;
 
-        // 1. Poing UI의 부모를 '상점 팝업 안'으로 변경
-        poingBarRect.SetParent(storePoingTargetParent);
-        
-        // 2. 앵커/위치/크기를 상점 우측 상단에 맞게 강제 설정
-        poingBarRect.anchorMin = new Vector2(1, 1); // (우측 상단)
-        poingBarRect.anchorMax = new Vector2(1, 1); // (우측 상단)
-        poingBarRect.pivot = new Vector2(1, 1);     // (기준점)
-        poingBarRect.anchoredPosition = new Vector2(-50, -50); // (우측 상단 여백 예시)
-        poingBarRect.localScale = Vector3.one; // 크기 1로
+        poingBarRect.SetParent(targetParent);
+
+        poingBarRect.anchorMin = new Vector2(1, 1);
+        poingBarRect.anchorMax = new Vector2(1, 1);
+        poingBarRect.pivot = new Vector2(1, 1);
+        poingBarRect.anchoredPosition = new Vector2(-50, -50);
+        poingBarRect.localScale = Vector3.one;
     }
 
-    // Poing UI를 원래 위치로 복구하는 함수
+
+    // Poing UI를 원래 위치로 복구하는 함수 
     private void ResetPoingUIPosition()
     {
         if (poingBarRect == null || poingBarOriginalParent == null) return;
 
-        // 1. Poing UI의 부모를 '원래 부모' (Canvas)로 변경
         poingBarRect.SetParent(poingBarOriginalParent);
-        
-        // 2. 원래 앵커/위치/크기로 복구
-        // (주의: 이 값들은 Poing_Bar_Background의 원래 RectTransform 값이어야 함)
-        poingBarRect.anchorMin = new Vector2(0, 1); // (좌측 상단 예시)
-        poingBarRect.anchorMax = new Vector2(0, 1); // (좌측 상단 예시)
-        poingBarRect.pivot = new Vector2(0, 1);     // (기준점)
-        poingBarRect.anchoredPosition = new Vector2(50, -50); // (원래 여백 예시)
-        poingBarRect.localScale = Vector3.one; // 크기 1로
+        poingBarRect.anchorMin = new Vector2(0, 1);
+        poingBarRect.anchorMax = new Vector2(0, 1);
+        poingBarRect.pivot = new Vector2(0, 1);
+        poingBarRect.anchoredPosition = new Vector2(50, -50);
+        poingBarRect.localScale = Vector3.one;
     }
 }
