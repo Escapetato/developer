@@ -17,7 +17,7 @@ MonoBehaviour:
     title: "\uB3C4\uB9DD\uAC04 \uAC10\uC790"
     type: 0
     questDesc: .
-    state: 3
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -29,7 +29,7 @@ MonoBehaviour:
       \uC637\uC744 \uC785\uACE0"
     type: 0
     questDesc: .
-    state: 0
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -84,7 +84,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C 10\uD68C \uC2EC\uAE30"
     type: 2
     questDesc: .
-    state: 1
+    state: 0
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -95,7 +95,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C 15\uD68C \uC2EC\uAE30"
     type: 2
     questDesc: .
-    state: 0
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
