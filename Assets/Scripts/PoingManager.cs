@@ -54,4 +54,9 @@ public class PoingManager : MonoBehaviour
     {
         return (currentPoing >= amount);
     }
+
+    public int GetPoing()
+    {
+        return currentPoing;
+    }
 }
