@@ -28,6 +28,8 @@ public class UIManager : MonoBehaviour
     [Header("Farm Popups")]
     public GameObject seedPopup;
     private Field currentField; // [추가] 씨앗을 심을 밭
+    private Field lastField = null;   // 마지막으로 클릭한 밭
+    private bool isSeedPopupOpen = false; // 시드 팝업 열림 여부
 
     [Header("Main UI Elements")]
     public RectTransform poingBarRect;
@@ -91,7 +93,8 @@ public class UIManager : MonoBehaviour
         // "확인" 버튼이 눌렸을 때의 행동을 설정
         alertCloseButton.onClick.RemoveAllListeners();
         // (단순히 알림창을 닫는 기능만 새로 연결)
-        alertCloseButton.onClick.AddListener(() => {
+        alertCloseButton.onClick.AddListener(() =>
+        {
             alertPopup.SetActive(false);
         });
 
@@ -109,7 +112,8 @@ public class UIManager : MonoBehaviour
 
         // 3b. "확인" 버튼이 눌렸을 때의 행동을 설정
         itemAcquiredConfirmButton.onClick.RemoveAllListeners();
-        itemAcquiredConfirmButton.onClick.AddListener(() => {
+        itemAcquiredConfirmButton.onClick.AddListener(() =>
+        {
 
             // 1. 인벤토리에 아이템 추가
             InventoryManager.Instance.AddItem(item, 1);
@@ -156,6 +160,15 @@ public class UIManager : MonoBehaviour
         currentField = field;
         seedPopup.SetActive(true);
         seedPopup.GetComponent<SeedPopupUI>().RefreshButtons(field);
+
+        isSeedPopupOpen = true;
+    }
+
+    public void ToggleSeedPopup(Field field)
+    {
+        // 새로운 밭 → 열기
+        lastField = field;
+        OpenSeedPopup(field);
     }
 
     public Field GetCurrentField()
@@ -189,4 +202,27 @@ public class UIManager : MonoBehaviour
         poingBarRect.anchoredPosition = new Vector2(50, -50);
         poingBarRect.localScale = Vector3.one;
     }
+    void Update()
+{
+    if (isSeedPopupOpen && Input.GetMouseButtonDown(0)) // 좌클릭
+    {
+        // 클릭한 오브젝트 감지
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            // 클릭한 오브젝트가 Field인지 확인
+            Field clickedField = hit.collider.GetComponent<Field>();
+
+            // 밭이 아니면 시드 팝업 닫기
+            if (clickedField == null)
+            {
+                seedPopup.SetActive(false);
+            }
+        }
+
+    }
+}
+
 }
