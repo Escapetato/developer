@@ -12,6 +12,9 @@ public class QuestListController : MonoBehaviour
     [SerializeField] private GameObject subSlotPrefab;
     [SerializeField] private GameObject dailySlotPrefab;
 
+    // 현재 선택된 슬롯 
+    private QuestSlotUI currentSelectedSlot;
+
     // 추후 세이브 로드, 진행도 반영 이벤트 연결 필요 
     private void Start()
     {
@@ -38,12 +41,13 @@ public class QuestListController : MonoBehaviour
             2
         );
 
-        // 4) 일일 3개
-        CreateMultipleSlots(
-            QuestManager.Instance.dailyQuests,
-            dailySlotPrefab,
-            3
-        );
+        // 4) 일일 대표 1개만
+        QuestData dailyRep = FindFirstActiveOrCompleted(QuestManager.Instance.dailyQuests);
+        if (dailyRep != null)
+        {
+            CreateSlot(dailySlotPrefab, dailyRep);
+        }
+
     }
 
     // 리스트에서 Active/Completed 중 제일 먼저 나오는 퀘스트 하나 찾기
@@ -90,12 +94,37 @@ public class QuestListController : MonoBehaviour
         if (ui != null)
         {
             ui.Setup(data);
+            ui.SetOwner(this);
+
+            ui.SetSelected(false);
         }
-        else
+
+        // 첫 슬롯 자동 선택 
+        if (currentSelectedSlot == null)
         {
-            Debug.LogWarning("[QuestListController] 프리팹에 QuestSlotUI 컴포넌트가 없습니다.");
+            OnSlotClicked(ui);
         }
     }
+
+    // 클릭 이벤트 발생 알림이 올 때 호출되는 함수 
+    public void OnSlotClicked(QuestSlotUI clickedSlot)
+    {
+        if (clickedSlot == null)
+            return;
+
+        // 1) 이전 선택된 슬롯이 있고, 그 슬롯이 이번에 클릭된 슬롯이 아니라면 선택 해제
+        if (currentSelectedSlot != null && currentSelectedSlot != clickedSlot)
+        {
+            currentSelectedSlot.SetSelected(false);
+        }
+
+        // 2) 새 슬롯을 선택 상태로
+        currentSelectedSlot = clickedSlot;
+        currentSelectedSlot.SetSelected(true);
+
+        // 추후 상세사항 보여주는 오른쪽 패널 확장 
+    }
+
 
     // 자식 모두 삭제
     private void ClearChildren(Transform parent)

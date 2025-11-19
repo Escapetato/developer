@@ -182,11 +182,11 @@ public class QuestManager : MonoBehaviour
     }
 
 
-    // 일일 퀘스트 
-    // 하루 기준으로 전부 리셋, 랜덤으로 오픈 
+    // 일일 퀘스트
+    // 하루 기준으로 전부 리셋, "그룹당 최대 1개" 규칙으로 랜덤 오픈
     private void RandomDailyQuestSlot(int targetCount)
     {
-        // 리셋 
+        // 1) 상태 리셋
         foreach (var q in dailyQuests)
         {
             if (q == null) continue;
@@ -196,36 +196,63 @@ public class QuestManager : MonoBehaviour
             q.rewardClaimed = false;
         }
 
-        // 목록 생성 
-        List<QuestData> candidates = new List<QuestData>();
+        // 2) 그룹별로 묶기
+        var groupMap = new Dictionary<int, List<QuestData>>();
+
         foreach (var q in dailyQuests)
         {
-            if (q != null)
-                candidates.Add(q);
+            if (q == null) continue;
+
+            int groupId = (q.key - 1) / 3;
+
+            if (!groupMap.ContainsKey(groupId))
+            {
+                groupMap[groupId] = new List<QuestData>();
+            }
+
+            groupMap[groupId].Add(q);
         }
 
-        if (candidates.Count == 0)
+        if (groupMap.Count == 0)
         {
-            Debug.Log("[QuestManager] 일일 퀘스트 후보가 없습니다.");
+            Debug.Log("[QuestManager] 일일 퀘스트 후보 그룹이 없습니다.");
             return;
         }
 
-        int toOpen = Mathf.Min(targetCount, candidates.Count);
-
-        // 랜덤 오픈 
-        for (int i = 0; i < toOpen; i++)
+        // 3) 그룹 순서를 랜덤 섞기
+        var groupIds = new List<int>(groupMap.Keys);
+        for (int i = 0; i < groupIds.Count; i++)
         {
-            int index = UnityEngine.Random.Range(0, candidates.Count); 
-            QuestData q = candidates[index];
-
-            q.state = QuestState.Active;
-            Debug.Log($"[QuestManager] 오늘의 일일 퀘스트 오픈: key={q.key}, title={q.title}");
-
-            candidates.RemoveAt(index); // 중복 방지 
+            int swapIndex = UnityEngine.Random.Range(i, groupIds.Count);
+            int tmp = groupIds[i];
+            groupIds[i] = groupIds[swapIndex];
+            groupIds[swapIndex] = tmp;
         }
 
-        Debug.Log($"[QuestManager] 오늘 일일 퀘스트 개수: {toOpen}/{targetCount}");
+        int opened = 0;
+        int maxOpen = Mathf.Min(targetCount, groupIds.Count);
+
+        // 4) 각 그룹에서 1개씩만 랜덤 선택하여 오픈
+        for (int i = 0; i < maxOpen; i++)
+        {
+            int groupId = groupIds[i];
+            List<QuestData> group = groupMap[groupId];
+
+            if (group == null || group.Count == 0)
+                continue;
+
+            int pickIndex = UnityEngine.Random.Range(0, group.Count);
+            QuestData q = group[pickIndex];
+
+            q.state = QuestState.Active;
+            Debug.Log($"[QuestManager] 오늘의 일일 퀘스트 오픈: key={q.key}, title={q.title}, group={groupId}");
+
+            opened++;
+        }
+
+        Debug.Log($"[QuestManager] 오늘 일일 퀘스트 개수: {opened}/{targetCount}");
     }
+
 
     // 퀘스트 개수 세기 (Active, Completed)
     private int CountActive(List<QuestData> list)

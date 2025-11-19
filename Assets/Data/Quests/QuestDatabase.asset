@@ -29,7 +29,7 @@ MonoBehaviour:
       \uC637\uC744 \uC785\uACE0"
     type: 0
     questDesc: .
-    state: 1
+    state: 0
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -84,7 +84,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C 10\uD68C \uC2EC\uAE30"
     type: 2
     questDesc: .
-    state: 0
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -95,7 +95,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C 15\uD68C \uC2EC\uAE30"
     type: 2
     questDesc: .
-    state: 1
+    state: 0
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -115,6 +115,127 @@ MonoBehaviour:
     nextKey: 0
   - key: 4
     title: "\uC791\uBB3C 5\uD68C \uC218\uD655\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 5
+    title: "\uC791\uBB3C 10\uD68C \uC218\uD655\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 6
+    title: "\uC791\uBB3C 15\uD68C \uC218\uD655\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 7
+    title: "\uC791\uBB3C 1\uD68C \uD310\uB9E4\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 8
+    title: "\uC791\uBB3C 3\uD68C \uD310\uB9E4\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 9
+    title: "\uC791\uBB3C 5\uD68C \uD310\uB9E4\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 10
+    title: "\uC791\uBB3C 1\uD68C \uC9C4\uD654 \uC131\uACF5\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 11
+    title: "\uC791\uBB3C 3\uD68C \uC9C4\uD654 \uC131\uACF5\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 12
+    title: "\uC791\uBB3C 5\uD68C \uC9C4\uD654 \uC131\uACF5\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 13
+    title: "\uC791\uBB3C 1\uD68C \uC9C4\uD654 \uC2E4\uD328\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 14
+    title: "\uC791\uBB3C 3\uD68C \uC9C4\uD654 \uC2E4\uD328\uD558\uAE30"
+    type: 2
+    questDesc: .
+    state: 1
+    currentCount: 0
+    rewardClaimed: 0
+    conditionCount: 0
+    rewardKey: 0
+    rewardAmount: 0
+    nextKey: 0
+  - key: 15
+    title: "\uC791\uBB3C 5\uD68C \uC9C4\uD654 \uC2E4\uD328\uD558\uAE30"
     type: 2
     questDesc: .
     state: 1
