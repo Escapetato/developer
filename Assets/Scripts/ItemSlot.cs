@@ -66,12 +66,12 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
             {
                 case SlotType.Inventory:
                 case SlotType.Lab_Inventory:
-                    detailText.text = "x" + quantity.ToString();
+                    detailText.text = "" + quantity.ToString();
                     detailText.gameObject.SetActive(true);
                     break;
 
                 case SlotType.Store:
-                    detailText.text = newItem.price.ToString(); // "P:" 뺌 (이미지처럼 숫자만 나오게)
+                    detailText.text = newItem.price.ToString(); 
                     detailText.gameObject.SetActive(true);
                     break;
 
@@ -93,7 +93,7 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
         if (slotBackground != null) slotBackground.sprite = defaultSprite;
     }
 
-    // (나머지 OnPointerClick, SetSelected는 기존과 동일하므로 생략 가능, 그대로 두세요)
+
     public void SetSelected(bool isSelected)
     {
         if (selectionBorder != null) selectionBorder.gameObject.SetActive(isSelected);

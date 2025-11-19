@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // [필수] TextMeshPro 사용
+using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -19,15 +19,16 @@ public class InventoryUI : MonoBehaviour
     public GameObject detailPanelObject;
     public Image detailImage;
 
-    // [변경] 텍스트들을 TextMeshPro로 변경
-    public TextMeshProUGUI detailNameText;
-    public TextMeshProUGUI detailQuantityText; // (원래 가격 뜨던 곳에 연결)
+    public TextMeshProUGUI detailNameText;     // 아이템 이름
+    public TextMeshProUGUI detailQuantityText; // 보유 수량
+
+    // ★ [추가] 아이템 설명을 표시할 텍스트
+    public TextMeshProUGUI detailDescriptionText;
 
     [Header("Category Buttons")]
     public List<CategoryButton> categoryButtons;
-    public CategoryButton defaultCategoryButton; 
+    public CategoryButton defaultCategoryButton;
 
-    // 기본값을 "All"에서 "Seed"로 변경
     private string currentCategory = "Seed";
 
     void Awake()
@@ -45,18 +46,11 @@ public class InventoryUI : MonoBehaviour
     void OnEnable()
     {
         if (InventoryManager.Instance != null)
-        {
             InventoryManager.Instance.OnInventoryChanged += RedrawInventory;
-        }
 
-        // [수정] 시작할 때 무조건 defaultCategoryButton(Seed)을 누른 것처럼 처리
-        if (defaultCategoryButton != null)
-        {
-            SetCategory(defaultCategoryButton);
-        }
+        if (defaultCategoryButton != null) SetCategory(defaultCategoryButton);
         else
         {
-            // 혹시 연결 안 했을 때를 대비해 강제로 Seed로 그림
             currentCategory = "Seed";
             RedrawInventory();
         }
@@ -65,54 +59,32 @@ public class InventoryUI : MonoBehaviour
     void OnDisable()
     {
         if (InventoryManager.Instance != null)
-        {
             InventoryManager.Instance.OnInventoryChanged -= RedrawInventory;
-        }
     }
 
-    // 1. 카테고리 버튼 로직 (상점과 100% 동일)
     public void SetCategory(CategoryButton clickedButton)
     {
-        // 모든 버튼 선택 해제
-        foreach (CategoryButton btn in categoryButtons)
-        {
-            btn.SetSelected(false);
-        }
-
-        // 클릭한 버튼만 선택
+        foreach (CategoryButton btn in categoryButtons) btn.SetSelected(false);
         clickedButton.SetSelected(true);
         currentCategory = clickedButton.categoryName;
-
-        // 선택 초기화 후 다시 그리기
         ClearSelection();
         RedrawInventory();
     }
 
-    // 2. 슬롯 클릭 시 호출
     public void SelectSlot(ItemSlot slot)
     {
-        // 이미 선택된 게 있다면 해제
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
+        if (selectedSlot != null) selectedSlot.SetSelected(false);
 
         if (slot.item != null)
         {
             selectedItem = slot.item;
             selectedSlot = slot;
             selectedSlot.SetSelected(true);
-
-            // 상세 패널 업데이트
             UpdateDetailPanel(slot.item);
         }
-        else
-        {
-            ClearSelection();
-        }
+        else ClearSelection();
     }
 
-    // 3. 상세 정보 패널 업데이트 (가격 대신 수량 표시)
     private void UpdateDetailPanel(ItemData item)
     {
         if (item != null)
@@ -121,25 +93,28 @@ public class InventoryUI : MonoBehaviour
             detailImage.sprite = item.itemIcon;
             detailImage.color = Color.white;
 
-            // 이름 표시
             detailNameText.text = item.itemName;
 
-            // [핵심] 인벤토리 매니저에서 현재 이 아이템을 몇 개 가지고 있는지 확인
-            int count = 0;
-            if (InventoryManager.Instance.items.ContainsKey(item))
+            // ★ [추가] 아이템 설명 표시
+            if (detailDescriptionText != null)
             {
-                count = InventoryManager.Instance.items[item];
+                // 설명이 비어있으면 기본 문구 출력 (선택사항)
+                if (string.IsNullOrEmpty(item.itemDescription))
+                    detailDescriptionText.text = "설명이 없습니다.";
+                else
+                    detailDescriptionText.text = item.itemDescription;
             }
 
-            // 가격 대신 수량 표시
+            // 보유 수량 표시
+            int count = 0;
+            if (InventoryManager.Instance.items.ContainsKey(item))
+                count = InventoryManager.Instance.items[item];
+
             if (detailQuantityText != null)
-            {
                 detailQuantityText.text = count.ToString();
-            }
         }
     }
 
-    // 인벤토리 다시 그리기 함수
     private void RedrawInventory()
     {
         Dictionary<ItemData, int> allItems = InventoryManager.Instance.items;
@@ -151,12 +126,12 @@ public class InventoryUI : MonoBehaviour
             {
                 if (i < slots.Count)
                 {
+                    slots[i].gameObject.SetActive(true);
                     slots[i].SetSlot(itemPair.Key, itemPair.Value);
 
                     if (selectedSlot == slots[i])
                     {
                         selectedSlot.SetSelected(true);
-
                         UpdateDetailPanel(slots[i].item);
                     }
                     i++;
@@ -164,10 +139,10 @@ public class InventoryUI : MonoBehaviour
             }
         }
 
-
         for (int j = i; j < slots.Count; j++)
         {
             slots[j].ClearSlot();
+            slots[j].gameObject.SetActive(false);
         }
 
         if (i == 0) ClearSelection();
@@ -175,14 +150,9 @@ public class InventoryUI : MonoBehaviour
 
     public void ClearSelection()
     {
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
+        if (selectedSlot != null) selectedSlot.SetSelected(false);
         selectedItem = null;
         selectedSlot = null;
-
-        if (detailPanelObject != null)
-            detailPanelObject.SetActive(false);
+        if (detailPanelObject != null) detailPanelObject.SetActive(false);
     }
 }

@@ -2,43 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // [필수]
+using TMPro; // [필수] TextMeshPro 사용을 위해 네임스페이스 추가
 
+// 게임 내 모든 UI 팝업과 알림창을 중앙에서 관리하는 매니저 클래스
 public class UIManager : MonoBehaviour
 {
+    // 싱글톤 패턴: 어디서든 UIManager.Instance로 접근 가능
     public static UIManager Instance { get; private set; }
 
-    [Header("UI Popups")]
-    public GameObject inventoryPopup;
-    public GameObject researchLabPopup;
-    public GameObject storePopup;
+    [Header("UI Popups (메인 팝업창들)")]
+    // Inspector에서 각 팝업창(Panel) 오브젝트를 연결해야 함
+    public GameObject inventoryPopup;   // 인벤토리 창
+    public GameObject researchLabPopup; // 연구실 창
+    public GameObject storePopup;       // 상점 창
 
-    [Header("Alert Popup")]
-    public GameObject alertPopup;
-    // [변경] Text -> TextMeshProUGUI
-    public TextMeshProUGUI alertMessageText;
-    public Button alertCloseButton;
+    [Header("Alert Popup (단순 알림창)")]
+    public GameObject alertPopup;       // 알림창 패널
+    public TextMeshProUGUI alertMessageText; // [TMP] 알림 메시지 (예: "돈이 부족합니다")
+    public Button alertCloseButton;     // 알림창 닫기(확인) 버튼
 
-    [Header("Item Acquired Popup")]
-    public GameObject itemAcquiredPopup;
-    public Image itemAcquiredIcon;
-    // [변경] Text -> TextMeshProUGUI
-    public TextMeshProUGUI itemAcquiredNameText;
-    public Button itemAcquiredConfirmButton;
+    [Header("Item Acquired Popup (아이템 획득 팝업)")]
+    public GameObject itemAcquiredPopup;       // 획득 팝업 패널
+    public Image itemAcquiredIcon;             // 획득한 아이템 아이콘
+    public TextMeshProUGUI itemAcquiredNameText; // [TMP] 획득한 아이템 이름
+    public Button itemAcquiredConfirmButton;   // 확인 버튼
 
-    [Header("Farm Popups")]
-    public GameObject seedPopup;
-    private Field currentField;
+    [Header("Farm Popups (농장 관련)")]
+    public GameObject seedPopup;    // 씨앗 심기 메뉴 팝업
+    private Field currentField;     // 현재 상호작용 중인 밭 (어떤 밭을 눌렀는지 기억)
 
-    [Header("Main UI Elements")]
-    public RectTransform poingBarRect;
-    public Transform poingBarOriginalParent;
+    [Header("Main UI Elements (재화 UI 이동 관리)")]
+    public RectTransform poingBarRect;        // 포잉(돈) 표시줄 UI
+    public Transform poingBarOriginalParent;  // 포잉 바의 원래 위치(부모)를 기억하는 변수
 
     void Awake()
     {
+        // 싱글톤 초기화
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
+        // 게임 시작 시 포잉 바의 원래 부모(위치)를 저장해둠
+        // (나중에 팝업창 안으로 이동했다가 다시 돌아올 때 사용)
         if (poingBarRect != null)
         {
             poingBarOriginalParent = poingBarRect.parent;
@@ -47,12 +51,16 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
+        // 게임 시작 시 모든 팝업을 닫고 시작
         CloseAllPopups();
+
+        // 안전장치: 알림창들이 켜져 있다면 강제로 끔
         if (alertPopup != null) alertPopup.SetActive(false);
         if (itemAcquiredPopup != null) itemAcquiredPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
     }
 
+    // 화면에 떠 있는 모든 메인 팝업을 닫는 함수
     public void CloseAllPopups()
     {
         if (inventoryPopup != null) inventoryPopup.SetActive(false);
@@ -60,27 +68,35 @@ public class UIManager : MonoBehaviour
         if (seedPopup != null) seedPopup.SetActive(false);
         if (storePopup != null) storePopup.SetActive(false);
 
+        // 팝업이 닫힐 때, 포잉 바(재화 UI)를 원래 위치(메인 화면)로 되돌림
         ResetPoingUIPosition();
     }
 
+    // [기능] 단순 메시지 알림창 띄우기
     public void ShowAlertPopup(string message)
     {
+        // 텍스트 내용 변경
         if (alertMessageText != null) alertMessageText.text = message;
 
+        // 기존에 연결된 버튼 이벤트 제거 (중복 실행 방지)
         alertCloseButton.onClick.RemoveAllListeners();
+
+        // '확인' 버튼 누르면 팝업 꺼지도록 설정
         alertCloseButton.onClick.AddListener(() => {
             alertPopup.SetActive(false);
         });
 
-        alertPopup.SetActive(true);
+        alertPopup.SetActive(true); // 팝업 켜기
     }
 
+    // [기능] 아이템 획득 팝업 띄우기 (아이콘 + 이름)
     public void ShowItemAcquiredPopup(ItemData item)
     {
+        // 아이콘과 이름 설정
         if (itemAcquiredIcon != null)
         {
             itemAcquiredIcon.sprite = item.itemIcon;
-            itemAcquiredIcon.color = Color.white;
+            itemAcquiredIcon.color = Color.white; // 투명도 이슈 방지
         }
 
         if (itemAcquiredNameText != null)
@@ -88,29 +104,38 @@ public class UIManager : MonoBehaviour
             itemAcquiredNameText.text = item.itemName + " (획득)";
         }
 
+        // 버튼 이벤트 설정
         itemAcquiredConfirmButton.onClick.RemoveAllListeners();
         itemAcquiredConfirmButton.onClick.AddListener(() => {
+            // 확인 누르면 -> 인벤토리에 진짜로 아이템 추가
             InventoryManager.Instance.AddItem(item, 1);
-            itemAcquiredPopup.SetActive(false);
+            itemAcquiredPopup.SetActive(false); // 팝업 닫기
         });
 
         itemAcquiredPopup.SetActive(true);
     }
 
+    // --- 팝업 열기 함수들 ---
+
     public void OpenInventoryPopup()
     {
-        CloseAllPopups();
+        CloseAllPopups(); // 다른 창 닫고
         if (inventoryPopup != null)
         {
-            inventoryPopup.SetActive(true);
-            MovePoingUIToPopup(inventoryPopup.transform);
+            inventoryPopup.SetActive(true); // 인벤토리 열기
+            MovePoingUIToPopup(inventoryPopup.transform); // 포잉 바를 인벤토리 창 안으로 이동
         }
     }
 
     public void OpenResearchLabPopup()
     {
         CloseAllPopups();
-        if (researchLabPopup != null) researchLabPopup.SetActive(true);
+        if (researchLabPopup != null)
+        {
+            researchLabPopup.SetActive(true);
+
+            MovePoingUIToPopup(researchLabPopup.transform);
+        }
     }
 
     public void OpenStorePopup()
@@ -119,45 +144,56 @@ public class UIManager : MonoBehaviour
         if (storePopup != null)
         {
             storePopup.SetActive(true);
-            MovePoingUIToPopup(storePopup.transform);
+            MovePoingUIToPopup(storePopup.transform); // 포잉 바를 상점 창 안으로 이동
         }
     }
 
+    // 밭을 클릭했을 때 씨앗 메뉴 열기
     public void OpenSeedPopup(Field field)
     {
         CloseAllPopups();
-        currentField = field;
+        currentField = field; // 현재 어떤 밭을 클릭했는지 저장
+
         if (seedPopup != null)
         {
             seedPopup.SetActive(true);
-            // SeedPopupUI가 없는 경우를 대비한 안전장치
+
+            // 팝업 UI 갱신 (안전장치 포함)
             var popupUI = seedPopup.GetComponent<SeedPopupUI>();
             if (popupUI != null) popupUI.RefreshButtons(field);
         }
     }
 
+    // 현재 열려있는 밭 정보를 반환 (다른 스크립트에서 사용)
     public Field GetCurrentField()
     {
         return currentField;
     }
 
+    // [유틸리티] 포잉 UI(재화 바)를 특정 팝업창 안으로 이동시키는 함수
+    // 이유: 팝업창 위에 돈이 보여야 하므로, 계층 구조상 부모를 바꿔줌
     private void MovePoingUIToPopup(Transform targetParent)
     {
         if (poingBarRect == null || targetParent == null) return;
 
-        poingBarRect.SetParent(targetParent);
+        poingBarRect.SetParent(targetParent); // 부모 변경
+
+        // 위치 및 앵커(Anchor) 재설정 (우측 상단 고정 등)
         poingBarRect.anchorMin = new Vector2(1, 1);
         poingBarRect.anchorMax = new Vector2(1, 1);
         poingBarRect.pivot = new Vector2(1, 1);
-        poingBarRect.anchoredPosition = new Vector2(-50, -50);
-        poingBarRect.localScale = Vector3.one;
+        poingBarRect.anchoredPosition = new Vector2(-50, -50); // 여백 조정
+        poingBarRect.localScale = Vector3.one; // 크기 초기화
     }
 
+    // [유틸리티] 포잉 UI를 원래 위치(메인 화면)로 복구하는 함수
     private void ResetPoingUIPosition()
     {
         if (poingBarRect == null || poingBarOriginalParent == null) return;
 
-        poingBarRect.SetParent(poingBarOriginalParent);
+        poingBarRect.SetParent(poingBarOriginalParent); // 원래 부모로 복귀
+
+        // 원래 위치 좌표로 재설정 (좌측 상단 등)
         poingBarRect.anchorMin = new Vector2(0, 1);
         poingBarRect.anchorMax = new Vector2(0, 1);
         poingBarRect.pivot = new Vector2(0, 1);
