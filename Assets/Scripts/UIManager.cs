@@ -2,32 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro; // [필수]
 
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
     [Header("UI Popups")]
-    // Inspector에서 팝업창 오브젝트를 연결할 슬롯
     public GameObject inventoryPopup;
     public GameObject researchLabPopup;
     public GameObject storePopup;
-    // 도감 등 여기에 추가
 
     [Header("Alert Popup")]
     public GameObject alertPopup;
-    public Text alertMessageText;
-    public Button alertCloseButton; // "확인" 버튼
+    // [변경] Text -> TextMeshProUGUI
+    public TextMeshProUGUI alertMessageText;
+    public Button alertCloseButton;
 
     [Header("Item Acquired Popup")]
     public GameObject itemAcquiredPopup;
     public Image itemAcquiredIcon;
-    public Text itemAcquiredNameText;
-    public Button itemAcquiredConfirmButton; // "확인" 버튼
+    // [변경] Text -> TextMeshProUGUI
+    public TextMeshProUGUI itemAcquiredNameText;
+    public Button itemAcquiredConfirmButton;
 
     [Header("Farm Popups")]
     public GameObject seedPopup;
-    private Field currentField; // [추가] 씨앗을 심을 밭
+    private Field currentField;
 
     [Header("Main UI Elements")]
     public RectTransform poingBarRect;
@@ -35,16 +36,9 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
 
-        // [추가] 게임 시작 시 Poing UI의 원래 부모를 기억
         if (poingBarRect != null)
         {
             poingBarOriginalParent = poingBarRect.parent;
@@ -53,109 +47,93 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        // 게임 시작 시 모든 팝업창을 끈 상태로 시작
         CloseAllPopups();
-
-        if (alertPopup != null)
-            alertPopup.SetActive(false); // 알림창도 꺼둠
-
-        if (itemAcquiredPopup != null)
-            itemAcquiredPopup.SetActive(false);
-
-        if (seedPopup != null) seedPopup.SetActive(false); // [추가]
+        if (alertPopup != null) alertPopup.SetActive(false);
+        if (itemAcquiredPopup != null) itemAcquiredPopup.SetActive(false);
+        if (seedPopup != null) seedPopup.SetActive(false);
     }
 
-    // 모든 팝업을 닫는 함수
     public void CloseAllPopups()
     {
-        // (기존 팝업 닫기)
-        if (inventoryPopup != null)
-            inventoryPopup.SetActive(false);
-        if (researchLabPopup != null)
-            researchLabPopup.SetActive(false);
-        if (seedPopup != null)
-            seedPopup.SetActive(false);
+        if (inventoryPopup != null) inventoryPopup.SetActive(false);
+        if (researchLabPopup != null) researchLabPopup.SetActive(false);
+        if (seedPopup != null) seedPopup.SetActive(false);
+        if (storePopup != null) storePopup.SetActive(false);
 
-        if (storePopup != null)
-            storePopup.SetActive(false);
-
-        // [추가] 팝업 닫을 때 Poing UI를 원래 위치로 복구
         ResetPoingUIPosition();
     }
 
     public void ShowAlertPopup(string message)
     {
-        // 메시지 텍스트를 바꿈
-        alertMessageText.text = message;
+        if (alertMessageText != null) alertMessageText.text = message;
 
-        // "확인" 버튼이 눌렸을 때의 행동을 설정
         alertCloseButton.onClick.RemoveAllListeners();
-        // (단순히 알림창을 닫는 기능만 새로 연결)
         alertCloseButton.onClick.AddListener(() => {
             alertPopup.SetActive(false);
         });
 
-        // 알림 팝업을 켠다
         alertPopup.SetActive(true);
     }
-    // --- 버튼과 연결할 함수들 ---
 
     public void ShowItemAcquiredPopup(ItemData item)
     {
-        // 3a. 아이콘과 이름 텍스트를 설정
-        itemAcquiredIcon.sprite = item.itemIcon;
-        itemAcquiredNameText.text = item.itemName + " (획득)";
-        itemAcquiredIcon.color = Color.white; // (투명도 복구)
+        if (itemAcquiredIcon != null)
+        {
+            itemAcquiredIcon.sprite = item.itemIcon;
+            itemAcquiredIcon.color = Color.white;
+        }
 
-        // 3b. "확인" 버튼이 눌렸을 때의 행동을 설정
+        if (itemAcquiredNameText != null)
+        {
+            itemAcquiredNameText.text = item.itemName + " (획득)";
+        }
+
         itemAcquiredConfirmButton.onClick.RemoveAllListeners();
         itemAcquiredConfirmButton.onClick.AddListener(() => {
-
-            // 1. 인벤토리에 아이템 추가
             InventoryManager.Instance.AddItem(item, 1);
-
-            // 2. 팝업 닫기
             itemAcquiredPopup.SetActive(false);
         });
 
-        // 3c. 팝업을 켠다
         itemAcquiredPopup.SetActive(true);
     }
 
-    // --- 버튼과 연결할 함수들 ---
-
-    // 인벤토리 팝업 열기 함수
     public void OpenInventoryPopup()
     {
         CloseAllPopups();
-        inventoryPopup.SetActive(true);
-
-        MovePoingUIToPopup(inventoryPopup.transform);
+        if (inventoryPopup != null)
+        {
+            inventoryPopup.SetActive(true);
+            MovePoingUIToPopup(inventoryPopup.transform);
+        }
     }
 
-    // 연구실 팝업 열기 함수
     public void OpenResearchLabPopup()
     {
         CloseAllPopups();
-        researchLabPopup.SetActive(true);
-        // (연구실은 Poing UI를 옮기지 않음)
+        if (researchLabPopup != null) researchLabPopup.SetActive(true);
     }
 
-    // 상점 팝업 열기 함수
     public void OpenStorePopup()
     {
         CloseAllPopups();
-        storePopup.SetActive(true);
-
-        MovePoingUIToPopup(storePopup.transform);
+        if (storePopup != null)
+        {
+            storePopup.SetActive(true);
+            MovePoingUIToPopup(storePopup.transform);
+        }
     }
 
     public void OpenSeedPopup(Field field)
     {
         CloseAllPopups();
         currentField = field;
-        seedPopup.SetActive(true);
-        seedPopup.GetComponent<SeedPopupUI>().RefreshButtons(field);
+        if (seedPopup != null)
+        {
+            seedPopup.SetActive(true);
+            // SeedPopupUI가 없는 경우를 대비한 안전장치
+            var popupUI = seedPopup.GetComponent<SeedPopupUI>();
+            if (popupUI != null) popupUI.RefreshButtons(field);
+        }
     }
 
     public Field GetCurrentField()
@@ -168,7 +146,6 @@ public class UIManager : MonoBehaviour
         if (poingBarRect == null || targetParent == null) return;
 
         poingBarRect.SetParent(targetParent);
-
         poingBarRect.anchorMin = new Vector2(1, 1);
         poingBarRect.anchorMax = new Vector2(1, 1);
         poingBarRect.pivot = new Vector2(1, 1);
@@ -176,8 +153,6 @@ public class UIManager : MonoBehaviour
         poingBarRect.localScale = Vector3.one;
     }
 
-
-    // Poing UI를 원래 위치로 복구하는 함수 
     private void ResetPoingUIPosition()
     {
         if (poingBarRect == null || poingBarOriginalParent == null) return;

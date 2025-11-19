@@ -27,4 +27,7 @@ public class ItemData : ScriptableObject
     public float growthReductionPercent = 0.25f; // 25%
 
     // 꾸미기 테마는 특별한 변수 없이 "Theme" 카테고리와 이름만
+
+    // ★ [추가] 기본적으로 해금되어 있는지 여부
+    public bool isDefaultUnlocked = false;
 }
