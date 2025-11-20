@@ -6,8 +6,8 @@ public class ResearchLab : MonoBehaviour
 {
     public static ResearchLab Instance { get; private set; }
 
-    [Header("1. Evolution Recipe")]
-    public EvolutionRecipe currentRecipe;
+    [Header("1. Evolution Data")]
+    public List<EvolutionRecipe> allRecipes;
 
     [Header("2. Mixer Slots (왼쪽 혼합기)")]
     public ItemSlot materialSlot;
@@ -37,8 +37,6 @@ public class ResearchLab : MonoBehaviour
     void OnEnable()
     {
         InventoryManager.Instance.OnInventoryChanged += RedrawInventory;
-
-        // ★ [수정] 연구실 열릴 때 'Crop'(작물)부터 보여주기
         SetCategory("Crop");
     }
 
@@ -100,46 +98,70 @@ public class ResearchLab : MonoBehaviour
 
     public void OnEvolutionButtonClick()
     {
+        // 1. 재료가 비었는지 확인
         if (materialSlot.item == null || potionSlot.item == null)
         {
             UIManager.Instance.ShowAlertPopup("재료가 부족합니다!");
             return;
         }
 
-        if (!PoingManager.Instance.HasEnoughPoing(currentRecipe.evolutionCost))
+        ItemData inputMaterial = materialSlot.item;
+        ItemData inputPotion = potionSlot.item;
+
+        // 2. 내가 넣은 재료랑 딱 맞는 레시피가 있는지 '전체 리스트'에서 검색
+        EvolutionRecipe foundRecipe = null;
+
+        foreach (var recipe in allRecipes)
         {
+            // 재료와 물약이 둘 다 일치하는 레시피 찾기
+            if (recipe.material == inputMaterial && recipe.potion == inputPotion)
+            {
+                foundRecipe = recipe;
+                break; // 찾았으면 반복문 종료
+            }
+        }
+
+        // 3. 결과 판정
+
+        // [CASE A] 맞는 레시피가 없음 -> 실패 (재료만 날림)
+        if (foundRecipe == null)
+        {
+            // 재료 삭제
+            InventoryManager.Instance.RemoveItem(inputMaterial, 1);
+            InventoryManager.Instance.RemoveItem(inputPotion, 1);
+
+            // 슬롯 비우기
+            materialSlot.ClearSlot();
+            potionSlot.ClearSlot();
+
+            UIManager.Instance.ShowAlertPopup("아무런 반응이 없습니다...\n(재료가 소멸되었습니다)");
+            return;
+        }
+
+        // [CASE B] 맞는 레시피 찾음 -> 성공 조건(돈) 체크
+        if (!PoingManager.Instance.HasEnoughPoing(foundRecipe.evolutionCost))
+        {
+            // 레시피는 맞는데 돈이 없으면? 재료 날리지 말고 경고만
             UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
             return;
         }
 
-        bool isRecipeCorrect = (materialSlot.item == currentRecipe.material) &&
-                               (potionSlot.item == currentRecipe.potion);
+        // 4. 진짜 성공 처리
 
-        if (materialSlot.item != null) InventoryManager.Instance.RemoveItem(materialSlot.item, 1);
-        if (potionSlot.item != null) InventoryManager.Instance.RemoveItem(potionSlot.item, 1);
-        PoingManager.Instance.DecreasePoing(currentRecipe.evolutionCost);
+        // 비용 지불 및 재료 삭제
+        PoingManager.Instance.DecreasePoing(foundRecipe.evolutionCost);
+        InventoryManager.Instance.RemoveItem(inputMaterial, 1);
+        InventoryManager.Instance.RemoveItem(inputPotion, 1);
 
-        // ★ 슬롯 UI 비워주기 (중요: 아이템 데이터만 지우면 그림이 남을 수 있음)
+        // 슬롯 비우기
         materialSlot.ClearSlot();
         potionSlot.ClearSlot();
 
-        if (isRecipeCorrect)
-        {
-            ItemData newItem = currentRecipe.resultItem;
+        // 결과물 지급 및 해금
+        ItemData newItem = foundRecipe.resultItem;
 
-
-            // 1. 도감 매니저에게 "이거 해금됨!"
-            GameProgressionManager.Instance.UnlockItem(newItem);
-
-            // 2. (선택사항) 진화 성공했으면 인벤토리에 결과물
-            InventoryManager.Instance.AddItem(newItem, 1);
-
-            // 3. 축하 팝업 띄우기
-            UIManager.Instance.ShowItemAcquiredPopup(newItem);
-        }
-        else
-        {
-            UIManager.Instance.ShowAlertPopup("진화 실패... (재료/포잉 모두 소멸됨)");
-        }
+        GameProgressionManager.Instance.UnlockItem(newItem); // 도감 해금
+        InventoryManager.Instance.AddItem(newItem, 1);       // 인벤토리 지급
+        UIManager.Instance.ShowItemAcquiredPopup(newItem);   // 축하 팝업
     }
 }
