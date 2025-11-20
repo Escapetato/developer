@@ -115,13 +115,26 @@ public class ResearchLab : MonoBehaviour
         bool isRecipeCorrect = (materialSlot.item == currentRecipe.material) &&
                                (potionSlot.item == currentRecipe.potion);
 
+        if (materialSlot.item != null) InventoryManager.Instance.RemoveItem(materialSlot.item, 1);
+        if (potionSlot.item != null) InventoryManager.Instance.RemoveItem(potionSlot.item, 1);
+        PoingManager.Instance.DecreasePoing(currentRecipe.evolutionCost);
+
+        // ★ 슬롯 UI 비워주기 (중요: 아이템 데이터만 지우면 그림이 남을 수 있음)
         materialSlot.ClearSlot();
         potionSlot.ClearSlot();
-        PoingManager.Instance.DecreasePoing(currentRecipe.evolutionCost);
 
         if (isRecipeCorrect)
         {
             ItemData newItem = currentRecipe.resultItem;
+
+
+            // 1. 도감 매니저에게 "이거 해금됨!"
+            GameProgressionManager.Instance.UnlockItem(newItem);
+
+            // 2. (선택사항) 진화 성공했으면 인벤토리에 결과물
+            InventoryManager.Instance.AddItem(newItem, 1);
+
+            // 3. 축하 팝업 띄우기
             UIManager.Instance.ShowItemAcquiredPopup(newItem);
         }
         else
