@@ -15808,7 +15808,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.0005702356, y: 0.036862012}
+  m_AnchoredPosition: {x: -0.0005702356, y: 0.00024347767}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &750298215
@@ -26214,7 +26214,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1810258392}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9977003
+  m_Size: 0.99996144
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -30793,6 +30793,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7d92192890101c449bd4c73074f05439, type: 2}
   - {fileID: 11400000, guid: 242ad463dedbf7a46a77ce416863fec4, type: 2}
   - {fileID: 11400000, guid: 96883fc5a05f9804295b0cd26eb0a5c9, type: 2}
+  defaultFailureCost: 100
   materialSlot: {fileID: 912561572}
   potionSlot: {fileID: 869837685}
   slotParent: {fileID: 750298214}
@@ -34963,9 +34964,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 828995676}
-        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-        m_MethodName: CloseAllPopups
+      - m_Target: {fileID: 617157318}
+        m_TargetAssemblyTypeName: CollectionUI, Assembly-CSharp
+        m_MethodName: OnCloseBtnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
