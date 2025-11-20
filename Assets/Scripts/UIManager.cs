@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
     public GameObject inventoryPopup;   // 인벤토리 창
     public GameObject researchLabPopup; // 연구실 창
     public GameObject storePopup;       // 상점 창
+    public GameObject collectionPopup; // 도감 창
 
     [Header("Alert Popup (단순 알림창)")]
     public GameObject alertPopup;       // 알림창 패널
@@ -34,6 +35,7 @@ public class UIManager : MonoBehaviour
     [Header("Main UI Elements (재화 UI 이동 관리)")]
     public RectTransform poingBarRect;        // 포잉(돈) 표시줄 UI
     public Transform poingBarOriginalParent;  // 포잉 바의 원래 위치(부모)를 기억하는 변수
+
 
     void Awake()
     {
@@ -67,6 +69,7 @@ public class UIManager : MonoBehaviour
         if (researchLabPopup != null) researchLabPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
         if (storePopup != null) storePopup.SetActive(false);
+        if (collectionPopup != null) collectionPopup.SetActive(false);
 
         // 팝업이 닫힐 때, 포잉 바(재화 UI)를 원래 위치(메인 화면)로 되돌림
         ResetPoingUIPosition();
@@ -145,6 +148,17 @@ public class UIManager : MonoBehaviour
         {
             storePopup.SetActive(true);
             MovePoingUIToPopup(storePopup.transform); // 포잉 바를 상점 창 안으로 이동
+        }
+    }
+
+    public void OpenCollectionPopup()
+    {
+        CloseAllPopups(); // 다른 창 다 닫고
+        if (collectionPopup != null)
+        {
+            collectionPopup.SetActive(true); // 도감 열기
+            // (도감은 화면을 꽉 채우니까 포잉 바 이동은 선택사항. 필요하면 아래 줄 주석 해제)
+            // MovePoingUIToPopup(collectionPopup.transform); 
         }
     }
 

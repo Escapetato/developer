@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d62a0d0d094bdb4e8b43638dcebb818, type: 3}
-  m_Name: tomatoRecipe
+  m_Name: 2asparagusRecipe
   m_EditorClassIdentifier: 
-  material: {fileID: 0}
-  potion: {fileID: 0}
-  resultItem: {fileID: 0}
+  material: {fileID: 11400000, guid: d610bf3fa42cdad42b18e4b755464ac4, type: 2}
+  potion: {fileID: 11400000, guid: 60ac3b5c96f1f8049ac28a767ca6ff7f, type: 2}
+  resultItem: {fileID: 11400000, guid: adcfea74a0b41a145b2e9f4dad86a036, type: 2}
   evolutionCost: 100
-  successChance: 0.7

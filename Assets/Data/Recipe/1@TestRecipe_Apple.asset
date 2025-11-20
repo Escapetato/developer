@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d62a0d0d094bdb4e8b43638dcebb818, type: 3}
-  m_Name: '@TestRecipe_Apple'
+  m_Name: 1@TestRecipe_Apple
   m_EditorClassIdentifier: 
   material: {fileID: 11400000, guid: eaa77d76b2039774c9230adfceb61aca, type: 2}
   potion: {fileID: 11400000, guid: a9f2d6e5448e4da4ea36a85ad9d00154, type: 2}

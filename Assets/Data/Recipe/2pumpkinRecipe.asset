@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d62a0d0d094bdb4e8b43638dcebb818, type: 3}
-  m_Name: pumpkinRecipe
+  m_Name: 2pumpkinRecipe
   m_EditorClassIdentifier: 
-  material: {fileID: 0}
-  potion: {fileID: 0}
-  resultItem: {fileID: 0}
+  material: {fileID: 11400000, guid: 3f9d23aa25892e846baf2ccdbd7a371e, type: 2}
+  potion: {fileID: 11400000, guid: 5b1de8934242f6b43b72dbbbe2c7018a, type: 2}
+  resultItem: {fileID: 11400000, guid: 70aaa14332b73d041afd5bf727cdb3cd, type: 2}
   evolutionCost: 100
-  successChance: 0.7
