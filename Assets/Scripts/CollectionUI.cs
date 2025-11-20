@@ -220,7 +220,7 @@ public class CollectionUI : MonoBehaviour
 
     public void OnCloseBtnClick()
     {
-        UIManager.Instance.CloseAllPopups();
+        gameObject.SetActive(false);
     }
 
 }
