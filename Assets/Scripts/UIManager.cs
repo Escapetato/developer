@@ -92,14 +92,13 @@ public class UIManager : MonoBehaviour
         alertPopup.SetActive(true); // 팝업 켜기
     }
 
-    // [기능] 아이템 획득 팝업 띄우기 (아이콘 + 이름)
+    // [기능] 아이템 획득 팝업 띄우기
     public void ShowItemAcquiredPopup(ItemData item)
     {
-        // 아이콘과 이름 설정
         if (itemAcquiredIcon != null)
         {
             itemAcquiredIcon.sprite = item.itemIcon;
-            itemAcquiredIcon.color = Color.white; // 투명도 이슈 방지
+            itemAcquiredIcon.color = Color.white;
         }
 
         if (itemAcquiredNameText != null)
@@ -107,12 +106,12 @@ public class UIManager : MonoBehaviour
             itemAcquiredNameText.text = item.itemName + " (획득)";
         }
 
-        // 버튼 이벤트 설정
         itemAcquiredConfirmButton.onClick.RemoveAllListeners();
         itemAcquiredConfirmButton.onClick.AddListener(() => {
-            // 확인 누르면 -> 인벤토리에 진짜로 아이템 추가
-            InventoryManager.Instance.AddItem(item, 1);
-            itemAcquiredPopup.SetActive(false); // 팝업 닫기
+
+
+            // 그냥 창만 닫으면 됨 (이미 ResearchLab이 아이템 줬음)
+            itemAcquiredPopup.SetActive(false);
         });
 
         itemAcquiredPopup.SetActive(true);
