@@ -52,7 +52,7 @@ public class CollectionUI : MonoBehaviour
 
     void OnEnable()
     {
-        // ★ [수정] 하드코딩("Vegetable") 대신, 첫 번째 탭 버튼을 자동으로 누르게 함
+        // 첫 번째 탭 버튼을 자동으로 누르게 함
         if (categoryButtons != null && categoryButtons.Count > 0)
         {
             SetCategoryButton(categoryButtons[0]);
