@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System; 
@@ -7,12 +7,15 @@ public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance { get; private set; }
 
-    // ÀÎº¥Åä¸® µ¥ÀÌÅÍ: (¾î¶² ¾ÆÀÌÅÛ, ¸î °³)
-    // ScriptableObjectÀÎ ItemData¸¦ Key·Î »ç¿ë
+    // ì¸ë²¤í† ë¦¬ ë°ì´í„°: (ì–´ë–¤ ì•„ì´í…œ, ëª‡ ê°œ)
+    // ScriptableObjectì¸ ItemDataë¥¼ Keyë¡œ ì‚¬ìš©
     public Dictionary<ItemData, int> items = new Dictionary<ItemData, int>();
 
-    // ÀÎº¥Åä¸®°¡ º¯°æµÉ ¶§ UI¿¡ ¾Ë·ÁÁÖ´Â ºÎºĞ
+    // ì¸ë²¤í† ë¦¬ê°€ ë³€ê²½ë  ë•Œ UIì— ì•Œë ¤ì£¼ëŠ” ë¶€ë¶„
     public event Action OnInventoryChanged;
+
+    // ì”¨ì•—
+    public ItemData SeedItem;
 
     void Awake()
     {
@@ -26,7 +29,7 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    // 'T' Å°¸¦ ´©¸£¸é green_apple 1°³ Ãß°¡
+    // 'T' í‚¤ë¥¼ ëˆ„ë¥´ë©´ green_apple 1ê°œ ì¶”ê°€
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.T))
@@ -44,47 +47,56 @@ public class InventoryManager : MonoBehaviour
                 AddItem(testPotion, 1);
             }
         }
+
+        // 'J' í‚¤ë¡œ star ì”¨ì•— 5ê°œ ì¶”ê°€
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            if (SeedItem != null)
+            {
+                AddItem(SeedItem, 5);
+            }
+        }
     }
 
 
-    public ItemData testItem; // Inspector¿¡ Å×½ºÆ®¿ë ¾ÆÀÌÅÛ ¿¬°á
+    public ItemData testItem; // Inspectorì— í…ŒìŠ¤íŠ¸ìš© ì•„ì´í…œ ì—°ê²°
     public ItemData testPotion;
 
 
-    // ¾ÆÀÌÅÛ Ãß°¡ ÇÔ¼ö
+    // ì•„ì´í…œ ì¶”ê°€ í•¨ìˆ˜
     public void AddItem(ItemData item, int amount)
     {
-        // ÀÌ¹Ì ¾ÆÀÌÅÛÀ» °¡Áö°í ÀÖ´Â°¡?
+        // ì´ë¯¸ ì•„ì´í…œì„ ê°€ì§€ê³  ìˆëŠ”ê°€?
         if (items.ContainsKey(item))
         {
-            items[item] += amount; // ¼ö·®¸¸ ´õÇÔ
+            items[item] += amount; // ìˆ˜ëŸ‰ë§Œ ë”í•¨
         }
-        // »õ·Î ¾òÀº ¾ÆÀÌÅÛÀÎ°¡?
+        // ìƒˆë¡œ ì–»ì€ ì•„ì´í…œì¸ê°€?
         else
         {
-            items.Add(item, amount); // µñ¼Å³Ê¸®¿¡ »õ·Î Ãß°¡
+            items.Add(item, amount); // ë”•ì…”ë„ˆë¦¬ì— ìƒˆë¡œ ì¶”ê°€
         }
 
-        // ÀÎº¥Åä¸® ¹Ù²î¾ú´Ù°í ¾Ë·Á ÁÜ
+        // ì¸ë²¤í† ë¦¬ ë°”ë€Œì—ˆë‹¤ê³  ì•Œë ¤ ì¤Œ
         OnInventoryChanged?.Invoke();
-        Debug.Log(item.itemName + " " + amount + "°³ Ãß°¡. ÃÑ: " + items[item] + "°³");
+        Debug.Log(item.itemName + " " + amount + "ê°œ ì¶”ê°€. ì´: " + items[item] + "ê°œ");
     }
 
-    // ¾ÆÀÌÅÛ Á¦°Å ÇÔ¼ö
+    // ì•„ì´í…œ ì œê±° í•¨ìˆ˜
     public void RemoveItem(ItemData item, int amount)
     {
         if (items.ContainsKey(item))
         {
             items[item] -= amount;
 
-            // ¸¸¾à 0°³°¡ µÇ¸é, µñ¼Å³Ê¸®¿¡¼­ ¾Æ¿¹ »èÁ¦
+            // ë§Œì•½ 0ê°œê°€ ë˜ë©´, ë”•ì…”ë„ˆë¦¬ì—ì„œ ì•„ì˜ˆ ì‚­ì œ
             if (items[item] <= 0)
             {
                 items.Remove(item);
             }
 
             OnInventoryChanged?.Invoke();
-            Debug.Log(item.itemName + " " + amount + "°³ »ç¿ë.");
+            Debug.Log(item.itemName + " " + amount + "ê°œ ì‚¬ìš©.");
         }
     }
 }

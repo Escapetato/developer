@@ -15,3 +15,11 @@ MonoBehaviour:
   itemName: 
   description: 
   itemIcon: {fileID: 0}
+  itemCategory: Crop
+  price: 50
+  plantPrefab: {fileID: 0}
+  growTime: 0
+  harvestItem: {fileID: 0}
+  requiredToolTier: 1
+  toolTier: 0
+  growthReductionPercent: 0.25

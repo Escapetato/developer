@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,21 +8,32 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     [Header("UI Popups")]
-    // Inspector¿¡¼­ ÆË¾÷Ã¢ ¿ÀºêÁ§Æ®¸¦ ¿¬°áÇÒ ½½·Ô
+    // Inspectorì—ì„œ íŒì—…ì°½ ì˜¤ë¸Œì íŠ¸ë¥¼ ì—°ê²°í•  ìŠ¬ë¡¯
     public GameObject inventoryPopup;
     public GameObject researchLabPopup;
-    // (³ªÁß¿¡ »óÁ¡, µµ°¨ µî ¿©±â¿¡ Ãß°¡)
+    public GameObject storePopup;
+    // ë„ê° ë“± ì—¬ê¸°ì— ì¶”ê°€
 
     [Header("Alert Popup")]
     public GameObject alertPopup;
     public Text alertMessageText;
-    public Button alertCloseButton; // "È®ÀÎ" ¹öÆ°
+    public Button alertCloseButton; // "í™•ì¸" ë²„íŠ¼
 
     [Header("Item Acquired Popup")]
     public GameObject itemAcquiredPopup;
     public Image itemAcquiredIcon;
     public Text itemAcquiredNameText;
-    public Button itemAcquiredConfirmButton; // "È®ÀÎ" ¹öÆ°
+    public Button itemAcquiredConfirmButton; // "í™•ì¸" ë²„íŠ¼
+
+    [Header("Farm Popups")]
+    public GameObject seedPopup;
+    private Field currentField; // [ì¶”ê°€] ì”¨ì•—ì„ ì‹¬ì„ ë°­
+    private Field lastField = null;   // ë§ˆì§€ë§‰ìœ¼ë¡œ í´ë¦­í•œ ë°­
+    private bool isSeedPopupOpen = false; // ì‹œë“œ íŒì—… ì—´ë¦¼ ì—¬ë¶€
+
+    [Header("Main UI Elements")]
+    public RectTransform poingBarRect;
+    public Transform poingBarOriginalParent;
 
     void Awake()
     {
@@ -34,81 +45,184 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        // [ì¶”ê°€] ê²Œì„ ì‹œì‘ ì‹œ Poing UIì˜ ì›ë˜ ë¶€ëª¨ë¥¼ ê¸°ì–µ
+        if (poingBarRect != null)
+        {
+            poingBarOriginalParent = poingBarRect.parent;
+        }
     }
 
     void Start()
     {
-        // °ÔÀÓ ½ÃÀÛ ½Ã ¸ğµç ÆË¾÷Ã¢À» ²ö »óÅÂ·Î ½ÃÀÛ
+        // ê²Œì„ ì‹œì‘ ì‹œ ëª¨ë“  íŒì—…ì°½ì„ ëˆ ìƒíƒœë¡œ ì‹œì‘
         CloseAllPopups();
 
         if (alertPopup != null)
-            alertPopup.SetActive(false); // ¾Ë¸²Ã¢µµ ²¨µÒ
+            alertPopup.SetActive(false); // ì•Œë¦¼ì°½ë„ êº¼ë‘ 
 
         if (itemAcquiredPopup != null)
             itemAcquiredPopup.SetActive(false);
+
+        if (seedPopup != null) seedPopup.SetActive(false); // [ì¶”ê°€]
     }
 
-    // ¸ğµç ÆË¾÷À» ´İ´Â ÇÔ¼ö
+    // ëª¨ë“  íŒì—…ì„ ë‹«ëŠ” í•¨ìˆ˜
     public void CloseAllPopups()
     {
-        // nullÀÌ ¾Æ´ÑÁö È®ÀÎÇÏ°í
+        // (ê¸°ì¡´ íŒì—… ë‹«ê¸°)
         if (inventoryPopup != null)
             inventoryPopup.SetActive(false);
-
         if (researchLabPopup != null)
             researchLabPopup.SetActive(false);
+        if (seedPopup != null)
+            seedPopup.SetActive(false);
+
+        if (storePopup != null)
+            storePopup.SetActive(false);
+
+        // [ì¶”ê°€] íŒì—… ë‹«ì„ ë•Œ Poing UIë¥¼ ì›ë˜ ìœ„ì¹˜ë¡œ ë³µêµ¬
+        ResetPoingUIPosition();
     }
 
     public void ShowAlertPopup(string message)
     {
-        // ¸Ş½ÃÁö ÅØ½ºÆ®¸¦ ¹Ù²Ş
+        // ë©”ì‹œì§€ í…ìŠ¤íŠ¸ë¥¼ ë°”ê¿ˆ
         alertMessageText.text = message;
 
-        // "È®ÀÎ" ¹öÆ°ÀÌ ´­·ÈÀ» ¶§ÀÇ Çàµ¿À» ¼³Á¤
+        // "í™•ì¸" ë²„íŠ¼ì´ ëˆŒë ¸ì„ ë•Œì˜ í–‰ë™ì„ ì„¤ì •
         alertCloseButton.onClick.RemoveAllListeners();
-        // (´Ü¼øÈ÷ ¾Ë¸²Ã¢À» ´İ´Â ±â´É¸¸ »õ·Î ¿¬°á)
-        alertCloseButton.onClick.AddListener(() => {
+        // (ë‹¨ìˆœíˆ ì•Œë¦¼ì°½ì„ ë‹«ëŠ” ê¸°ëŠ¥ë§Œ ìƒˆë¡œ ì—°ê²°)
+        alertCloseButton.onClick.AddListener(() =>
+        {
             alertPopup.SetActive(false);
         });
 
-        // ¾Ë¸² ÆË¾÷À» ÄÒ´Ù
+        // ì•Œë¦¼ íŒì—…ì„ ì¼ ë‹¤
         alertPopup.SetActive(true);
     }
-    // --- ¹öÆ°°ú ¿¬°áÇÒ ÇÔ¼öµé ---
+    // --- ë²„íŠ¼ê³¼ ì—°ê²°í•  í•¨ìˆ˜ë“¤ ---
 
     public void ShowItemAcquiredPopup(ItemData item)
     {
-        // 3a. ¾ÆÀÌÄÜ°ú ÀÌ¸§ ÅØ½ºÆ®¸¦ ¼³Á¤
+        // 3a. ì•„ì´ì½˜ê³¼ ì´ë¦„ í…ìŠ¤íŠ¸ë¥¼ ì„¤ì •
         itemAcquiredIcon.sprite = item.itemIcon;
-        itemAcquiredNameText.text = item.itemName + " (È¹µæ)";
-        itemAcquiredIcon.color = Color.white; // (Åõ¸íµµ º¹±¸)
+        itemAcquiredNameText.text = item.itemName + " (íšë“)";
+        itemAcquiredIcon.color = Color.white; // (íˆ¬ëª…ë„ ë³µêµ¬)
 
-        // 3b. "È®ÀÎ" ¹öÆ°ÀÌ ´­·ÈÀ» ¶§ÀÇ Çàµ¿À» ¼³Á¤
+        // 3b. "í™•ì¸" ë²„íŠ¼ì´ ëˆŒë ¸ì„ ë•Œì˜ í–‰ë™ì„ ì„¤ì •
         itemAcquiredConfirmButton.onClick.RemoveAllListeners();
-        itemAcquiredConfirmButton.onClick.AddListener(() => {
+        itemAcquiredConfirmButton.onClick.AddListener(() =>
+        {
 
-            // 1. ÀÎº¥Åä¸®¿¡ ¾ÆÀÌÅÛ Ãß°¡
+            // 1. ì¸ë²¤í† ë¦¬ì— ì•„ì´í…œ ì¶”ê°€
             InventoryManager.Instance.AddItem(item, 1);
 
-            // 2. ÆË¾÷ ´İ±â
+            // 2. íŒì—… ë‹«ê¸°
             itemAcquiredPopup.SetActive(false);
         });
 
-        // 3c. ÆË¾÷À» ÄÒ´Ù
+        // 3c. íŒì—…ì„ ì¼ ë‹¤
         itemAcquiredPopup.SetActive(true);
     }
 
-    // ÀÎº¥Åä¸® ÆË¾÷ ¿­±â ÇÔ¼ö
+    // --- ë²„íŠ¼ê³¼ ì—°ê²°í•  í•¨ìˆ˜ë“¤ ---
+
+    // ì¸ë²¤í† ë¦¬ íŒì—… ì—´ê¸° í•¨ìˆ˜
     public void OpenInventoryPopup()
     {
-        CloseAllPopups(); // ´Ù¸¥ °É ¸ÕÀú ´İ°í
-        inventoryPopup.SetActive(true); // ÀÎº¥Åä¸®¸¸
+        CloseAllPopups();
+        inventoryPopup.SetActive(true);
+
+        MovePoingUIToPopup(inventoryPopup.transform);
     }
 
-    // ¿¬±¸½Ç ÆË¾÷ ¿­±â ÇÔ¼ö
+    // ì—°êµ¬ì‹¤ íŒì—… ì—´ê¸° í•¨ìˆ˜
     public void OpenResearchLabPopup()
     {
-        CloseAllPopups(); // ´Ù¸¥ °É ¸ÕÀú ´İ°í
-        researchLabPopup.SetActive(true); // ¿¬±¸½Ç¸¸
+        CloseAllPopups();
+        researchLabPopup.SetActive(true);
+        // (ì—°êµ¬ì‹¤ì€ Poing UIë¥¼ ì˜®ê¸°ì§€ ì•ŠìŒ)
     }
+
+    // ìƒì  íŒì—… ì—´ê¸° í•¨ìˆ˜
+    public void OpenStorePopup()
+    {
+        CloseAllPopups();
+        storePopup.SetActive(true);
+
+        MovePoingUIToPopup(storePopup.transform);
+    }
+
+    public void OpenSeedPopup(Field field)
+    {
+        CloseAllPopups();
+        currentField = field;
+        seedPopup.SetActive(true);
+        seedPopup.GetComponent<SeedPopupUI>().RefreshButtons(field);
+
+        isSeedPopupOpen = true;
+    }
+
+    public void ToggleSeedPopup(Field field)
+    {
+        // ìƒˆë¡œìš´ ë°­ â†’ ì—´ê¸°
+        lastField = field;
+        OpenSeedPopup(field);
+    }
+
+    public Field GetCurrentField()
+    {
+        return currentField;
+    }
+
+    private void MovePoingUIToPopup(Transform targetParent)
+    {
+        if (poingBarRect == null || targetParent == null) return;
+
+        poingBarRect.SetParent(targetParent);
+
+        poingBarRect.anchorMin = new Vector2(1, 1);
+        poingBarRect.anchorMax = new Vector2(1, 1);
+        poingBarRect.pivot = new Vector2(1, 1);
+        poingBarRect.anchoredPosition = new Vector2(-50, -50);
+        poingBarRect.localScale = Vector3.one;
+    }
+
+
+    // Poing UIë¥¼ ì›ë˜ ìœ„ì¹˜ë¡œ ë³µêµ¬í•˜ëŠ” í•¨ìˆ˜ 
+    private void ResetPoingUIPosition()
+    {
+        if (poingBarRect == null || poingBarOriginalParent == null) return;
+
+        poingBarRect.SetParent(poingBarOriginalParent);
+        poingBarRect.anchorMin = new Vector2(0, 1);
+        poingBarRect.anchorMax = new Vector2(0, 1);
+        poingBarRect.pivot = new Vector2(0, 1);
+        poingBarRect.anchoredPosition = new Vector2(50, -50);
+        poingBarRect.localScale = Vector3.one;
+    }
+    void Update()
+{
+    if (isSeedPopupOpen && Input.GetMouseButtonDown(0)) // ì¢Œí´ë¦­
+    {
+        // í´ë¦­í•œ ì˜¤ë¸Œì íŠ¸ ê°ì§€
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            // í´ë¦­í•œ ì˜¤ë¸Œì íŠ¸ê°€ Fieldì¸ì§€ í™•ì¸
+            Field clickedField = hit.collider.GetComponent<Field>();
+
+            // ë°­ì´ ì•„ë‹ˆë©´ ì‹œë“œ íŒì—… ë‹«ê¸°
+            if (clickedField == null)
+            {
+                seedPopup.SetActive(false);
+            }
+        }
+
+    }
+}
+
 }

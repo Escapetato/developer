@@ -1,30 +1,50 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+public enum SlotType { Inventory, Material, Result, Lab_Inventory, Store }
 
-public enum SlotType { Inventory, Material, Result, Lab_Inventory }
-
-public class ItemSlot : MonoBehaviour, IPointerClickHandler 
+public class ItemSlot : MonoBehaviour, IPointerClickHandler
 {
-    public ItemData item; // ÀÌ ½½·ÔÀÌ ÇöÀç °¡Áö°í ÀÖ´Â ¾ÆÀÌÅÛ Á¤º¸
-    public SlotType slotType; // [Ãß°¡] Inspector¿¡¼­ ¼³Á¤ÇÒ ½½·Ô Å¸ÀÔ
+    [Header("Core Info")]
+    public ItemData item;
+    public SlotType slotType;
 
-    private Image itemIcon;
-    public Text quantityText;
+    [Header("UI Components (Optional)")]
 
+    public Image itemIconDisplay;
+    public Image slotBackground;
+    public Text detailText; // (quantityTextì—ì„œ ì´ë¦„ ë³€ê²½)
     public Image selectionBorder;
+
+    [Header("Selection Sprites (Optional)")]
+
+    public Sprite selectedSprite;
+    private Sprite defaultSprite;
 
     void Awake()
     {
-        itemIcon = GetComponent<Image>();
 
-        if (quantityText == null)
+        if (detailText == null)
         {
-            quantityText = GetComponentInChildren<Text>();
+            detailText = GetComponentInChildren<Text>(true);
         }
 
-        // [Ãß°¡] ¼±ÅÃ Å×µÎ¸®°¡ ÀÖ´Ù¸é Ã³À½¿£ ¼û±è
+        if (selectionBorder == null && transform.Find("SelectionBorder") != null)
+        {
+            selectionBorder = transform.Find("SelectionBorder").GetComponent<Image>();
+        }
+
+        if (slotBackground == null)
+        {
+            slotBackground = GetComponent<Image>();
+        }
+
+        if (slotBackground != null)
+        {
+            defaultSprite = slotBackground.sprite; // ì›ë˜ ìŠ¤í”„ë¼ì´íŠ¸ ì €ì¥
+        }
+
         if (selectionBorder != null)
         {
             selectionBorder.gameObject.SetActive(false);
@@ -33,99 +53,149 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
 
     void Start()
     {
-        ClearSlot(); // ½ÃÀÛÇÒ ¶© ¹«Á¶°Ç ºó ½½·ÔÀ¸·Î
+        ClearSlot();
     }
 
-    // ¾ÆÀÌÅÛ°ú ¼ö·®À» ¼³Á¤
-    public void SetItem(ItemData newItem, int quantity)
+    public void SetSlot(ItemData newItem, int quantity = 1)
     {
         item = newItem;
-        itemIcon.sprite = item.itemIcon;
-        itemIcon.color = Color.white;
 
-        if (quantityText != null)
+        // --- ì•„ì´ì½˜ í‘œì‹œ ---
+        if (itemIconDisplay != null)
         {
-            quantityText.text = "x" + quantity.ToString();
-            quantityText.gameObject.SetActive(true);
+            itemIconDisplay.sprite = newItem.itemIcon;
+            itemIconDisplay.color = Color.white;
+            itemIconDisplay.gameObject.SetActive(true);
+        }
+
+        // --- í…ìŠ¤íŠ¸ í‘œì‹œ (ìŠ¬ë¡¯ íƒ€ì…ì— ë”°ë¼ ë‹¤ë¦„) ---
+        if (detailText != null)
+        {
+            switch (slotType)
+            {
+                // ì¸ë²¤í† ë¦¬ íƒ€ì…ì€ 'ìˆ˜ëŸ‰' (xN) í‘œì‹œ
+                case SlotType.Inventory:
+                case SlotType.Lab_Inventory:
+                    detailText.text = "x" + quantity.ToString();
+                    detailText.gameObject.SetActive(true);
+                    break;
+
+                // ìƒì  íƒ€ì…ì€ 'ê°€ê²©' (P: N) í‘œì‹œ
+                case SlotType.Store:
+                    detailText.text = "P: " + newItem.price.ToString();
+                    detailText.gameObject.SetActive(true);
+                    break;
+
+                // ì¬ë£Œ, ê²°ê³¼ ìŠ¬ë¡¯ì€ í…ìŠ¤íŠ¸ ìˆ¨ê¹€
+                case SlotType.Material:
+                case SlotType.Result:
+                    detailText.text = "";
+                    detailText.gameObject.SetActive(false);
+                    break;
+            }
         }
     }
 
-    // ½½·Ô ºñ¿ì±â
     public void ClearSlot()
     {
         item = null;
 
-        itemIcon.sprite = null;
-        itemIcon.color = Color.white;
-
-        if (quantityText != null)
+        // --- ì•„ì´ì½˜ ìˆ¨ê¹€ ---
+        if (itemIconDisplay != null)
         {
-            quantityText.text = "";
-            quantityText.gameObject.SetActive(false);
+            itemIconDisplay.sprite = null;
+            itemIconDisplay.gameObject.SetActive(false);
         }
 
+        // --- í…ìŠ¤íŠ¸ ìˆ¨ê¹€ ---
+        if (detailText != null)
+        {
+            detailText.text = "";
+            detailText.gameObject.SetActive(false);
+        }
+
+        // --- ì„ íƒ í…Œë‘ë¦¬ ìˆ¨ê¹€ ---
         if (selectionBorder != null)
         {
             selectionBorder.gameObject.SetActive(false);
+        }
+
+        // --- ë°°ê²½ ë˜ëŒë¦¬ê¸° ---
+        if (slotBackground != null)
+        {
+            slotBackground.sprite = defaultSprite;
         }
     }
 
     public void SetSelected(bool isSelected)
     {
+        // --- ì„ íƒ í…Œë‘ë¦¬ ì¼œê³  ë„ê¸° ---
         if (selectionBorder != null)
         {
             selectionBorder.gameObject.SetActive(isSelected);
         }
+
+        // --- ë°°ê²½ ìŠ¤í”„ë¼ì´íŠ¸ ë³€ê²½ ---
+        if (slotBackground != null && selectedSprite != null)
+        {
+            if (isSelected)
+            {
+                slotBackground.sprite = selectedSprite;
+            }
+            else
+            {
+                slotBackground.sprite = defaultSprite;
+            }
+        }
     }
 
-
-    // ½½·ÔÀÌ Å¬¸¯µÇ¾úÀ» ¶§ È£ÃâµÇ´Â ÇÔ¼ö
     public void OnPointerClick(PointerEventData eventData)
     {
-        // 1. '¸ŞÀÎ ÀÎº¥Åä¸®' ½½·ÔÀ» Å¬¸¯ÇßÀ» ¶§ (±âÁ¸°ú µ¿ÀÏ)
+        // 1. 'ë©”ì¸ ì¸ë²¤í† ë¦¬' ìŠ¬ë¡¯
         if (slotType == SlotType.Inventory)
         {
-            // ÇÑ ¹ø Å¬¸¯: ¼±ÅÃ
             if (eventData.clickCount == 1)
             {
                 InventoryUI.Instance.SelectSlot(this);
             }
         }
-        // 2. '¿¬±¸½Ç ¾ÈÀÇ ÀÎº¥Åä¸®' ½½·ÔÀ» Å¬¸¯ÇßÀ» ¶§
+        // 1-A. 'ìƒì ' ìŠ¬ë¡¯
+        else if (slotType == SlotType.Store)
+        {
+            if (eventData.clickCount == 1)
+            {
+                StoreUI.Instance.SelectSlot(this);
+            }
+        }
+        // 2. 'ì—°êµ¬ì‹¤ ì•ˆì˜ ì¸ë²¤í† ë¦¬' ìŠ¬ë¡¯
         else if (slotType == SlotType.Lab_Inventory)
         {
-            // 2a. ÇÑ ¹ø Å¬¸¯ (¼±ÅÃ)
             if (eventData.clickCount == 1)
             {
                 ResearchLab.Instance.SelectSlot(this);
             }
-            // 2b. µÎ ¹ø Å¬¸¯ (ÀÚµ¿ ¹èÄ¡)
             else if (eventData.clickCount == 2 && this.item != null)
             {
                 ResearchLab lab = ResearchLab.Instance;
                 ItemData itemToMove = this.item;
 
-                // 2c. ¾ÆÀÌÅÛ Ä«Å×°í¸®¿¡ µû¶ó ÀûÀıÇÑ È¥ÇÕ±â ½½·Ô¿¡ ¹èÄ¡
                 if (itemToMove.itemCategory == "Crop" && lab.materialSlot.item == null)
                 {
-                    // ÀÛ¹°ÀÌ¸é 'Àç·á' ½½·Ô¿¡ ¹èÄ¡
-                    lab.materialSlot.SetItem(itemToMove, 1);
+                    lab.materialSlot.SetSlot(itemToMove, 1);
                     InventoryManager.Instance.RemoveItem(itemToMove, 1);
                     lab.ClearSelection();
                 }
                 else if (itemToMove.itemCategory == "Potion" && lab.potionSlot.item == null)
                 {
-                    // Æ÷¼ÇÀÌ¸é 'Æ÷¼Ç' ½½·Ô¿¡ ¹èÄ¡
-                    lab.potionSlot.SetItem(itemToMove, 1);
+                    lab.potionSlot.SetSlot(itemToMove, 1);
                     InventoryManager.Instance.RemoveItem(itemToMove, 1);
                     lab.ClearSelection();
                 }
             }
         }
-        // 3. '¿¬±¸½Ç Àç·á' ½½·Ô (¿ŞÂÊ È¥ÇÕ±â)À» Å¬¸¯ÇßÀ» ¶§
+        // 3. 'ì—°êµ¬ì‹¤ ì¬ë£Œ' ìŠ¬ë¡¯ (ì™¼ìª½ í˜¼í•©ê¸°)
         else if (slotType == SlotType.Material)
         {
-            // [!!! ¼öÁ¤ !!!]
             if (this.item != null)
             {
                 InventoryManager.Instance.AddItem(this.item, 1);
@@ -135,7 +205,7 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
                     ResearchLab.Instance.ClearSelection();
             }
         }
-        // 4. '°á°ú' ½½·Ô (±âÁ¸°ú µ¿ÀÏ)
+        // 4. 'ê²°ê³¼' ìŠ¬ë¡¯
         else if (slotType == SlotType.Result)
         {
             if (this.item != null)
