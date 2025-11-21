@@ -70,10 +70,6 @@ public class QuestDetailUI : MonoBehaviour
                     conditionCheckOn[i].SetActive(false);
             }
         }
-
-        // 4) 보상 버튼은 기본적으로 비활성화
-        if (rewardButton != null)
-            rewardButton.interactable = false;
             
         // 4) currentCounts / targetCounts 기준으로 취소선 + 체크 + 버튼 상태 갱신
         RefreshConditions();
@@ -81,8 +77,19 @@ public class QuestDetailUI : MonoBehaviour
     
     public void RefreshConditions()
     {
-        if (currentQuest == null) return;
-        if (currentQuest.conditionTexts == null) return;
+        if (currentQuest == null)
+        {
+            if (rewardButton != null) rewardButton.interactable = false;
+            return;
+        }
+
+        if (currentQuest.conditionTexts == null ||
+            currentQuest.targetCounts == null ||
+            currentQuest.currentCounts == null)
+        {
+            if (rewardButton != null) rewardButton.interactable = false;
+            return;
+        }
 
         int count = Mathf.Min(
             currentQuest.conditionTexts.Length,
@@ -92,6 +99,13 @@ public class QuestDetailUI : MonoBehaviour
             conditionTexts.Length,
             conditionCheckOn.Length
         );
+
+        // 조건이 한 개도 없으면 보상 버튼은 비활성
+        if (count == 0)
+        {
+            if (rewardButton != null) rewardButton.interactable = false;
+            return;
+        }
 
         bool allCompleted = true;
 
