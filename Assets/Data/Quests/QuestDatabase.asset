@@ -70,7 +70,7 @@ MonoBehaviour:
     - "\uB9C8\uB298 3\uAC1C \uC2EC\uAE30"
     - "\uC54C\uB9AC\uC624\uC62C\uB9AC\uC624 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0300000001000000
-    currentCounts: 
+    currentCounts: 0300000001000000
     rewardKey: 0
     rewardAmount: 0
     nextKey: 4
@@ -292,7 +292,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C 15\uD68C \uC2EC\uAE30"
     type: 2
     questDesc: 
-    state: 1
+    state: 0
     currentCount: 0
     rewardClaimed: 0
     conditionTexts: []
@@ -357,7 +357,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C 1\uD68C \uD310\uB9E4\uD558\uAE30"
     type: 2
     questDesc: 
-    state: 0
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionTexts: []
@@ -409,7 +409,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C \uC9C4\uD654 3\uD68C \uC131\uACF5\uD558\uAE30"
     type: 2
     questDesc: 
-    state: 1
+    state: 0
     currentCount: 0
     rewardClaimed: 0
     conditionTexts: []
@@ -448,7 +448,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C \uC9C4\uD654 3\uD68C \uC2E4\uD328\uD558\uAE30"
     type: 2
     questDesc: 
-    state: 1
+    state: 0
     currentCount: 0
     rewardClaimed: 0
     conditionTexts: []
@@ -539,7 +539,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C \uC528\uC557 20\uD68C \uAD6C\uB9E4\uD558\uAE30"
     type: 2
     questDesc: 
-    state: 0
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionTexts: []
@@ -565,7 +565,7 @@ MonoBehaviour:
     title: "\uBB3C\uC57D 3\uD68C \uAD6C\uB9E4\uD558\uAE30"
     type: 2
     questDesc: 
-    state: 0
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionTexts: []
