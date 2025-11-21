@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class QuestListController : MonoBehaviour
 {
@@ -11,6 +12,17 @@ public class QuestListController : MonoBehaviour
     [SerializeField] private GameObject mainSlotPrefab;
     [SerializeField] private GameObject subSlotPrefab;
     [SerializeField] private GameObject dailySlotPrefab;
+
+    [Header("과거 메인 슬롯 프리팹")]
+    [SerializeField] private GameObject closedMainSlotPrefab;
+
+    [Header("과거 퀘스트 박스 아이콘")]
+    [SerializeField] private GameObject boxIconObject;
+    [SerializeField] private Sprite boxOffSprite;      
+    [SerializeField] private Sprite boxOnSprite;
+
+    // 현재 모드 (평소 퀘스트 데이터) 
+    private bool showClosedMains = false;
 
     // 현재 선택된 슬롯 
     private QuestSlotUI currentSelectedSlot;
@@ -49,6 +61,34 @@ public class QuestListController : MonoBehaviour
         }
 
     }
+
+    // 박스 선택 시 Closed 된 메인 퀘스트만 
+    private void RefreshClosedMainSlots()
+    {
+        ClearChildren(slotParent);
+
+        var closedList = new List<QuestData>();
+        foreach (var q in QuestManager.Instance.mainQuests)
+        {
+            if (q == null) continue;
+            if (q.state == QuestState.Closed)
+            {
+                closedList.Add(q);
+            }
+        }
+
+        if (closedMainSlotPrefab == null)
+        {
+            Debug.LogWarning("[QuestListController] closedMainSlotPrefab 이 비어 있습니다.");
+            return;
+        }
+
+        foreach (var q in closedList)
+        {
+            CreateSlot(closedMainSlotPrefab, q); 
+        }
+    }
+
 
     // 리스트에서 Active/Completed 중 제일 먼저 나오는 퀘스트 하나 찾기
     private QuestData FindFirstActiveOrCompleted(List<QuestData> list)
@@ -97,13 +137,39 @@ public class QuestListController : MonoBehaviour
             ui.SetOwner(this);
 
             ui.SetSelected(false);
+
+            // 첫 슬롯 자동 선택 
+            if (currentSelectedSlot == null)
+            {
+                OnSlotClicked(ui);
+            }
+        }
+    }
+
+    // 박스 아이콘 눌렀을 때 
+    public void OnClickBoxIcon()
+    {
+        showClosedMains = !showClosedMains;
+        Debug.Log("[QuestListController] Box clicked, mode = " + showClosedMains);
+
+        if (boxIconObject != null)
+        {
+            var img = boxIconObject.GetComponent<UnityEngine.UI.Image>();
+            var sr = boxIconObject.GetComponent<SpriteRenderer>();
+
+            if (img != null)
+                img.sprite = showClosedMains ? boxOnSprite : boxOffSprite;
+            else if (sr != null)
+                sr.sprite = showClosedMains ? boxOnSprite : boxOffSprite;
         }
 
-        // 첫 슬롯 자동 선택 
-        if (currentSelectedSlot == null)
-        {
-            OnSlotClicked(ui);
-        }
+        // 슬롯 모드 변경
+        currentSelectedSlot = null;
+
+        if (showClosedMains)
+            RefreshClosedMainSlots();
+        else
+            RefreshSlots();
     }
 
     // 클릭 이벤트 발생 알림이 올 때 호출되는 함수 

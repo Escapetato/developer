@@ -65,7 +65,6 @@ public class QuestManager : MonoBehaviour
         foreach (var q in questDatabase.quests)
         {
             if (q == null) continue;
-            if (q.state == QuestState.Closed) continue;
             allQuestList.Add(q);   
         }
 
@@ -111,6 +110,12 @@ public class QuestManager : MonoBehaviour
         foreach (var q in allQuestList)
         {
             if (q == null) continue;
+
+            if (q.state == QuestState.Closed)
+            {
+                // 끝난 메인 퀘스트 슬롯 테스트 : Closed 로 시작 후 유지 
+                continue;
+            }
 
             q.state = QuestState.Locked;
             q.currentCount = 0;
