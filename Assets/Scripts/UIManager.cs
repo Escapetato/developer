@@ -28,7 +28,6 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI itemAcquiredNameText; // [TMP] 획득한 아이템 이름
     public Button itemAcquiredConfirmButton;   // 확인 버튼
 
-
     [Header("Main UI Elements (재화 UI 이동 관리)")]
     public RectTransform poingBarRect;        // 포잉(돈) 표시줄 UI
     public Transform poingBarOriginalParent;  // 포잉 바의 원래 위치(부모)를 기억하는 변수
@@ -38,7 +37,6 @@ public class UIManager : MonoBehaviour
     private Field currentField; // [추가] 씨앗을 심을 밭
     private Field lastField = null;   // 마지막으로 클릭한 밭
     private bool isSeedPopupOpen = false; // 시드 팝업 열림 여부
-
 
     void Awake()
     {
