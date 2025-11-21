@@ -51,11 +51,11 @@ MonoBehaviour:
     questDesc: "\uCE5C\uD558\uAC8C \uC9C0\uB0B4\uB358 \uCE5C\uAD6C\uAC00 \uC5C9\uC5C9
       \uC6B8\uBA74\uC11C \uCC3E\uC544\uC654\uB2E4.\n\"\uB098 \uC785\uC5D0\uC11C \uB9C8\uB298
       \uB0C4\uC0C8 \uB09C\uB2E4\uACE0 \uCC28\uC600\uC5B4... \uC608\uC804\uC5D4 \uAC19\uC774
-      \uB9C8\uB298 \uBCF4\uC308\uB3C4 \uBA39\uC5C8\uC5C8\uB294\uB370... \uC5B4\uCA4C\uB2E4
+      \uB9C8\uB298 \uBCF4\uC308\uB3C4 \uBA39\uC5C8\uC5C8\uB294\uB370...\n\uC5B4\uCA4C\uB2E4
       \uC774\uB807\uAC8C \uB41C \uAC78\uAE4C...\"\n\uCE5C\uAD6C\uAC00 \uC774\uBCC4\uC758
       \uC544\uD514\uC744 \uADF9\uBCF5\uD560 \uC218 \uC788\uB3C4\uB85D \uC704\uB85C\uC758
       \uC74C\uC2DD\uC744 \uB9CC\uB4E4\uC5B4 \uC8FC\uC790. "
-    state: 0
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -118,7 +118,7 @@ MonoBehaviour:
     questDesc: "\uC2F1\uADF8\uB7FD\uACE0 \uBD89\uC740 \uD1A0\uB9C8\uD1A0\uB97C \uB9CC\uB098\uB824\uBA74
       \uB354 \uB9CE\uC740 \uC528\uC557\uC774 \uD544\uC694\uD558\uB2E4. \n\uAF2C\uB9C8
       \uD1A0\uB9C8\uD1A0\uAC00 \"\uC800\uB3C4 \uADF8 \uC911 \uD558\uB098\uB85C \uD0DC\uC5B4\uB098\uACE0
-      \uC2F6\uC5B4\uC694!\"\uB77C\uBA70 \uC870\uC6A9\uD788 \uAE30\uB300\uD558\uACE0
+      \uC2F6\uC5B4\uACE0\uC694!\"\uB77C\uBA70 \uC870\uC6A9\uD788 \uAE30\uB300\uD558\uACE0
       \uC788\uB2E4. "
     state: 1
     currentCount: 0
@@ -242,7 +242,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C 15\uD68C \uC2EC\uAE30"
     type: 2
     questDesc: 
-    state: 0
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -253,7 +253,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C 20\uD68C \uC2EC\uAE30"
     type: 2
     questDesc: 
-    state: 1
+    state: 0
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -374,7 +374,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C \uC9C4\uD654 3\uD68C \uC2E4\uD328\uD558\uAE30"
     type: 2
     questDesc: 
-    state: 0
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0
@@ -385,7 +385,7 @@ MonoBehaviour:
     title: "\uC791\uBB3C \uC9C4\uD654 5\uD68C \uC2E4\uD328\uD558\uAE30"
     type: 2
     questDesc: 
-    state: 1
+    state: 0
     currentCount: 0
     rewardClaimed: 0
     conditionCount: 0

@@ -21,6 +21,9 @@ public class QuestListController : MonoBehaviour
     [SerializeField] private Sprite boxOffSprite;      
     [SerializeField] private Sprite boxOnSprite;
 
+    [Header("퀘스트 상세 패널")]
+    [SerializeField] private QuestDetailUI questDetailUI;
+
     // 현재 모드 (평소 퀘스트 데이터) 
     private bool showClosedMains = false;
 
@@ -188,7 +191,12 @@ public class QuestListController : MonoBehaviour
         currentSelectedSlot = clickedSlot;
         currentSelectedSlot.SetSelected(true);
 
-        // 추후 상세사항 보여주는 오른쪽 패널 확장 
+        // 3) 상세사항 보여주는 오른쪽 패널 업데이트
+        if (questDetailUI != null)
+        {
+            QuestData data = clickedSlot.GetQuest();
+            questDetailUI.Show(data);
+        }
     }
 
 

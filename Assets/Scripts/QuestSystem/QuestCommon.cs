@@ -35,7 +35,9 @@ public class QuestData
     public bool rewardClaimed = false; // 보상 수령 여부 
 
     [Header("달성 조건")]
-    public int conditionCount; // 목표 수치 
+    public string[] conditionTexts;  // 조건 설명들
+    public int[] targetCounts;       // 각 조건의 목표 수치
+    public int[] currentCounts;      // 각 조건의 현재 수치
 
     [Header("보상 정보")]
     public int rewardKey; // 보상 아이템 ID
