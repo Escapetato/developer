@@ -1,27 +1,35 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
-    // 1. ½Ì±ÛÅæ
     public static InventoryUI Instance { get; private set; }
 
     [Header("Inventory Slots")]
     public Transform slotParent;
     private List<ItemSlot> slots;
 
-    // 2. ÇöÀç ¼±ÅÃÇÑ ¾ÆÀÌÅÛ (¿¬±¸½Ç·Î º¸³¾ ¾ÆÀÌÅÛ)
     public ItemData selectedItem { get; private set; }
     public ItemSlot selectedSlot { get; private set; }
 
     [Header("Details Panel")]
-    public GameObject detailPanelObject; // Right_Detail_Panel ÀÚÃ¼
-    public Image detailImage;           // Detail_Image
-    public Text detailNameText;        // Detail_Name_Text
+    public GameObject detailPanelObject;
+    public Image detailImage;
 
-    private string currentCategory = "All";
+    public TextMeshProUGUI detailNameText;     // ì•„ì´í…œ ì´ë¦„
+    public TextMeshProUGUI detailQuantityText; // ë³´ìœ  ìˆ˜ëŸ‰
+
+    // â˜… [ì¶”ê°€] ì•„ì´í…œ ì„¤ëª…ì„ í‘œì‹œí•  í…ìŠ¤íŠ¸
+    public TextMeshProUGUI detailDescriptionText;
+
+    [Header("Category Buttons")]
+    public List<CategoryButton> categoryButtons;
+    public CategoryButton defaultCategoryButton;
+
+    private string currentCategory = "Seed";
 
     void Awake()
     {
@@ -31,119 +39,120 @@ public class InventoryUI : MonoBehaviour
         slots = new List<ItemSlot>();
         slotParent.GetComponentsInChildren<ItemSlot>(slots);
 
-        // ½ÃÀÛÇÒ ¶§ »ó¼¼ Á¤º¸ ÆĞ³ÎÀ» ¼û±è
         if (detailPanelObject != null)
             detailPanelObject.SetActive(false);
     }
 
     void OnEnable()
     {
-        InventoryManager.Instance.OnInventoryChanged += RedrawInventory;
-        SetCategory("All");
+        if (InventoryManager.Instance != null)
+            InventoryManager.Instance.OnInventoryChanged += RedrawInventory;
+
+        if (defaultCategoryButton != null) SetCategory(defaultCategoryButton);
+        else
+        {
+            currentCategory = "Seed";
+            RedrawInventory();
+        }
     }
 
     void OnDisable()
     {
-        InventoryManager.Instance.OnInventoryChanged -= RedrawInventory;
+        if (InventoryManager.Instance != null)
+            InventoryManager.Instance.OnInventoryChanged -= RedrawInventory;
     }
 
-    public void SetCategory(string category)
+    public void SetCategory(CategoryButton clickedButton)
     {
-        currentCategory = category;
-        ClearSelection(); // Ä«Å×°í¸® ¹Ù²Ù¸é ¼±ÅÃ ÇØÁ¦
-        RedrawInventory(); // ÀÎº¥Åä¸® ´Ù½Ã ±×¸®±â
+        foreach (CategoryButton btn in categoryButtons) btn.SetSelected(false);
+        clickedButton.SetSelected(true);
+        currentCategory = clickedButton.categoryName;
+        ClearSelection();
+        RedrawInventory();
     }
 
-    // ½½·Ô ¼±ÅÃ ÇÔ¼ö (°¡Àå Áß¿ä)
     public void SelectSlot(ItemSlot slot)
     {
-        // ÀÌÀü¿¡ ¼±ÅÃÇÑ ½½·ÔÀÌ ÀÖ´Ù¸é ¼±ÅÃ ÇØÁ¦
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
+        if (selectedSlot != null) selectedSlot.SetSelected(false);
 
-        // »õ·Î ¼±ÅÃ (´Ü, ¾ÆÀÌÅÛÀÌ ÀÖ´Â ½½·Ô¸¸)
         if (slot.item != null)
         {
-            // (¿¬±¸½Ç¿ë) ¾ÆÀÌÅÛ ¼±ÅÃ
             selectedItem = slot.item;
             selectedSlot = slot;
             selectedSlot.SetSelected(true);
-
-            // »ó¼¼ Á¤º¸ ÆĞ³Î ¾÷µ¥ÀÌÆ®
             UpdateDetailPanel(slot.item);
         }
+        else ClearSelection();
     }
 
-    // 6. [!!! ¼öÁ¤ !!!] ¼±ÅÃ ÇØÁ¦ ÇÔ¼ö
-    public void ClearSelection()
-    {
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
-        selectedItem = null;
-        selectedSlot = null;
-
-        // 7. [Ãß°¡] ¼±ÅÃ ÇØÁ¦ ½Ã »ó¼¼ Á¤º¸ ÆĞ³Îµµ ¼û±è
-        if (detailPanelObject != null)
-            detailPanelObject.SetActive(false);
-    }
-
-    // 8. [Ãß°¡] »ó¼¼ Á¤º¸ ÆĞ³Î ¾÷µ¥ÀÌÆ® Àü¿ë ÇÔ¼ö
     private void UpdateDetailPanel(ItemData item)
     {
         if (item != null)
         {
-            detailPanelObject.SetActive(true); // 1. ÆĞ³ÎÀ» ÄÒ´Ù
+            detailPanelObject.SetActive(true);
+            detailImage.sprite = item.itemIcon;
+            detailImage.color = Color.white;
 
-            detailImage.sprite = item.itemIcon; // 2. Å« ÀÌ¹ÌÁö ±³Ã¼
-            detailImage.color = Color.white; // (Åõ¸íµµ º¹±¸)
+            detailNameText.text = item.itemName;
 
-            detailNameText.text = item.itemName; // 3. ÅØ½ºÆ® ±³Ã¼
+            // â˜… [ì¶”ê°€] ì•„ì´í…œ ì„¤ëª… í‘œì‹œ
+            if (detailDescriptionText != null)
+            {
+                // ì„¤ëª…ì´ ë¹„ì–´ìˆìœ¼ë©´ ê¸°ë³¸ ë¬¸êµ¬ ì¶œë ¥ (ì„ íƒì‚¬í•­)
+                if (string.IsNullOrEmpty(item.itemDescription))
+                    detailDescriptionText.text = "ì„¤ëª…ì´ ì—†ìŠµë‹ˆë‹¤.";
+                else
+                    detailDescriptionText.text = item.itemDescription;
+            }
+
+            // ë³´ìœ  ìˆ˜ëŸ‰ í‘œì‹œ
+            int count = 0;
+            if (InventoryManager.Instance.items.ContainsKey(item))
+                count = InventoryManager.Instance.items[item];
+
+            if (detailQuantityText != null)
+                detailQuantityText.text = count.ToString();
         }
     }
 
-    // ÀÎº¥Åä¸® ´Ù½Ã ±×¸®±â ÇÔ¼ö
     private void RedrawInventory()
     {
-        // 4a. ÀÎº¥Åä¸® ¸Å´ÏÀú¿¡¼­ 'ÀüÃ¼' ¾ÆÀÌÅÛ ¸ñ·ÏÀ» °¡Á®¿È
         Dictionary<ItemData, int> allItems = InventoryManager.Instance.items;
-        int i = 0; // UI ½½·Ô ÀÎµ¦½º
+        int i = 0;
 
-        // 4b. 'ÀüÃ¼' ¾ÆÀÌÅÛ ¸ñ·ÏÀ» ÇÏ³ª¾¿ °Ë»ç
         foreach (KeyValuePair<ItemData, int> itemPair in allItems)
         {
-            // 4c. [ÇÊÅÍ¸µ]
-            // "All" Ä«Å×°í¸®¸¦ ¼±ÅÃÇß°Å³ª, 
-            // ¾ÆÀÌÅÛÀÇ Ä«Å×°í¸®°¡ 'currentCategory'¿Í ÀÏÄ¡ÇÒ ¶§¸¸ ±×¸²
-            if (currentCategory == "All" || itemPair.Key.itemCategory == currentCategory)
+            if (itemPair.Key.itemCategory == currentCategory)
             {
                 if (i < slots.Count)
                 {
-                    // UI ½½·Ô¿¡ ¾ÆÀÌÅÛ Á¤º¸¿Í ¼ö·®À» Àü´Ş
-                    slots[i].SetItem(itemPair.Key, itemPair.Value);
+                    slots[i].gameObject.SetActive(true);
+                    slots[i].SetSlot(itemPair.Key, itemPair.Value);
 
                     if (selectedSlot == slots[i])
                     {
                         selectedSlot.SetSelected(true);
+                        UpdateDetailPanel(slots[i].item);
                     }
-                    i++; // ±×¸° ¾ÆÀÌÅÛ ¼ö Áõ°¡
+                    i++;
                 }
             }
         }
 
-        // 4d. ³²Àº ½½·ÔµéÀº ¸ğµÎ ºñ¿ò
         for (int j = i; j < slots.Count; j++)
         {
             slots[j].ClearSlot();
+            slots[j].gameObject.SetActive(false);
         }
 
-        // 4e. ÀÌ Ä«Å×°í¸®¿¡ ¾ÆÀÌÅÛÀÌ ¾øÀ¸¸é »ó¼¼ Á¤º¸µµ ²ö´Ù
-        if (i == 0)
-        {
-            ClearSelection();
-        }
+        if (i == 0) ClearSelection();
+    }
+
+    public void ClearSelection()
+    {
+        if (selectedSlot != null) selectedSlot.SetSelected(false);
+        selectedItem = null;
+        selectedSlot = null;
+        if (detailPanelObject != null) detailPanelObject.SetActive(false);
     }
 }

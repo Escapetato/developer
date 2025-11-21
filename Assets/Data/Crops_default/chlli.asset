@@ -12,6 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d03ab3bb4aaf9e54ea50e8c2207288ec, type: 3}
   m_Name: chlli
   m_EditorClassIdentifier: 
-  itemName: 
+  itemName: "\uACE0\uCD94"
   description: 
   itemIcon: {fileID: 0}
+  itemCategory: Crop
+  collectionCategory: Vegetable
+  price: 50
+  plantPrefab: {fileID: 0}
+  growTime: 0
+  harvestItem: {fileID: 0}
+  requiredToolTier: 1
+  growTimeDisplay: "1\uBD84"
+  harvestToolName: "\uD638\uBBF8"
+  toolTier: 0
+  growthReductionPercent: 0.25
+  isDefaultUnlocked: 0
+  itemDescription: 

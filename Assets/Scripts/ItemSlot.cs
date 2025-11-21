@@ -1,148 +1,121 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
+public enum SlotType { Inventory, Material, Result, Lab_Inventory, Store }
 
-public enum SlotType { Inventory, Material, Result, Lab_Inventory }
-
-public class ItemSlot : MonoBehaviour, IPointerClickHandler 
+public class ItemSlot : MonoBehaviour, IPointerClickHandler
 {
-    public ItemData item; // ¿Ã ΩΩ∑‘¿Ã «ˆ¿Á ∞°¡ˆ∞Ì ¿÷¥¬ æ∆¿Ã≈€ ¡§∫∏
-    public SlotType slotType; // [√ﬂ∞°] Inspectorø°º≠ º≥¡§«“ ΩΩ∑‘ ≈∏¿‘
+    [Header("Core Info")]
+    public ItemData item;
+    public SlotType slotType;
 
-    private Image itemIcon;
-    public Text quantityText;
+    [Header("UI Components")]
+    public Image itemIconDisplay;
+    public Image slotBackground;
+    public TextMeshProUGUI detailText;   // Í∞ÄÍ≤© or ÏàòÎüâ
+
+    // ‚òÖ [Ï∂îÍ∞Ä] ÏïÑÏù¥ÌÖú Ïù¥Î¶ÑÏùÑ ÌëúÏãúÌï† ÌÖçÏä§Ìä∏
+    public TextMeshProUGUI itemNameText;
 
     public Image selectionBorder;
 
+    [Header("Selection Sprites")]
+    public Sprite selectedSprite;
+    private Sprite defaultSprite;
+
     void Awake()
     {
-        itemIcon = GetComponent<Image>();
+        if (selectionBorder == null && transform.Find("SelectionBorder") != null)
+            selectionBorder = transform.Find("SelectionBorder").GetComponent<Image>();
 
-        if (quantityText == null)
-        {
-            quantityText = GetComponentInChildren<Text>();
-        }
+        if (slotBackground == null)
+            slotBackground = GetComponent<Image>();
 
-        // [√ﬂ∞°] º±≈√ ≈◊µŒ∏Æ∞° ¿÷¥Ÿ∏È √≥¿Ωø£ º˚±Ë
+        if (slotBackground != null)
+            defaultSprite = slotBackground.sprite;
+
         if (selectionBorder != null)
-        {
             selectionBorder.gameObject.SetActive(false);
-        }
     }
 
-    void Start()
-    {
-        ClearSlot(); // Ω√¿€«“ ∂© π´¡∂∞« ∫Û ΩΩ∑‘¿∏∑Œ
-    }
-
-    // æ∆¿Ã≈€∞˙ ºˆ∑Æ¿ª º≥¡§
-    public void SetItem(ItemData newItem, int quantity)
+    public void SetSlot(ItemData newItem, int quantity = 1)
     {
         item = newItem;
-        itemIcon.sprite = item.itemIcon;
-        itemIcon.color = Color.white;
 
-        if (quantityText != null)
+        // 1. ÏïÑÏù¥ÏΩò
+        if (itemIconDisplay != null)
         {
-            quantityText.text = "x" + quantity.ToString();
-            quantityText.gameObject.SetActive(true);
+            itemIconDisplay.sprite = newItem.itemIcon;
+            itemIconDisplay.color = Color.white;
+            itemIconDisplay.gameObject.SetActive(true);
+        }
+
+        // 2. ‚òÖ [Ï∂îÍ∞Ä] Ïù¥Î¶Ñ ÌëúÏãú (Ïù¥Î¶Ñ ÌÖçÏä§Ìä∏Í∞Ä Ïó∞Í≤∞ÎêòÏñ¥ ÏûàÎã§Î©¥)
+        if (itemNameText != null)
+        {
+            itemNameText.text = newItem.itemName;
+            itemNameText.gameObject.SetActive(true);
+        }
+
+        // 3. ÌïòÎã® ÌÖçÏä§Ìä∏ (Í∞ÄÍ≤© or ÏàòÎüâ)
+        if (detailText != null)
+        {
+            switch (slotType)
+            {
+                case SlotType.Inventory:
+                case SlotType.Lab_Inventory:
+                    detailText.text = "" + quantity.ToString();
+                    detailText.gameObject.SetActive(true);
+                    break;
+
+                case SlotType.Store:
+                    detailText.text = newItem.price.ToString(); 
+                    detailText.gameObject.SetActive(true);
+                    break;
+
+                default:
+                    detailText.text = "";
+                    detailText.gameObject.SetActive(false);
+                    break;
+            }
         }
     }
 
-    // ΩΩ∑‘ ∫ÒøÏ±‚
     public void ClearSlot()
     {
         item = null;
-
-        itemIcon.sprite = null;
-        itemIcon.color = Color.white;
-
-        if (quantityText != null)
-        {
-            quantityText.text = "";
-            quantityText.gameObject.SetActive(false);
-        }
-
-        if (selectionBorder != null)
-        {
-            selectionBorder.gameObject.SetActive(false);
-        }
+        if (itemIconDisplay != null) itemIconDisplay.gameObject.SetActive(false);
+        if (detailText != null) detailText.gameObject.SetActive(false);
+        if (itemNameText != null) itemNameText.gameObject.SetActive(false); // Ïù¥Î¶Ñ Ïà®Í∏∞Í∏∞
+        if (selectionBorder != null) selectionBorder.gameObject.SetActive(false);
+        if (slotBackground != null) slotBackground.sprite = defaultSprite;
     }
+
 
     public void SetSelected(bool isSelected)
     {
-        if (selectionBorder != null)
-        {
-            selectionBorder.gameObject.SetActive(isSelected);
-        }
+        if (selectionBorder != null) selectionBorder.gameObject.SetActive(isSelected);
+        if (slotBackground != null && selectedSprite != null)
+            slotBackground.sprite = isSelected ? selectedSprite : defaultSprite;
     }
 
-
-    // ΩΩ∑‘¿Ã ≈¨∏Øµ«æ˙¿ª ∂ß »£√‚µ«¥¬ «‘ºˆ
     public void OnPointerClick(PointerEventData eventData)
     {
-        // 1. '∏ﬁ¿Œ ¿Œ∫•≈‰∏Æ' ΩΩ∑‘¿ª ≈¨∏Ø«ﬂ¿ª ∂ß (±‚¡∏∞˙ µø¿œ)
-        if (slotType == SlotType.Inventory)
-        {
-            // «— π¯ ≈¨∏Ø: º±≈√
-            if (eventData.clickCount == 1)
-            {
-                InventoryUI.Instance.SelectSlot(this);
-            }
-        }
-        // 2. 'ø¨±∏Ω« æ»¿« ¿Œ∫•≈‰∏Æ' ΩΩ∑‘¿ª ≈¨∏Ø«ﬂ¿ª ∂ß
+        if (slotType == SlotType.Inventory && eventData.clickCount == 1) InventoryUI.Instance.SelectSlot(this);
+        else if (slotType == SlotType.Store && eventData.clickCount == 1) StoreUI.Instance.SelectSlot(this);
         else if (slotType == SlotType.Lab_Inventory)
         {
-            // 2a. «— π¯ ≈¨∏Ø (º±≈√)
-            if (eventData.clickCount == 1)
-            {
-                ResearchLab.Instance.SelectSlot(this);
-            }
-            // 2b. µŒ π¯ ≈¨∏Ø (¿⁄µø πËƒ°)
+            if (eventData.clickCount == 1) ResearchLab.Instance.SelectSlot(this);
             else if (eventData.clickCount == 2 && this.item != null)
             {
                 ResearchLab lab = ResearchLab.Instance;
-                ItemData itemToMove = this.item;
-
-                // 2c. æ∆¿Ã≈€ ƒ´≈◊∞Ì∏Æø° µ˚∂Û ¿˚¿˝«— »•«’±‚ ΩΩ∑‘ø° πËƒ°
-                if (itemToMove.itemCategory == "Crop" && lab.materialSlot.item == null)
-                {
-                    // ¿€π∞¿Ã∏È '¿Á∑·' ΩΩ∑‘ø° πËƒ°
-                    lab.materialSlot.SetItem(itemToMove, 1);
-                    InventoryManager.Instance.RemoveItem(itemToMove, 1);
-                    lab.ClearSelection();
-                }
-                else if (itemToMove.itemCategory == "Potion" && lab.potionSlot.item == null)
-                {
-                    // ∆˜º«¿Ã∏È '∆˜º«' ΩΩ∑‘ø° πËƒ°
-                    lab.potionSlot.SetItem(itemToMove, 1);
-                    InventoryManager.Instance.RemoveItem(itemToMove, 1);
-                    lab.ClearSelection();
-                }
+                if (this.item.itemCategory == "Crop" && lab.materialSlot.item == null) { lab.materialSlot.SetSlot(this.item, 1); InventoryManager.Instance.RemoveItem(this.item, 1); lab.ClearSelection(); }
+                else if (this.item.itemCategory == "Potion" && lab.potionSlot.item == null) { lab.potionSlot.SetSlot(this.item, 1); InventoryManager.Instance.RemoveItem(this.item, 1); lab.ClearSelection(); }
             }
         }
-        // 3. 'ø¨±∏Ω« ¿Á∑·' ΩΩ∑‘ (øﬁ¬  »•«’±‚)¿ª ≈¨∏Ø«ﬂ¿ª ∂ß
-        else if (slotType == SlotType.Material)
-        {
-            // [!!! ºˆ¡§ !!!]
-            if (this.item != null)
-            {
-                InventoryManager.Instance.AddItem(this.item, 1);
-                this.ClearSlot();
-
-                if (ResearchLab.Instance != null)
-                    ResearchLab.Instance.ClearSelection();
-            }
-        }
-        // 4. '∞·∞˙' ΩΩ∑‘ (±‚¡∏∞˙ µø¿œ)
-        else if (slotType == SlotType.Result)
-        {
-            if (this.item != null)
-            {
-                InventoryManager.Instance.AddItem(this.item, 1);
-                this.ClearSlot();
-            }
-        }
+        else if (slotType == SlotType.Material && this.item != null) { InventoryManager.Instance.AddItem(this.item, 1); this.ClearSlot(); ResearchLab.Instance.ClearSelection(); }
+        else if (slotType == SlotType.Result && this.item != null) { InventoryManager.Instance.AddItem(this.item, 1); this.ClearSlot(); }
     }
 }

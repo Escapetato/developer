@@ -1,164 +1,175 @@
-using System.Collections.Generic; // List, Dictionary
+ï»¿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Text
+using UnityEngine.UI;
+using TMPro;
 
-// ResearchLab.cs
 public class ResearchLab : MonoBehaviour
 {
-    // 1. [Ãß°¡] ½Ì±ÛÅæ ¼³Á¤ (ItemSlotÀÌ Á¢±ÙÇØ¾ß ÇÔ)
     public static ResearchLab Instance { get; private set; }
 
-    [Header("1. Evolution Recipe")]
-    public EvolutionRecipe currentRecipe;
+    [Header("1. Evolution Data")]
+    public List<EvolutionRecipe> allRecipes;
 
-    [Header("2. Mixer Slots (¿ŞÂÊ È¥ÇÕ±â)")]
-    public ItemSlot materialSlot; // (Inspector¿¡¼­ 'È¥ÇÕ±â'ÀÇ Ã¹ ¹øÂ° ½½·Ô ¿¬°á)
-    public ItemSlot potionSlot;   // (Inspector¿¡¼­ 'È¥ÇÕ±â'ÀÇ µÎ ¹øÂ° ½½·Ô ¿¬°á)
+    // â˜… [ì¶”ê°€] ë ˆì‹œí”¼ê°€ ì—†ëŠ” ì¡°í•©ì¼ ë•Œ ë“¤ì–´ê°€ëŠ” ê¸°ë³¸ ë¹„ìš©
+    public int defaultFailureCost = 100;
 
-    [Header("3. Inventory Grid (¿À¸¥ÂÊ ±×¸®µå)")]
-    public Transform slotParent;  // (Inspector¿¡¼­ 9Ä­ ±×¸®µåÀÇ ºÎ¸ğÀÎ 'Grid_Panel' ¿¬°á)
+    [Header("2. Mixer Slots")]
+    public ItemSlot materialSlot;
+    public ItemSlot potionSlot;
+
+    [Header("3. Inventory Grid")]
+    public Transform slotParent;
     private List<ItemSlot> inventorySlots;
-    private string currentCategory = "All"; // ÇöÀç ¼±ÅÃµÈ Ä«Å×°í¸®
 
-    // (InventoryUI¿¡¼­ °¡Á®¿Â ·ÎÁ÷)
+    [Header("4. Confirm Popup")]
+    public GameObject confirmPopupObject;
+    public TextMeshProUGUI confirmPopupText;
+
+    [Header("5. Success Popup")]
+    public GameObject successPopupObject;
+    public Image successItemIcon;
+    public TextMeshProUGUI successNameText;
+    public TextMeshProUGUI successMessageText;
+
+    private EvolutionRecipe pendingRecipe; // ì°¾ì€ ë ˆì‹œí”¼ (ì—†ìœ¼ë©´ null)
+    private int currentEvolutionCost = 0;  // â˜… [ì¶”ê°€] ì´ë²ˆ ì§„í™”ì— ë“¤ì–´ê°ˆ ë¹„ìš©
+
+    private string currentCategory = "Crop";
     public ItemData selectedItem { get; private set; }
     public ItemSlot selectedSlot { get; private set; }
 
     void Awake()
     {
-        // 1-1. ½Ì±ÛÅæ
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        // 3-1. ¿À¸¥ÂÊ ±×¸®µåÀÇ 9°³ ½½·ÔÀ» Ã£¾Æ ¸®½ºÆ®¿¡ ´ãÀ½
         inventorySlots = new List<ItemSlot>();
         if (slotParent != null)
-        {
             slotParent.GetComponentsInChildren<ItemSlot>(inventorySlots);
-        }
+
+        if (confirmPopupObject != null) confirmPopupObject.SetActive(false);
+        if (successPopupObject != null) successPopupObject.SetActive(false);
     }
 
-    void OnEnable()
-    {
-        InventoryManager.Instance.OnInventoryChanged += RedrawInventory;
+    void OnEnable() { InventoryManager.Instance.OnInventoryChanged += RedrawInventory; SetCategory("Crop"); }
+    void OnDisable() { InventoryManager.Instance.OnInventoryChanged -= RedrawInventory; }
 
-        SetCategory("All");
-    }
+    // (ê¸°ì¡´ UI ê·¸ë¦¬ê¸° í•¨ìˆ˜ë“¤ì€ ìƒëµ - ê·¸ëŒ€ë¡œ ë‘ì„¸ìš”)
+    public void SelectSlot(ItemSlot slot) { if (selectedSlot != null) selectedSlot.SetSelected(false); if (slot.item != null) { selectedItem = slot.item; selectedSlot = slot; selectedSlot.SetSelected(true); } }
+    public void ClearSelection() { if (selectedSlot != null) selectedSlot.SetSelected(false); selectedItem = null; selectedSlot = null; }
+    public void SetCategory(string category) { currentCategory = category; ClearSelection(); RedrawInventory(); }
+    private void RedrawInventory() { Dictionary<ItemData, int> allItems = InventoryManager.Instance.items; int i = 0; foreach (KeyValuePair<ItemData, int> itemPair in allItems) { if (currentCategory == "All" || itemPair.Key.itemCategory == currentCategory) { if (i < inventorySlots.Count) { inventorySlots[i].gameObject.SetActive(true); inventorySlots[i].SetSlot(itemPair.Key, itemPair.Value); if (selectedSlot == inventorySlots[i]) selectedSlot.SetSelected(true); i++; } } } for (int j = i; j < inventorySlots.Count; j++) { inventorySlots[j].ClearSlot(); inventorySlots[j].gameObject.SetActive(false); } }
 
-    void OnDisable()
-    {
-        InventoryManager.Instance.OnInventoryChanged -= RedrawInventory;
-    }
 
-    // 4-1. [Ãß°¡] ½½·Ô ¼±ÅÃ ÇÔ¼ö (InventoryUI¿¡¼­ º¹»ç)
-    public void SelectSlot(ItemSlot slot)
-    {
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
-
-        if (slot.item != null)
-        {
-            selectedItem = slot.item;
-            selectedSlot = slot;
-            selectedSlot.SetSelected(true);
-        }
-    }
-
-    // 4-2. [Ãß°¡] ¼±ÅÃ ÇØÁ¦ ÇÔ¼ö (InventoryUI¿¡¼­ º¹»ç)
-    public void ClearSelection()
-    {
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
-        selectedItem = null;
-        selectedSlot = null;
-    }
-
-    // 3-5. [Ãß°¡] Ä«Å×°í¸® ¹öÆ°µéÀÌ È£ÃâÇÒ ÇÔ¼ö
-    public void SetCategory(string category)
-    {
-        currentCategory = category;
-        ClearSelection(); // Ä«Å×°í¸® ¹Ù²Ù¸é ¼±ÅÃ ÇØÁ¦
-        RedrawInventory(); // ÀÎº¥Åä¸® ´Ù½Ã ±×¸®±â
-    }
-
-    // 3-6. [Ãß°¡] ÀÎº¥Åä¸® ´Ù½Ã ±×¸®±â (InventoryUI¿¡¼­ º¹»ç)
-    private void RedrawInventory()
-    {
-        Dictionary<ItemData, int> allItems = InventoryManager.Instance.items;
-        int i = 0; // UI ½½·Ô ÀÎµ¦½º
-
-        foreach (KeyValuePair<ItemData, int> itemPair in allItems)
-        {
-            // [ÇÊÅÍ¸µ]
-            if (currentCategory == "All" || itemPair.Key.itemCategory == currentCategory)
-            {
-                if (i < inventorySlots.Count)
-                {
-                    inventorySlots[i].SetItem(itemPair.Key, itemPair.Value);
-                    if (selectedSlot == inventorySlots[i])
-                    {
-                        selectedSlot.SetSelected(true);
-                    }
-                    i++;
-                }
-            }
-        }
-        for (int j = i; j < inventorySlots.Count; j++)
-        {
-            inventorySlots[j].ClearSlot();
-        }
-    }
-
-    // 5. 'ÁøÈ­' ¹öÆ°ÀÌ È£ÃâÇÒ ÇÔ¼ö (ÀÌÁ¦ ¿ŞÂÊ È¥ÇÕ±â ½½·ÔÀ» ÂüÁ¶)
+    // [1] ì§„í™” ë²„íŠ¼ í´ë¦­
     public void OnEvolutionButtonClick()
     {
-        // 5-1. ¿ŞÂÊ 'È¥ÇÕ±â' ½½·Ô¿¡ Àç·á°¡ ´Ù Ã¡´ÂÁö È®ÀÎ
         if (materialSlot.item == null || potionSlot.item == null)
         {
-            UIManager.Instance.ShowAlertPopup("Àç·á°¡ ºÎÁ·ÇÕ´Ï´Ù!");
+            UIManager.Instance.ShowAlertPopup("ì¬ë£Œê°€ ë¶€ì¡±í•©ë‹ˆë‹¤!");
             return;
         }
 
-        // 5-2. Æ÷À×(Poing) È®ÀÎ
-        if (!PoingManager.Instance.HasEnoughPoing(currentRecipe.evolutionCost))
+        ItemData inputMaterial = materialSlot.item;
+        ItemData inputPotion = potionSlot.item;
+        EvolutionRecipe foundRecipe = null;
+
+        // ë ˆì‹œí”¼ ê²€ìƒ‰
+        foreach (var recipe in allRecipes)
         {
-            UIManager.Instance.ShowAlertPopup("Æ÷À×ÀÌ ºÎÁ·ÇÕ´Ï´Ù!");
+            if (recipe.material == inputMaterial && recipe.potion == inputPotion)
+            {
+                foundRecipe = recipe;
+                break;
+            }
+        }
+
+        // â˜… [ë³€ê²½] ë ˆì‹œí”¼ë¥¼ ëª» ì°¾ì•„ë„ íŒì—…ì„ ë„ì›Œì•¼ í•¨!
+        pendingRecipe = foundRecipe; // nullì¼ ìˆ˜ë„ ìˆìŒ
+
+        // ë¹„ìš© ê²°ì • (ë ˆì‹œí”¼ ìˆìœ¼ë©´ ê·¸ ë¹„ìš©, ì—†ìœ¼ë©´ ê¸°ë³¸ ì‹¤íŒ¨ ë¹„ìš©)
+        if (foundRecipe != null)
+            currentEvolutionCost = foundRecipe.evolutionCost;
+        else
+            currentEvolutionCost = defaultFailureCost;
+
+        // íŒì—… í…ìŠ¤íŠ¸ ì„¤ì •
+        if (confirmPopupText != null)
+            confirmPopupText.text = $"{currentEvolutionCost} í¬ì‰ìœ¼ë¡œ ì§„í™”í•˜ì‹œê² ìŠµë‹ˆê¹Œ?";
+
+        // íŒì—… ë„ìš°ê¸°
+        if (confirmPopupObject != null) confirmPopupObject.SetActive(true);
+        else OnConfirmEvolution();
+    }
+
+    // [2] ê²°ì œ íŒì—…ì—ì„œ 'ë„¤' í´ë¦­
+    public void OnConfirmEvolution()
+    {
+        if (confirmPopupObject != null) confirmPopupObject.SetActive(false);
+
+        // 1. ëˆ ê²€ì‚¬ (pendingRecipeê°€ nullì´ì–´ë„ currentEvolutionCostë¡œ ê²€ì‚¬)
+        if (!PoingManager.Instance.HasEnoughPoing(currentEvolutionCost))
+        {
+            UIManager.Instance.ShowAlertPopup("í¬ì‰ì´ ë¶€ì¡±í•©ë‹ˆë‹¤!");
             return;
         }
 
-        // 5-3. ·¹½ÃÇÇ ÀÏÄ¡ °Ë»ç
-        bool isRecipeCorrect = (materialSlot.item == currentRecipe.material) &&
-                               (potionSlot.item == currentRecipe.potion);
+        // === ì‹œë„ ì‹œì‘ (ì„±ê³µì´ë“  ì‹¤íŒ¨ë“  ê³µí†µ ìˆ˜í–‰) ===
 
-        // 5-4. Àç·á ¹× Æ÷À× ¼Ò¸ê
+        // 2. ëˆ ì°¨ê°
+        PoingManager.Instance.DecreasePoing(currentEvolutionCost);
+
+        // 3. ì¬ë£Œ ì‚­ì œ
+        if (materialSlot.item != null) InventoryManager.Instance.RemoveItem(materialSlot.item, 1);
+        if (potionSlot.item != null) InventoryManager.Instance.RemoveItem(potionSlot.item, 1);
+
         materialSlot.ClearSlot();
         potionSlot.ClearSlot();
-        PoingManager.Instance.DecreasePoing(currentRecipe.evolutionCost);
 
-        // °á°ú Ã³¸®
-        if (isRecipeCorrect)
+
+        // === ê²°ê³¼ íŒì • ===
+
+        if (pendingRecipe != null)
         {
-            // [¼º°ø]
-            ItemData newItem = currentRecipe.resultItem;
+            // [CASE A] ì„±ê³µ (ë ˆì‹œí”¼ê°€ ìˆì—ˆìŒ)
+            ItemData newItem = pendingRecipe.resultItem;
+            GameProgressionManager.Instance.UnlockItem(newItem);
+            InventoryManager.Instance.AddItem(newItem, 1);
 
-            // 1. [»èÁ¦] ÀÎº¥Åä¸®¿¡ ¹Ù·Î Ãß°¡ÇÏ´Â ·ÎÁ÷ »èÁ¦
-            // InventoryManager.Instance.AddItem(newItem, 1); 
-
-            // 2. [»èÁ¦] ¿¬±¸½Ç °á°ú ½½·Ô¿¡ º¸¿©ÁÖ´Â ·ÎÁ÷ »èÁ¦
-            // (»õ ÆË¾÷ÀÌ º¸¿©ÁÙ °ÍÀÌ¹Ç·Î)
-            // resultSlot.SetItem(newItem, 1); 
-
-            UIManager.Instance.ShowItemAcquiredPopup(newItem);
+            // ì„±ê³µ íŒì—…
+            OpenSuccessPopup(newItem);
         }
         else
         {
-            // [½ÇÆĞ]
-            // resultSlot.ClearSlot(); // (°á°ú ½½·ÔÀÌ ¾ø´Ù¸é ÀÌ ÁÙµµ »èÁ¦)
-            UIManager.Instance.ShowAlertPopup("ÁøÈ­ ½ÇÆĞ... (Àç·á/Æ÷À× ¸ğµÎ ¼Ò¸êµÊ)");
+            // [CASE B] ì‹¤íŒ¨ (ë ˆì‹œí”¼ê°€ ì—†ì—ˆìŒ) -> ëˆê³¼ ì¬ë£ŒëŠ” ì´ë¯¸ ë‚ ì•„ê°
+            UIManager.Instance.ShowAlertPopup("ì•„ë¬´ëŸ° ë°˜ì‘ì´ ì—†ìŠµë‹ˆë‹¤...\n ì¬ë£Œê°€ ëª¨ë‘ ì‚¬ë¼ì¡ŒìŠµë‹ˆë‹¤.");
         }
+
+        // ì´ˆê¸°í™”
+        pendingRecipe = null;
+        currentEvolutionCost = 0;
+    }
+
+    public void OnCancelEvolution()
+    {
+        if (confirmPopupObject != null) confirmPopupObject.SetActive(false);
+        pendingRecipe = null;
+        currentEvolutionCost = 0;
+    }
+
+    private void OpenSuccessPopup(ItemData item)
+    {
+        if (successPopupObject != null)
+        {
+            successPopupObject.SetActive(true);
+            if (successItemIcon != null) successItemIcon.sprite = item.itemIcon;
+            if (successNameText != null) successNameText.text = item.itemName;
+            if (successMessageText != null) successMessageText.text = "ì§„í™”ì— ì„±ê³µí–ˆìŠµë‹ˆë‹¤!";
+        }
+    }
+
+    public void OnCloseSuccessPopup()
+    {
+        if (successPopupObject != null) successPopupObject.SetActive(false);
     }
 }

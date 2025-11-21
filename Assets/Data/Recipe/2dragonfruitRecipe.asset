@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d62a0d0d094bdb4e8b43638dcebb818, type: 3}
+  m_Name: 2dragonfruitRecipe
+  m_EditorClassIdentifier: 
+  material: {fileID: 11400000, guid: 1903f4a3e8186c2429d9e8184b450b58, type: 2}
+  potion: {fileID: 11400000, guid: fc160dc35553f0b4f91068d055162ab8, type: 2}
+  resultItem: {fileID: 11400000, guid: 6e668259577322b4ea876c4052067212, type: 2}
+  evolutionCost: 100

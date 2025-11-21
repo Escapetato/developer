@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -7,15 +7,15 @@ public class PoingManager : MonoBehaviour
 {
     public static PoingManager Instance { get; private set; }
 
-    // (Inspector¿¡¼­ Å×½ºÆ®¿ë ÃÊ±â ÀÚ±İ ¼³Á¤)
+    // (Inspectorì—ì„œ í…ŒìŠ¤íŠ¸ìš© ì´ˆê¸° ìê¸ˆ ì„¤ì •)
     [SerializeField] private int currentPoing = 500;
 
-    // Æ÷À×ÀÌ º¯°æµÉ ¶§ UI¿¡ ¾Ë·ÁÁÖ±â À§ÇÑ ÀÌº¥Æ®
+    // í¬ì‰ì´ ë³€ê²½ë  ë•Œ UIì— ì•Œë ¤ì£¼ê¸° ìœ„í•œ ì´ë²¤íŠ¸
     public event Action<int> OnPoingChanged;
 
     void Awake()
     {
-        // ½Ì±ÛÅæ ÀÎ½ºÅÏ½º ¼³Á¤
+        // ì‹±ê¸€í†¤ ì¸ìŠ¤í„´ìŠ¤ ì„¤ì •
         if (Instance == null)
         {
             Instance = this;
@@ -28,30 +28,35 @@ public class PoingManager : MonoBehaviour
 
     void Start()
     {
-        // °ÔÀÓ ½ÃÀÛ ½Ã, UI¿¡ ÇöÀç Æ÷À×À» ¾Ë·Á ÁÜ
+        // ê²Œì„ ì‹œì‘ ì‹œ, UIì— í˜„ì¬ í¬ì‰ì„ ì•Œë ¤ ì¤Œ
         OnPoingChanged?.Invoke(currentPoing);
     }
 
-    // Æ÷À× È¹µæ ÇÔ¼ö
+    // í¬ì‰ íšë“ í•¨ìˆ˜
     public void AddPoing(int amount)
     {
         currentPoing += amount;
-        // Æ÷À× º¯°æ
+        // í¬ì‰ ë³€ê²½
         OnPoingChanged?.Invoke(currentPoing);
-        Debug.Log(amount + " Æ÷À× È¹µæ. ÇöÀç Æ÷À×: " + currentPoing);
+        Debug.Log(amount + " í¬ì‰ íšë“. í˜„ì¬ í¬ì‰: " + currentPoing);
     }
 
-    // Æ÷À× Â÷°¨ ÇÔ¼ö
+    // í¬ì‰ ì°¨ê° í•¨ìˆ˜
     public void DecreasePoing(int amount)
     {
         currentPoing -= amount;
         OnPoingChanged?.Invoke(currentPoing);
-        Debug.Log(amount + " Æ÷À× »ç¿ë. ÇöÀç Æ÷À×: " + currentPoing);
+        Debug.Log(amount + " í¬ì‰ ì‚¬ìš©. í˜„ì¬ í¬ì‰: " + currentPoing);
     }
 
-    // Æ÷À×ÀÌ ÃæºĞÇÑÁö È®ÀÎÇÏ´Â ÇÔ¼ö
+    // í¬ì‰ì´ ì¶©ë¶„í•œì§€ í™•ì¸í•˜ëŠ” í•¨ìˆ˜
     public bool HasEnoughPoing(int amount)
     {
         return (currentPoing >= amount);
+    }
+
+    public int GetPoing()
+    {
+        return currentPoing;
     }
 }

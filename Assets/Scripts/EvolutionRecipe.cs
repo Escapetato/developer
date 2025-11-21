@@ -1,21 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+ï»¿using UnityEngine;
 
-// 'Create' ¸Ş´º¿¡¼­ ½±°Ô ¸¸µé ¼ö ÀÖµµ·Ï ¸Ş´º Ç×¸ñ Ãß°¡
+// 'Create' ë©”ë‰´ì—ì„œ ì‰½ê²Œ ë§Œë“¤ ìˆ˜ ìˆë„ë¡ ì„¤ì •
 [CreateAssetMenu(fileName = "NewEvolutionRecipe", menuName = "Data/Evolution Recipe")]
 public class EvolutionRecipe : ScriptableObject
 {
-    [Header("ÁøÈ­ Àç·á")]
-    public ItemData material; // (ÀÌ ½ºÅ©¸³Æ®´Â ItemData.cs°¡ ÇÊ¿äÇÕ´Ï´Ù)
-    public ItemData potion;   // (ÀÌ°Íµµ ItemData.cs°¡ ÇÊ¿äÇÕ´Ï´Ù)
+    [Header("ì§„í™” ì¬ë£Œ")]
+    public ItemData material; // ì˜ˆ: ë©œë¡  (ë² ì´ìŠ¤ ì‘ë¬¼)
+    public ItemData potion;   // ì˜ˆ: ë¬¼ì•½
 
-    [Header("ÁøÈ­ °á°ú")]
-    public ItemData resultItem; // ¼º°ø ½Ã °á°ú¹°
+    [Header("ì§„í™” ê²°ê³¼")]
+    public ItemData resultItem; // ì˜ˆ: í™”ì±„ (ê²°ê³¼ë¬¼)
 
-    [Header("ÁøÈ­ ºñ¿ë ¹× È®·ü")]
-    public int evolutionCost = 100; // ÁøÈ­ ºñ¿ë
+    [Header("ì§„í™” ì„¤ì •")]
+    public int evolutionCost = 100; // ì§„í™” ë¹„ìš©
 
-    [Range(0f, 1f)]
-    public float successChance = 0.7f; // ¼º°ø È®·ü (¿¹: 0.7 = 70%)
 }

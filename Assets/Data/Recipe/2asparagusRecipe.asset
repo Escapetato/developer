@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d62a0d0d094bdb4e8b43638dcebb818, type: 3}
+  m_Name: 2asparagusRecipe
+  m_EditorClassIdentifier: 
+  material: {fileID: 11400000, guid: d610bf3fa42cdad42b18e4b755464ac4, type: 2}
+  potion: {fileID: 11400000, guid: 60ac3b5c96f1f8049ac28a767ca6ff7f, type: 2}
+  resultItem: {fileID: 11400000, guid: adcfea74a0b41a145b2e9f4dad86a036, type: 2}
+  evolutionCost: 100
