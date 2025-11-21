@@ -28,13 +28,16 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI itemAcquiredNameText; // [TMP] 획득한 아이템 이름
     public Button itemAcquiredConfirmButton;   // 확인 버튼
 
-    [Header("Farm Popups (농장 관련)")]
-    public GameObject seedPopup;    // 씨앗 심기 메뉴 팝업
-    private Field currentField;     // 현재 상호작용 중인 밭 (어떤 밭을 눌렀는지 기억)
 
     [Header("Main UI Elements (재화 UI 이동 관리)")]
     public RectTransform poingBarRect;        // 포잉(돈) 표시줄 UI
     public Transform poingBarOriginalParent;  // 포잉 바의 원래 위치(부모)를 기억하는 변수
+
+    [Header("Farm Popups")]
+    public GameObject seedPopup;
+    private Field currentField; // [추가] 씨앗을 심을 밭
+    private Field lastField = null;   // 마지막으로 클릭한 밭
+    private bool isSeedPopupOpen = false; // 시드 팝업 열림 여부
 
 
     void Awake()
@@ -107,7 +110,8 @@ public class UIManager : MonoBehaviour
         }
 
         itemAcquiredConfirmButton.onClick.RemoveAllListeners();
-        itemAcquiredConfirmButton.onClick.AddListener(() => {
+        itemAcquiredConfirmButton.onClick.AddListener(() =>
+        {
 
 
             // 그냥 창만 닫으면 됨 (이미 ResearchLab이 아이템 줬음)
@@ -165,16 +169,18 @@ public class UIManager : MonoBehaviour
     public void OpenSeedPopup(Field field)
     {
         CloseAllPopups();
-        currentField = field; // 현재 어떤 밭을 클릭했는지 저장
+        currentField = field;
+        seedPopup.SetActive(true);
+        seedPopup.GetComponent<SeedPopupUI>().RefreshButtons(field);
 
-        if (seedPopup != null)
-        {
-            seedPopup.SetActive(true);
+        isSeedPopupOpen = true;
+    }
 
-            // 팝업 UI 갱신 (안전장치 포함)
-            var popupUI = seedPopup.GetComponent<SeedPopupUI>();
-            if (popupUI != null) popupUI.RefreshButtons(field);
-        }
+    public void ToggleSeedPopup(Field field)
+    {
+        // 새로운 밭 → 열기
+        lastField = field;
+        OpenSeedPopup(field);
     }
 
     // 현재 열려있는 밭 정보를 반환 (다른 스크립트에서 사용)
@@ -213,4 +219,27 @@ public class UIManager : MonoBehaviour
         poingBarRect.anchoredPosition = new Vector2(50, -50);
         poingBarRect.localScale = Vector3.one;
     }
+    void Update()
+{
+    if (isSeedPopupOpen && Input.GetMouseButtonDown(0)) // 좌클릭
+    {
+        // 클릭한 오브젝트 감지
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            // 클릭한 오브젝트가 Field인지 확인
+            Field clickedField = hit.collider.GetComponent<Field>();
+
+            // 밭이 아니면 시드 팝업 닫기
+            if (clickedField == null)
+            {
+                seedPopup.SetActive(false);
+            }
+        }
+
+    }
+}
+
 }
