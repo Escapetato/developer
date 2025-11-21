@@ -1,157 +1,175 @@
-﻿using System.Collections.Generic; // List, Dictionary
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Text
+using UnityEngine.UI;
+using TMPro;
 
-// ResearchLab.cs
 public class ResearchLab : MonoBehaviour
 {
-    // 1. [추가] 싱글톤 설정 (ItemSlot이 접근해야 함)
     public static ResearchLab Instance { get; private set; }
 
-    [Header("1. Evolution Recipe")]
-    public EvolutionRecipe currentRecipe;
+    [Header("1. Evolution Data")]
+    public List<EvolutionRecipe> allRecipes;
 
-    [Header("2. Mixer Slots (왼쪽 혼합기)")]
-    public ItemSlot materialSlot; // (Inspector에서 '혼합기'의 첫 번째 슬롯 연결)
-    public ItemSlot potionSlot;   // (Inspector에서 '혼합기'의 두 번째 슬롯 연결)
+    // ★ [추가] 레시피가 없는 조합일 때 들어가는 기본 비용
+    public int defaultFailureCost = 100;
 
-    [Header("3. Inventory Grid (오른쪽 그리드)")]
-    public Transform slotParent;  // (Inspector에서 9칸 그리드의 부모인 'Grid_Panel' 연결)
+    [Header("2. Mixer Slots")]
+    public ItemSlot materialSlot;
+    public ItemSlot potionSlot;
+
+    [Header("3. Inventory Grid")]
+    public Transform slotParent;
     private List<ItemSlot> inventorySlots;
-    private string currentCategory = "All"; // 현재 선택된 카테고리
 
-    // (InventoryUI에서 가져온 로직)
+    [Header("4. Confirm Popup")]
+    public GameObject confirmPopupObject;
+    public TextMeshProUGUI confirmPopupText;
+
+    [Header("5. Success Popup")]
+    public GameObject successPopupObject;
+    public Image successItemIcon;
+    public TextMeshProUGUI successNameText;
+    public TextMeshProUGUI successMessageText;
+
+    private EvolutionRecipe pendingRecipe; // 찾은 레시피 (없으면 null)
+    private int currentEvolutionCost = 0;  // ★ [추가] 이번 진화에 들어갈 비용
+
+    private string currentCategory = "Crop";
     public ItemData selectedItem { get; private set; }
     public ItemSlot selectedSlot { get; private set; }
 
     void Awake()
     {
-        // 1-1. 싱글톤
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        // 3-1. 오른쪽 그리드의 9개 슬롯을 찾아 리스트에 담음
         inventorySlots = new List<ItemSlot>();
         if (slotParent != null)
-        {
             slotParent.GetComponentsInChildren<ItemSlot>(inventorySlots);
-        }
+
+        if (confirmPopupObject != null) confirmPopupObject.SetActive(false);
+        if (successPopupObject != null) successPopupObject.SetActive(false);
     }
 
-    void OnEnable()
-    {
-        InventoryManager.Instance.OnInventoryChanged += RedrawInventory;
+    void OnEnable() { InventoryManager.Instance.OnInventoryChanged += RedrawInventory; SetCategory("Crop"); }
+    void OnDisable() { InventoryManager.Instance.OnInventoryChanged -= RedrawInventory; }
 
-        SetCategory("All");
-    }
+    // (기존 UI 그리기 함수들은 생략 - 그대로 두세요)
+    public void SelectSlot(ItemSlot slot) { if (selectedSlot != null) selectedSlot.SetSelected(false); if (slot.item != null) { selectedItem = slot.item; selectedSlot = slot; selectedSlot.SetSelected(true); } }
+    public void ClearSelection() { if (selectedSlot != null) selectedSlot.SetSelected(false); selectedItem = null; selectedSlot = null; }
+    public void SetCategory(string category) { currentCategory = category; ClearSelection(); RedrawInventory(); }
+    private void RedrawInventory() { Dictionary<ItemData, int> allItems = InventoryManager.Instance.items; int i = 0; foreach (KeyValuePair<ItemData, int> itemPair in allItems) { if (currentCategory == "All" || itemPair.Key.itemCategory == currentCategory) { if (i < inventorySlots.Count) { inventorySlots[i].gameObject.SetActive(true); inventorySlots[i].SetSlot(itemPair.Key, itemPair.Value); if (selectedSlot == inventorySlots[i]) selectedSlot.SetSelected(true); i++; } } } for (int j = i; j < inventorySlots.Count; j++) { inventorySlots[j].ClearSlot(); inventorySlots[j].gameObject.SetActive(false); } }
 
-    void OnDisable()
-    {
-        InventoryManager.Instance.OnInventoryChanged -= RedrawInventory;
-    }
 
-    // 4-1. [추가] 슬롯 선택 함수 (InventoryUI에서 복사)
-    public void SelectSlot(ItemSlot slot)
-    {
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
-
-        if (slot.item != null)
-        {
-            selectedItem = slot.item;
-            selectedSlot = slot;
-            selectedSlot.SetSelected(true);
-        }
-    }
-
-    // 4-2. [추가] 선택 해제 함수 (InventoryUI에서 복사)
-    public void ClearSelection()
-    {
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
-        selectedItem = null;
-        selectedSlot = null;
-    }
-
-    // 3-5. [추가] 카테고리 버튼들이 호출할 함수
-    public void SetCategory(string category)
-    {
-        currentCategory = category;
-        ClearSelection(); // 카테고리 바꾸면 선택 해제
-        RedrawInventory(); // 인벤토리 다시 그리기
-    }
-
-    // 3-6. [추가] 인벤토리 다시 그리기 (InventoryUI에서 복사)
-    private void RedrawInventory()
-    {
-        Dictionary<ItemData, int> allItems = InventoryManager.Instance.items;
-        int i = 0; // UI 슬롯 인덱스
-
-        foreach (KeyValuePair<ItemData, int> itemPair in allItems)
-        {
-            // [필터링]
-            if (currentCategory == "All" || itemPair.Key.itemCategory == currentCategory)
-            {
-                if (i < inventorySlots.Count)
-                {
-                    inventorySlots[i].SetSlot(itemPair.Key, itemPair.Value);
-                    if (selectedSlot == inventorySlots[i])
-                    {
-                        selectedSlot.SetSelected(true);
-                    }
-                    i++;
-                }
-            }
-        }
-        for (int j = i; j < inventorySlots.Count; j++)
-        {
-            inventorySlots[j].ClearSlot();
-        }
-    }
-
-    // 5. '진화' 버튼이 호출할 함수 (이제 왼쪽 혼합기 슬롯을 참조)
+    // [1] 진화 버튼 클릭
     public void OnEvolutionButtonClick()
     {
-        // 5-1. 왼쪽 '혼합기' 슬롯에 재료가 다 찼는지 확인
         if (materialSlot.item == null || potionSlot.item == null)
         {
             UIManager.Instance.ShowAlertPopup("재료가 부족합니다!");
             return;
         }
 
-        // 5-2. 포잉(Poing) 확인
-        if (!PoingManager.Instance.HasEnoughPoing(currentRecipe.evolutionCost))
+        ItemData inputMaterial = materialSlot.item;
+        ItemData inputPotion = potionSlot.item;
+        EvolutionRecipe foundRecipe = null;
+
+        // 레시피 검색
+        foreach (var recipe in allRecipes)
+        {
+            if (recipe.material == inputMaterial && recipe.potion == inputPotion)
+            {
+                foundRecipe = recipe;
+                break;
+            }
+        }
+
+        // ★ [변경] 레시피를 못 찾아도 팝업을 띄워야 함!
+        pendingRecipe = foundRecipe; // null일 수도 있음
+
+        // 비용 결정 (레시피 있으면 그 비용, 없으면 기본 실패 비용)
+        if (foundRecipe != null)
+            currentEvolutionCost = foundRecipe.evolutionCost;
+        else
+            currentEvolutionCost = defaultFailureCost;
+
+        // 팝업 텍스트 설정
+        if (confirmPopupText != null)
+            confirmPopupText.text = $"{currentEvolutionCost} 포잉으로 진화하시겠습니까?";
+
+        // 팝업 띄우기
+        if (confirmPopupObject != null) confirmPopupObject.SetActive(true);
+        else OnConfirmEvolution();
+    }
+
+    // [2] 결제 팝업에서 '네' 클릭
+    public void OnConfirmEvolution()
+    {
+        if (confirmPopupObject != null) confirmPopupObject.SetActive(false);
+
+        // 1. 돈 검사 (pendingRecipe가 null이어도 currentEvolutionCost로 검사)
+        if (!PoingManager.Instance.HasEnoughPoing(currentEvolutionCost))
         {
             UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
             return;
         }
 
-        // 5-3. 레시피 일치 검사
-        bool isRecipeCorrect = (materialSlot.item == currentRecipe.material) &&
-                               (potionSlot.item == currentRecipe.potion);
+        // === 시도 시작 (성공이든 실패든 공통 수행) ===
 
-        // 5-4. 재료 및 포잉 소멸
+        // 2. 돈 차감
+        PoingManager.Instance.DecreasePoing(currentEvolutionCost);
+
+        // 3. 재료 삭제
+        if (materialSlot.item != null) InventoryManager.Instance.RemoveItem(materialSlot.item, 1);
+        if (potionSlot.item != null) InventoryManager.Instance.RemoveItem(potionSlot.item, 1);
+
         materialSlot.ClearSlot();
         potionSlot.ClearSlot();
-        PoingManager.Instance.DecreasePoing(currentRecipe.evolutionCost);
 
-        // 결과 처리
-        if (isRecipeCorrect)
+
+        // === 결과 판정 ===
+
+        if (pendingRecipe != null)
         {
-            // [성공]
-            ItemData newItem = currentRecipe.resultItem;
+            // [CASE A] 성공 (레시피가 있었음)
+            ItemData newItem = pendingRecipe.resultItem;
+            GameProgressionManager.Instance.UnlockItem(newItem);
+            InventoryManager.Instance.AddItem(newItem, 1);
 
-            UIManager.Instance.ShowItemAcquiredPopup(newItem);
+            // 성공 팝업
+            OpenSuccessPopup(newItem);
         }
         else
         {
-            // [실패]
-            // resultSlot.ClearSlot(); // (결과 슬롯이 없다면 이 줄도 삭제)
-            UIManager.Instance.ShowAlertPopup("진화 실패... (재료/포잉 모두 소멸됨)");
+            // [CASE B] 실패 (레시피가 없었음) -> 돈과 재료는 이미 날아감
+            UIManager.Instance.ShowAlertPopup("아무런 반응이 없습니다...\n 재료가 모두 사라졌습니다.");
         }
+
+        // 초기화
+        pendingRecipe = null;
+        currentEvolutionCost = 0;
+    }
+
+    public void OnCancelEvolution()
+    {
+        if (confirmPopupObject != null) confirmPopupObject.SetActive(false);
+        pendingRecipe = null;
+        currentEvolutionCost = 0;
+    }
+
+    private void OpenSuccessPopup(ItemData item)
+    {
+        if (successPopupObject != null)
+        {
+            successPopupObject.SetActive(true);
+            if (successItemIcon != null) successItemIcon.sprite = item.itemIcon;
+            if (successNameText != null) successNameText.text = item.itemName;
+            if (successMessageText != null) successMessageText.text = "진화에 성공했습니다!";
+        }
+    }
+
+    public void OnCloseSuccessPopup()
+    {
+        if (successPopupObject != null) successPopupObject.SetActive(false);
     }
 }

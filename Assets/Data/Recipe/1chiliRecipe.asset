@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d62a0d0d094bdb4e8b43638dcebb818, type: 3}
-  m_Name: dragonfruitRecipe
+  m_Name: 1chiliRecipe
   m_EditorClassIdentifier: 
-  material: {fileID: 0}
-  potion: {fileID: 0}
-  resultItem: {fileID: 0}
+  material: {fileID: 11400000, guid: 937ae693d49875e4aa994cc8eefcace9, type: 2}
+  potion: {fileID: 11400000, guid: ecdc859f7660ad84c91f3122abf59b71, type: 2}
+  resultItem: {fileID: 11400000, guid: e217104933849c045b4f6ee8766bff3f, type: 2}
   evolutionCost: 100
-  successChance: 0.7

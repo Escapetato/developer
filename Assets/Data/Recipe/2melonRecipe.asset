@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d62a0d0d094bdb4e8b43638dcebb818, type: 3}
+  m_Name: 2melonRecipe
+  m_EditorClassIdentifier: 
+  material: {fileID: 11400000, guid: cdd542ae1919f9743a54088d6e19a46a, type: 2}
+  potion: {fileID: 11400000, guid: 60ac3b5c96f1f8049ac28a767ca6ff7f, type: 2}
+  resultItem: {fileID: 11400000, guid: 85bcbe743956b524f9a280b790a85b6d, type: 2}
+  evolutionCost: 100

@@ -1,35 +1,40 @@
-using System.Collections;
+癤퓎sing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro; 
 
 public class PoingDisplayUI : MonoBehaviour
 {
-    public Text poingText;
+    public TextMeshProUGUI poingText;
 
     void Awake()
     {
         if (poingText == null)
         {
-            poingText = GetComponent<Text>();
+            poingText = GetComponent<TextMeshProUGUI>();
         }
     }
 
     void OnEnable()
     {
-        // PoingManager 구독
-        PoingManager.Instance.OnPoingChanged += UpdatePoingText;
+        if (PoingManager.Instance != null)
+        {
+            PoingManager.Instance.OnPoingChanged += UpdatePoingText;
+            UpdatePoingText(PoingManager.Instance.GetPoing());
+        }
     }
 
     void OnDisable()
     {
-        // 구독 취소
-        PoingManager.Instance.OnPoingChanged -= UpdatePoingText;
+        if (PoingManager.Instance != null)
+        {
+            PoingManager.Instance.OnPoingChanged -= UpdatePoingText;
+        }
     }
 
-    // 함수 내용
     private void UpdatePoingText(int newPoingAmount)
     {
-        poingText.text = "" + newPoingAmount.ToString();
+        poingText.text = newPoingAmount.ToString();
     }
 }

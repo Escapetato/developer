@@ -8,23 +8,31 @@ public class ItemData : ScriptableObject
     public string description;
     public Sprite itemIcon;
     public string itemCategory; // "Seed", "Tool", "Potion", "Fertilizer", "Theme"
+
+    // [도감용] 세부 분류 (예: "Vegetable", "Fruit", "Grain")
+    public string collectionCategory;
+
     public int price = 50;
 
     [Header("씨앗 전용 정보 (Seed)")]
     public GameObject plantPrefab;
-    public float growTime;       // (초 단위, 예: 10분 = 600)
-    public ItemData harvestItem; // 수확물
+    public float growTime;         // 실제 로직용 시간 (초)
+    public ItemData harvestItem;   // 수확물
+    public int requiredToolTier = 1;
 
-    // (씨앗에만 필요) 이 씨앗을 수확할 때 필요한 도구 레벨
-    public int requiredToolTier = 1; // 1=호미, 2=낫, 3=모종삽, 4=가위
+    [Header("도감 표시용 정보 (UI)")]
+    public string growTimeDisplay = "1분";    // 예: "10분", "30초"
+    public string harvestToolName = "호미";   // 예: "호미", "낫"
 
     [Header("수확 도구 전용 정보 (Tool)")]
-    // (도구 아이템 자체에 필요) 이 도구의 레벨
     public int toolTier = 0;
 
     [Header("비료 전용 정보 (Fertilizer)")]
-    // (비료 아이템 자체에 필요)
-    public float growthReductionPercent = 0.25f; // 25%
+    public float growthReductionPercent = 0.25f;
 
-    // 꾸미기 테마는 특별한 변수 없이 "Theme" 카테고리와 이름만
+    [Header("해금 및 설명")]
+    public bool isDefaultUnlocked = false;
+
+    [TextArea]
+    public string itemDescription;
 }

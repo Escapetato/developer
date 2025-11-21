@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d62a0d0d094bdb4e8b43638dcebb818, type: 3}
-  m_Name: chiliRecipe
+  m_Name: 1potatoRecipe
   m_EditorClassIdentifier: 
-  material: {fileID: 0}
-  potion: {fileID: 0}
-  resultItem: {fileID: 0}
+  material: {fileID: 11400000, guid: 48d7f29a3bd99d842b1450283f0823e4, type: 2}
+  potion: {fileID: 11400000, guid: 6deaf2a4e67777d4c9119edc844bebd3, type: 2}
+  resultItem: {fileID: 11400000, guid: da1ee6b8fb62f7a4fb673d94fb07a17d, type: 2}
   evolutionCost: 100
-  successChance: 0.7

@@ -23,3 +23,4 @@ MonoBehaviour:
   requiredToolTier: 1
   toolTier: 1
   growthReductionPercent: 0.25
+  isDefaultUnlocked: 1
