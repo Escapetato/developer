@@ -1,5 +1,13 @@
 ﻿using UnityEngine;
 
+  public enum SeedType
+    {
+        None,       // 미지정
+        Fruit,      // 과일
+        Grain,      // 곡식
+        Vegetable   // 야채
+    }
+
 [CreateAssetMenu(fileName = "NewItem", menuName = "Data/Item Data")]
 public class ItemData : ScriptableObject
 {
@@ -11,6 +19,7 @@ public class ItemData : ScriptableObject
     public int price = 50;
 
     [Header("씨앗 전용 정보 (Seed)")]
+    public SeedType seedCategory = SeedType.None;
     public GameObject plantPrefab;
     public float growTime;       // (초 단위, 예: 10분 = 600)
     public ItemData harvestItem; // 수확물
