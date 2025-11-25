@@ -58,7 +58,7 @@ public class QuestManager : MonoBehaviour
 
         if (questDatabase == null)
         {
-            Debug.LogWarning("[QuestManager] QuestDatabase가 연결되지 않았습니다. Inspector를 확인하세요.");
+            Debug.LogWarning("[QuestManager] QuestDatabase가 연결되지 않았습니다.");
             return;
         }
 
