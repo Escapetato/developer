@@ -19,7 +19,7 @@ public enum QuestState
 }
 
 // 퀘스트 데이터 구조 정의
-[System.Serializable] 
+[System.Serializable]
 public class QuestData
 {
     [Header("기본 정보")]
@@ -45,5 +45,9 @@ public class QuestData
 
     [Header("체인 연결")]
     public int nextKey; // 다음 퀘스트 ID (없으면 0이나 -1로 처리)
+    
+    [Header("일일 퀘스트 설정")]
+    public DailyQuestDifficulty dailyDifficulty = DailyQuestDifficulty.Low;
+    public DailyQuestTargetConfig dailyTargets;
 }
 
