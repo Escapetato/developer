@@ -22,7 +22,8 @@ public class QuestDetailUI : MonoBehaviour
     private QuestData currentQuest;
     
     private bool isDailyQuestView = false;  // 현재 화면이 '일일퀘스트(3개 리스트)' 모드인지 여부
-
+    // 일일퀘스트는 최대 몇 개까지 UI 슬롯에 표시할지
+    private const int DailyQuestSlotCount = 3; 
 
     public void Show(QuestData data)
     {
@@ -116,7 +117,12 @@ public class QuestDetailUI : MonoBehaviour
             return;
 
         // 4) 최대 3개까지만 표시
-        int rowCount = Mathf.Min(3, dailyQuests.Count, conditionRows.Length, conditionTexts.Length);
+        if (conditionRows.Length < DailyQuestSlotCount || conditionTexts.Length < DailyQuestSlotCount)
+        {
+            Debug.LogWarning($"일일퀘스트는 {DailyQuestSlotCount}개 슬롯이 필요합니다. Hierarchy에서 conditionRow와 Text 슬롯을 추가하세요.");
+        }
+
+        int rowCount = Mathf.Min(DailyQuestSlotCount, dailyQuests.Count, conditionRows.Length, conditionTexts.Length);
 
         for (int i = 0; i < rowCount; i++)
         {
