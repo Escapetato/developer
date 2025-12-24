@@ -36939,6 +36939,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sfxSource: {fileID: 1956119076}
   bgmSource: {fileID: 1956119075}
+  fadeDuration: 0.3
   sfxList:
   - soundName: back
     clip: {fileID: 8300000, guid: 42ea5841e6f72fa46b0578acbe345df9, type: 3}
@@ -36962,6 +36963,23 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 2b77d68b4833c1740860943c3a26591f, type: 3}
   - soundName: tool_change
     clip: {fileID: 8300000, guid: e3bed8c8a1172a14c8b87d9724c42102, type: 3}
+  bgmList:
+  - soundName: candy
+    clip: {fileID: 8300000, guid: 25cc2225e435897429edc1d2d07361fe, type: 3}
+  - soundName: candy1
+    clip: {fileID: 8300000, guid: 0e84dcb149c27a140995b957647d56cf, type: 3}
+  - soundName: lab
+    clip: {fileID: 8300000, guid: d9e89ab4704ab6c4f995f1b9957461f6, type: 3}
+  - soundName: mainfarm
+    clip: {fileID: 8300000, guid: 42a96c86ff25a5c469bbd528dae7b6d0, type: 3}
+  - soundName: moonlight1
+    clip: {fileID: 8300000, guid: 516c6be70729ec24986ebc0e7743de44, type: 3}
+  - soundName: moonlight
+    clip: {fileID: 8300000, guid: c04b39aadd879484c913e1b0c7e2af65, type: 3}
+  - soundName: store
+    clip: {fileID: 8300000, guid: 1423e4dda2da0db42819a6815d9e3616, type: 3}
+  - soundName: winter
+    clip: {fileID: 8300000, guid: 359ae11356e22614e83f689c044a3c78, type: 3}
 --- !u!1 &1968104464
 GameObject:
   m_ObjectHideFlags: 0

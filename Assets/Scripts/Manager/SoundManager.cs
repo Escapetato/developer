@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
 public class SoundData
 {
-    public string soundName; // 부를 이름 (예: "Click", "Plant")
-    public AudioClip clip;   // 실제 오디오 파일
+    public string soundName;
+    public AudioClip clip;
 }
 
 public class SoundManager : MonoBehaviour
@@ -13,22 +14,34 @@ public class SoundManager : MonoBehaviour
     public static SoundManager Instance;
 
     [Header("Sound Settings")]
-    public AudioSource sfxSource;   // 효과음 틀어줄 스피커
-    public AudioSource bgmSource;   // 배경음악 틀어줄 스피커 (나중을 위해)
+    public AudioSource sfxSource;
+    public AudioSource bgmSource;
 
-    [Header("Registered Sounds")]
-    public List<SoundData> sfxList; // 인스펙터에서 등록할 소리 목록
+    [Range(0.1f, 3.0f)]
+    public float fadeDuration = 0.3f;
 
-    // 소리를 빠르게 찾기 위한 딕셔너리
+    [Header("Data Lists")]
+    public List<SoundData> sfxList;
+    public List<SoundData> bgmList;
+
     private Dictionary<string, AudioClip> sfxDictionary = new Dictionary<string, AudioClip>();
+    private Dictionary<string, AudioClip> bgmDictionary = new Dictionary<string, AudioClip>();
+
+    private Coroutine currentFadeCoroutine; // 현재 실행 중인 페이드 작업을 저장
 
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // 씬이 바뀌어도 소리 매니저는 사라지지 않음
+            DontDestroyOnLoad(gameObject);
             InitSoundDictionary();
+
+            if (bgmSource != null)
+            {
+                bgmSource.loop = true;
+                bgmSource.volume = 1f; // 시작 볼륨 확실하게 설정
+            }
         }
         else
         {
@@ -36,28 +49,74 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    // 리스트에 있는 걸 딕셔너리로 옮겨담기 (성능 최적화)
     void InitSoundDictionary()
     {
         foreach (var data in sfxList)
         {
-            if (!sfxDictionary.ContainsKey(data.soundName))
-            {
-                sfxDictionary.Add(data.soundName, data.clip);
-            }
+            if (!sfxDictionary.ContainsKey(data.soundName)) sfxDictionary.Add(data.soundName, data.clip);
+        }
+        foreach (var data in bgmList)
+        {
+            if (!bgmDictionary.ContainsKey(data.soundName)) bgmDictionary.Add(data.soundName, data.clip);
         }
     }
 
-    // 다른 스크립트에서 이 함수만 부르면 소리가 남
     public void PlaySFX(string name)
     {
-        if (sfxDictionary.ContainsKey(name))
+        if (sfxDictionary.ContainsKey(name)) sfxSource.PlayOneShot(sfxDictionary[name]);
+        else Debug.LogWarning($"SFX '{name}' 없음!");
+    }
+
+    public void PlayBGM(string name)
+    {
+        if (bgmDictionary.ContainsKey(name))
         {
-            sfxSource.PlayOneShot(sfxDictionary[name]);
+            AudioClip nextClip = bgmDictionary[name];
+
+            // 1. 이미 똑같은 노래가 나오고 있으면 무시 (괜히 페이드하지 않음)
+            if (bgmSource.clip == nextClip && bgmSource.isPlaying) return;
+
+            // 2. 이미 페이드 중이었다면 멈추고 새로운 페이드 시작
+            if (currentFadeCoroutine != null) StopCoroutine(currentFadeCoroutine);
+
+            // 3. 부드럽게 전환 시작
+            currentFadeCoroutine = StartCoroutine(FadeToBGM(nextClip));
         }
         else
         {
-            Debug.LogWarning($"'{name}'을(를) 찾을 수 없습니다.");
+            Debug.LogWarning($"BGM '{name}' 없음!");
         }
+    }
+
+    IEnumerator FadeToBGM(AudioClip newClip)
+    {
+        // 1단계: 기존 음악 페이드 아웃 (볼륨 1 -> 0)
+        float startVolume = bgmSource.volume;
+
+        // 만약 음악이 켜져 있었다면 서서히 줄이기
+        if (bgmSource.isPlaying)
+        {
+            while (bgmSource.volume > 0)
+            {
+                bgmSource.volume -= startVolume * Time.deltaTime / fadeDuration;
+                yield return null; // 한 프레임 대기
+            }
+        }
+
+        bgmSource.volume = 0;
+        bgmSource.Stop();
+
+        // 2단계: 음악 교체
+        bgmSource.clip = newClip;
+        bgmSource.Play();
+
+        // 3단계: 새 음악 페이드 인 (볼륨 0 -> 1)
+        while (bgmSource.volume < 1f)
+        {
+            bgmSource.volume += Time.deltaTime / fadeDuration;
+            yield return null;
+        }
+
+        bgmSource.volume = 1f; // 볼륨 확실하게 1로 고정
     }
 }

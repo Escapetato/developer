@@ -61,11 +61,24 @@ public class UIManager : MonoBehaviour
         if (alertPopup != null) alertPopup.SetActive(false);
         if (itemAcquiredPopup != null) itemAcquiredPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
+
+        SoundManager.Instance.PlayBGM("mainfarm");
     }
 
     // 화면에 떠 있는 모든 메인 팝업을 닫는 함수
     public void CloseAllPopups()
     {
+        // [소리] 팝업이 하나라도 열려 있었다면 닫는 소리 재생
+        bool wasAnyPopupOpen = (inventoryPopup != null && inventoryPopup.activeSelf) ||
+                               (researchLabPopup != null && researchLabPopup.activeSelf) ||
+                               (storePopup != null && storePopup.activeSelf) ||
+                               (collectionPopup != null && collectionPopup.activeSelf);
+
+        if (wasAnyPopupOpen)
+        {
+            SoundManager.Instance.PlayBGM("mainfarm");
+        }
+
         if (inventoryPopup != null) inventoryPopup.SetActive(false);
         if (researchLabPopup != null) researchLabPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
@@ -137,8 +150,8 @@ public class UIManager : MonoBehaviour
         if (researchLabPopup != null)
         {
             researchLabPopup.SetActive(true);
-
             MovePoingUIToPopup(researchLabPopup.transform);
+            SoundManager.Instance.PlayBGM("lab");
         }
     }
 
@@ -149,6 +162,7 @@ public class UIManager : MonoBehaviour
         {
             storePopup.SetActive(true);
             MovePoingUIToPopup(storePopup.transform); // 포잉 바를 상점 창 안으로 이동
+            SoundManager.Instance.PlayBGM("store");
         }
     }
 
