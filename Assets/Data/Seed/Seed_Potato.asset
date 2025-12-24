@@ -16,11 +16,16 @@ MonoBehaviour:
   description: 
   itemIcon: {fileID: 21300000, guid: 988aad686dc1fec48bbc0dee20cead64, type: 3}
   itemCategory: Seed
+  collectionCategory: 
   price: 300
   seedCategory: 2
   plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 11400000, guid: 48d7f29a3bd99d842b1450283f0823e4, type: 2}
   requiredToolTier: 1
+  growTimeDisplay: "1\uBD84"
+  harvestToolName: "\uD638\uBBF8"
   toolTier: 0
   growthReductionPercent: 0.25
+  isDefaultUnlocked: 0
+  itemDescription: 

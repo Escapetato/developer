@@ -16,3 +16,11 @@ MonoBehaviour:
   description: 
   itemIcon: {fileID: 21300000, guid: ddf8838d0a06d8d4c9dec9e3bed69260, type: 3}
   itemCategory: Potion
+  price: 50
+  plantPrefab: {fileID: 0}
+  growTime: 0
+  harvestItem: {fileID: 0}
+  requiredToolTier: 1
+  toolTier: 0
+  growthReductionPercent: 0.25
+  isDefaultUnlocked: 1

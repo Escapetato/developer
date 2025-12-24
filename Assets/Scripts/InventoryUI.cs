@@ -2,30 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
-    // 1. 싱글톤
     public static InventoryUI Instance { get; private set; }
 
     [Header("Inventory Slots")]
     public Transform slotParent;
     private List<ItemSlot> slots;
 
-    // 2. 현재 선택한 아이템 (연구실로 보낼 아이템)
     public ItemData selectedItem { get; private set; }
     public ItemSlot selectedSlot { get; private set; }
 
     [Header("Details Panel")]
-    public GameObject detailPanelObject; // Right_Detail_Panel 자체
-    public Image detailImage;           // Detail_Image
-    public Text detailNameText;         // Detail_Name_Text
+    public GameObject detailPanelObject;
+    public Image detailImage;
+
+    public TextMeshProUGUI detailNameText;     // 아이템 이름
+    public TextMeshProUGUI detailQuantityText; // 보유 수량
+
+    // ★ [추가] 아이템 설명을 표시할 텍스트
+    public TextMeshProUGUI detailDescriptionText;
 
     [Header("Category Buttons")]
-    public List<CategoryButton> categoryButtons; // (Inspector에서 'CategoryButton' 스크립트 연결)
-    public CategoryButton defaultCategoryButton; // (Inspector에서 'All' 또는 'Seed' 버튼 연결)
+    public List<CategoryButton> categoryButtons;
+    public CategoryButton defaultCategoryButton;
 
-    private string currentCategory = "All";
+    private string currentCategory = "Seed";
 
     void Awake()
     {
@@ -41,44 +45,35 @@ public class InventoryUI : MonoBehaviour
 
     void OnEnable()
     {
-        InventoryManager.Instance.OnInventoryChanged += RedrawInventory;
+        if (InventoryManager.Instance != null)
+            InventoryManager.Instance.OnInventoryChanged += RedrawInventory;
 
-        if (defaultCategoryButton != null)
+        if (defaultCategoryButton != null) SetCategory(defaultCategoryButton);
+        else
         {
-            SetCategory(defaultCategoryButton);
-        }
-        else if (categoryButtons != null && categoryButtons.Count > 0)
-        {
-            SetCategory(categoryButtons[0]);
+            currentCategory = "Seed";
+            RedrawInventory();
         }
     }
 
     void OnDisable()
     {
-        InventoryManager.Instance.OnInventoryChanged -= RedrawInventory;
+        if (InventoryManager.Instance != null)
+            InventoryManager.Instance.OnInventoryChanged -= RedrawInventory;
     }
 
-    // 카테고리 버튼 클릭 시 호출되는 함수
     public void SetCategory(CategoryButton clickedButton)
     {
-        foreach (CategoryButton btn in categoryButtons)
-        {
-            btn.SetSelected(false);
-        }
+        foreach (CategoryButton btn in categoryButtons) btn.SetSelected(false);
         clickedButton.SetSelected(true);
         currentCategory = clickedButton.categoryName;
-
         ClearSelection();
         RedrawInventory();
     }
 
-    // 슬롯 선택 함수
     public void SelectSlot(ItemSlot slot)
     {
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
+        if (selectedSlot != null) selectedSlot.SetSelected(false);
 
         if (slot.item != null)
         {
@@ -87,27 +82,9 @@ public class InventoryUI : MonoBehaviour
             selectedSlot.SetSelected(true);
             UpdateDetailPanel(slot.item);
         }
-        else
-        {
-            ClearSelection(); // 빈 슬롯 클릭 시 선택 해제
-        }
+        else ClearSelection();
     }
 
-    // 선택 해제 함수
-    public void ClearSelection()
-    {
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
-        selectedItem = null;
-        selectedSlot = null;
-
-        if (detailPanelObject != null)
-            detailPanelObject.SetActive(false);
-    }
-
-    // 상세 정보 패널 업데이트 전용 함수
     private void UpdateDetailPanel(ItemData item)
     {
         if (item != null)
@@ -115,13 +92,29 @@ public class InventoryUI : MonoBehaviour
             detailPanelObject.SetActive(true);
             detailImage.sprite = item.itemIcon;
             detailImage.color = Color.white;
+
             detailNameText.text = item.itemName;
 
-            // [!!! 가격(Price) 표시 코드 제거 !!!]
+            // ★ [추가] 아이템 설명 표시
+            if (detailDescriptionText != null)
+            {
+                // 설명이 비어있으면 기본 문구 출력 (선택사항)
+                if (string.IsNullOrEmpty(item.itemDescription))
+                    detailDescriptionText.text = "설명이 없습니다.";
+                else
+                    detailDescriptionText.text = item.itemDescription;
+            }
+
+            // 보유 수량 표시
+            int count = 0;
+            if (InventoryManager.Instance.items.ContainsKey(item))
+                count = InventoryManager.Instance.items[item];
+
+            if (detailQuantityText != null)
+                detailQuantityText.text = count.ToString();
         }
     }
 
-    // 인벤토리 다시 그리기 함수
     private void RedrawInventory()
     {
         Dictionary<ItemData, int> allItems = InventoryManager.Instance.items;
@@ -129,15 +122,17 @@ public class InventoryUI : MonoBehaviour
 
         foreach (KeyValuePair<ItemData, int> itemPair in allItems)
         {
-            if (currentCategory == "All" || itemPair.Key.itemCategory == currentCategory)
+            if (itemPair.Key.itemCategory == currentCategory)
             {
                 if (i < slots.Count)
                 {
+                    slots[i].gameObject.SetActive(true);
                     slots[i].SetSlot(itemPair.Key, itemPair.Value);
 
                     if (selectedSlot == slots[i])
                     {
                         selectedSlot.SetSelected(true);
+                        UpdateDetailPanel(slots[i].item);
                     }
                     i++;
                 }
@@ -147,11 +142,17 @@ public class InventoryUI : MonoBehaviour
         for (int j = i; j < slots.Count; j++)
         {
             slots[j].ClearSlot();
+            slots[j].gameObject.SetActive(false);
         }
 
-        if (i == 0)
-        {
-            ClearSelection();
-        }
+        if (i == 0) ClearSelection();
+    }
+
+    public void ClearSelection()
+    {
+        if (selectedSlot != null) selectedSlot.SetSelected(false);
+        selectedItem = null;
+        selectedSlot = null;
+        if (detailPanelObject != null) detailPanelObject.SetActive(false);
     }
 }
