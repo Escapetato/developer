@@ -22,37 +22,47 @@ public class Field : MonoBehaviour
     private float remainingTime;
     private Coroutine growCoroutine; // 성장 코루틴 저장
 
+    [Header("비료 상태")]
+    public int fertilizerCount = 0; // 이 밭에 적용된 비료 개수
+    private const float BASE_SPEED_MULTIPLIER = 1f;
+    private const float FERTILIZER_EFFECT = 0.25f;
+
     private void Start()
     {
         UpdateFieldVisual();
     }
 
-    private IEnumerator GrowRoutine(float growTime)
+    private IEnumerator GrowRoutine(float duration)
     {
         // [수정] state -> currentState
         currentState = FieldState.Growing;
         UpdateFieldVisual();
 
+        // [추가] 이미 얼마나 성장했는지 (스케일 계산을 위한) 초기 비율을 계산합니다.
+    float totalGrowTime = plantedSeed.growTime;
+    float currentProgress = 1f - (duration / totalGrowTime);
+
         float t = 0;
-        while (t < growTime)
+        while (t < duration)
         {
-            t += Time.deltaTime;
-            remainingTime = growTime - t; // 남은 시간 갱신
+            t += Time.deltaTime*GetGrowthMultiplier();
+            remainingTime = duration - t; // 남은 시간 갱신
 
             if (plantInstance != null)
-            {
-                // (팀원분의 성장 로직)
-                float scale = Mathf.Lerp(0.3f, 1f, t / growTime);
-                plantInstance.transform.localScale = Vector3.one * scale;
-            }
-            yield return null;
+        {
+            // 최종 성장 비율 = 현재 진행된 비율 + (남은 성장량 비율 * t/duration)
+            float scaleProgress = currentProgress + (1f - currentProgress) * (t / duration);
+            float scale = Mathf.Lerp(0.3f, 1f, scaleProgress);
+            plantInstance.transform.localScale = Vector3.one * scale;
         }
-
-        remainingTime = 0;
-        // [수정] state -> currentState
-        currentState = FieldState.Ready;
-        UpdateFieldVisual();
+        
+        yield return null;
     }
+
+    remainingTime = 0;
+    currentState = FieldState.Ready;
+    UpdateFieldVisual();
+}
 
     private void UpdateFieldVisual()
     {
@@ -74,13 +84,36 @@ public class Field : MonoBehaviour
         }
     }
 
+    public Sprite GetFieldSprite()
+{
+    // 가장 정확한 방법: 현재 SpriteRenderer가 렌더링하고 있는 Sprite를 반환
+    if (fieldImage != null)
+    {
+        return fieldImage.sprite;
+    }
+    
+    // Fallback: fieldImage가 null일 경우, 상태에 따라 미리 정의된 Sprite 반환
+    switch (currentState)
+    {
+        case FieldState.Empty:
+            return emptySprite;
+        case FieldState.Growing:
+            return growingSprite;
+        case FieldState.Ready:
+            return readySprite;
+        default:
+            return null; // 모든 경우가 아니라면 null 반환
+    }
+}
+
     // [수정] state -> currentState
     public bool IsEmpty() => currentState == FieldState.Empty;
     public bool IsReady() => currentState == FieldState.Ready;
 
-    private void OnMouseDown()
-    {
-        if (currentState == FieldState.Empty)
+   private void OnMouseDown()
+{
+    Debug.Log($"클릭됨! 현재 상태: {currentState}");
+    if (currentState == FieldState.Empty)
         {
             UIManager.Instance.OpenSeedPopup(this);
         }
@@ -90,9 +123,9 @@ public class Field : MonoBehaviour
         }
         else if (currentState == FieldState.Growing)
         {
-            Debug.Log("성장 중입니다...");
+            UIManager.Instance.OpenFertilizerPopup(this);
         }
-    }
+}
 
     public void Plant(ItemData seed)
     {
@@ -114,6 +147,44 @@ public class Field : MonoBehaviour
         Debug.Log(seed.itemName + "을(를) 심었습니다.");
         UpdateFieldVisual(); // (필요 시 plantedSprite로 변경)
     }
+
+    // 비료 개수에 따른 최종 성장 속도 배율 계산
+    public float GetGrowthMultiplier()
+    {
+        return BASE_SPEED_MULTIPLIER + (fertilizerCount * FERTILIZER_EFFECT);
+    }
+
+public void ApplyFertilizer(int count)
+{
+    // 비료 적용 전 현재 배율 저장 (남은 시간 계산에 필요)
+    float oldMultiplier = GetGrowthMultiplier(); 
+    
+    // 1. 비료 개수 증가
+    fertilizerCount += count;
+    
+    // 비료 적용 후 새로운 배율 계산
+    float newMultiplier = GetGrowthMultiplier();
+
+    // 2. 남은 성장 시간 업데이트
+    // 현재까지 진행된 성장 시간 (총 걸릴 시간 - 현재 남은 시간)
+    float totalGrowTime = plantedSeed.growTime; 
+    float timeElapsed = totalGrowTime - remainingTime;
+    
+    // 비료 적용 전의 성장 속도를 적용한 실제 남은 시간 (TimeLeft * Old_Speed)
+    float actualRemainingGrowth = remainingTime * oldMultiplier;
+    
+    // 새로운 배속에 따른 실제 남은 시간 (ActualGrowth / New_Speed)
+    remainingTime = actualRemainingGrowth / newMultiplier;
+
+    // 3. 성장 코루틴 재시작
+    if (growCoroutine != null)
+    {
+        StopCoroutine(growCoroutine);
+    }
+    growCoroutine = StartCoroutine(GrowRoutine(remainingTime));
+
+    Debug.Log($"{count}개 비료 적용. 새 배율: {newMultiplier}배. 남은 시간: {remainingTime:F2}초");
+}
 
     public void Harvest()
     {

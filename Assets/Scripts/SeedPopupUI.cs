@@ -5,24 +5,24 @@ using TMPro;
 
 public class SeedPopupUI : MonoBehaviour // [수정] 이름
 {
-public Transform buttonContainer;
-public GameObject seedButtonPrefab;
-private Field currentField;
-private List<GameObject> spawnedButtons = new List<GameObject>();
+    public Transform buttonContainer;
+    public GameObject seedButtonPrefab;
+    private Field currentField;
+    private List<GameObject> spawnedButtons = new List<GameObject>();
 
-// [삭제] Start(), Show(), Hide() 함수 삭제 (UIManager가 대신함)
+    // [삭제] Start(), Show(), Hide() 함수 삭제 (UIManager가 대신함)
 
-private void ClearButtons()
-{
-foreach (var b in spawnedButtons) Destroy(b);
-spawnedButtons.Clear();
-}
+    private void ClearButtons()
+    {
+        foreach (var b in spawnedButtons) Destroy(b);
+        spawnedButtons.Clear();
+    }
 
-// UIManager가 호출할 수 있도록 public으로 변경
-public void RefreshButtons(Field field)
-{
-currentField = field;
-ClearButtons();
+    // UIManager가 호출할 수 있도록 public으로 변경
+    public void RefreshButtons(Field field)
+    {
+        currentField = field;
+        ClearButtons();
 
 // 'Seed_InventoryManager' 대신 'InventoryManager' 사용
 var dict = InventoryManager.Instance.items;
