@@ -195,7 +195,17 @@ public class QuestListController : MonoBehaviour
         if (questDetailUI != null)
         {
             QuestData data = clickedSlot.GetQuest();
-            questDetailUI.Show(data);
+
+            // 일일 퀘스트 슬롯이면 단일 상세가 아니라 일일 목록 UI를 보여준다.
+            bool isDaily = (clickedSlot.IsDailySlot()) || (data != null && data.type == QuestType.Daily);
+            if (isDaily)
+            {
+                questDetailUI.ShowDailyQuests(GetDailyQuestsForUI());
+            }
+            else
+            {
+                questDetailUI.Show(data);
+            }
         }
     }
 
@@ -207,5 +217,21 @@ public class QuestListController : MonoBehaviour
         {
             Destroy(parent.GetChild(i).gameObject);
         }
+    }
+
+    // 일일 퀘스트(Active/Completed) 목록을 UI에 보여주기 위한 리스트로 모은다.
+    private List<QuestData> GetDailyQuestsForUI()
+    {
+        var result = new List<QuestData>();
+        if (QuestManager.Instance == null || QuestManager.Instance.dailyQuests == null)
+            return result;
+
+        foreach (var q in QuestManager.Instance.dailyQuests)
+        {
+            if (q == null) continue;
+            if (q.state == QuestState.Active || q.state == QuestState.Completed)
+                result.Add(q);
+        }
+        return result;
     }
 }

@@ -16,20 +16,30 @@ public class QuestDetailUI : MonoBehaviour
     [SerializeField] private GameObject[] conditionStrikeLine;   // complete_line1, complete_line2
     [SerializeField] private GameObject[] conditionCheckOn;     // 빨간 체크 아이콘들
 
+    [Header("일일퀘스트 레이아웃")]
+    [SerializeField] private RectTransform conditionContainer; // ConditionContainer
+    [SerializeField] private float dailyContainerOffsetY = 2f; // 위로 올릴 값 (Inspector에서 조절)
+
+    private Vector2 conditionContainerNormalPos;
+    private bool isConditionPosCached = false;
+
     [Header("보상 버튼")]
     [SerializeField] private Button rewardButton;
 
     private QuestData currentQuest;
-    
+
     private bool isDailyQuestView = false;  // 현재 화면이 '일일퀘스트(3개 리스트)' 모드인지 여부
     // 일일퀘스트는 최대 몇 개까지 UI 슬롯에 표시할지
-    private const int DailyQuestSlotCount = 3; 
+    private const int DailyQuestSlotCount = 3;
 
     public void Show(QuestData data)
     {
         currentQuest = data;
         isDailyQuestView = false;
         if (descText != null) descText.gameObject.SetActive(true);
+
+        isDailyQuestView = false;
+        ApplyDailyLayout(false);
 
         // 0) 데이터가 없으면 깨끗이 지우고 끝
         if (data == null)
@@ -80,10 +90,11 @@ public class QuestDetailUI : MonoBehaviour
         // 4) currentCounts / targetCounts 기준으로 취소선 + 체크 + 버튼 상태 갱신
         RefreshConditions();
     }
-    
+
     public void ShowDailyQuests(List<QuestData> dailyQuests)
     {
         isDailyQuestView = true;
+        ApplyDailyLayout(true);
 
         // 1) 제목 통합 변경
         if (titleText != null) titleText.text = "일일퀘스트";
@@ -162,6 +173,31 @@ public class QuestDetailUI : MonoBehaviour
 
             if (i < conditionCheckOn.Length && conditionCheckOn[i] != null)
                 conditionCheckOn[i].SetActive(completed);
+        }
+    }
+
+    private void ApplyDailyLayout(bool isDaily)
+    {
+        if (conditionContainer == null) return;
+
+        // 설명 텍스트는 일일퀘스트에서 숨김
+        if (descText != null)
+            descText.gameObject.SetActive(!isDaily);
+
+        if (!isConditionPosCached)
+        {
+            conditionContainerNormalPos = conditionContainer.anchoredPosition;
+            isConditionPosCached = true;
+        }
+
+        if (isDaily)
+        {
+            conditionContainer.anchoredPosition =
+                conditionContainerNormalPos + new Vector2(0f, dailyContainerOffsetY);
+        }
+        else
+        {
+            conditionContainer.anchoredPosition = conditionContainerNormalPos;
         }
     }
 
@@ -262,5 +298,14 @@ public class QuestDetailUI : MonoBehaviour
 
         if (rewardButton != null)
             rewardButton.interactable = false;
+    }
+    
+    private void Awake()
+    {
+        if (conditionContainer != null && !isConditionPosCached)
+        {
+            conditionContainerNormalPos = conditionContainer.anchoredPosition;
+            isConditionPosCached = true;
+        }
     }
 }

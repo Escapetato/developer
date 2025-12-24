@@ -139,40 +139,6 @@ public static class DailyQuestSelector
                 $"[DailyQuestSelector] 오늘의 일일 퀘스트 오픈: slot={(char)('A' + i)} | key={quest.key} | title=\"{quest.title}\" | diff={GetDifficultyLabel(difficulty)}"
                 + $" | target={target} | reward={rewardInfo.label} x{rewardInfo.amount} (rewardKey={rewardInfo.rewardKey})");
         }
-
-        // --- 오늘의 일일 퀘스트 요약 로그 ---
-        if (openedToday.Count > 0)
-        {
-            Debug.Log("[DailyQuestSelector] ===== 오늘의 일일 퀘스트 3개 요약 =====");
-            for (int i = 0; i < openedToday.Count; i++)
-            {
-                var q = openedToday[i];
-                if (q == null) continue;
-
-                string slot = ((char)('A' + i)).ToString();
-                string diff = GetDifficultyLabel(q.dailyDifficulty);
-                int target = (q.targetCounts != null && q.targetCounts.Length > 0) ? q.targetCounts[0] : 0;
-                string rewardLabel = q.rewardKey switch
-                {
-                    (int)DailyRewardType.Poing => "포잉",
-                    (int)DailyRewardType.Fertilizer => "비료",
-                    (int)DailyRewardType.Potion => "물약",
-                    _ => $"rewardKey={q.rewardKey}"
-                };
-
-                // 포션이면 rewardKey(100+)로 타입 추정해서 라벨을 조금 더 친절하게
-                if (q.rewardKey >= 100)
-                {
-                    int idx = q.rewardKey - 100;
-                    if (idx >= 0 && idx < potionTypes.Length)
-                        rewardLabel = $"{potionTypes[idx]} 물약";
-                }
-
-                Debug.Log(
-                    $"[DailyQuestSelector] {slot} | key={q.key} | title=\"{q.title}\" | diff={diff} | target={target} | reward={rewardLabel} x{q.rewardAmount} (rewardKey={q.rewardKey})");
-            }
-            Debug.Log("[DailyQuestSelector] =====================================");
-        }
     }
 
     private static void ResetDailyQuestStates(List<QuestData> dailyQuests)
