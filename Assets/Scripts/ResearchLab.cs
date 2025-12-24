@@ -195,6 +195,8 @@ public class ResearchLab : MonoBehaviour
             GameProgressionManager.Instance.UnlockItem(newItem);
             InventoryManager.Instance.AddItem(newItem, 1);
 
+            SoundManager.Instance.PlaySFX("ev_success"); // 소리 추가
+
             // 성공 팝업
             OpenSuccessPopup(newItem);
         }
@@ -202,6 +204,8 @@ public class ResearchLab : MonoBehaviour
         {
             // [CASE B] 실패 (레시피가 없었음) -> 돈과 재료는 이미 날아감
             UIManager.Instance.ShowAlertPopup("아무런 반응이 없습니다...\n 재료가 모두 사라졌습니다.");
+
+            SoundManager.Instance.PlaySFX("ev_fail");
         }
 
         // 초기화
