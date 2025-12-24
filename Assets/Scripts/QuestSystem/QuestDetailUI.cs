@@ -164,7 +164,16 @@ public class QuestDetailUI : MonoBehaviour
             if (conditionTexts[i] != null)
             {
                 string questTitle = (q != null) ? q.title : "";
-                conditionTexts[i].text = questTitle;
+                questTitle = System.Text.RegularExpressions.Regex.Replace(
+                    questTitle,
+                    @"\s*\d+\s*회",
+                    ""
+                );
+
+                if (target > 0)
+                    conditionTexts[i].text = $"{questTitle} ({cur}/{target})";
+                else
+                    conditionTexts[i].text = questTitle;
             }
 
             // 취소선/체크
