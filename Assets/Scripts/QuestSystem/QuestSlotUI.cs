@@ -12,6 +12,7 @@ public class QuestSlotUI : MonoBehaviour
     [SerializeField] private Sprite selectedSprite;   
 
     private QuestData boundQuest;
+    private bool isDailySlot = false;
     private QuestListController ownerController;
 
     // 현재 선택 여부
@@ -34,6 +35,7 @@ public class QuestSlotUI : MonoBehaviour
     public void Setup(QuestData data)
     {
         boundQuest = data;
+        isDailySlot = (data != null && data.type == QuestType.Daily);
 
         if (titleText != null)
         {
@@ -94,5 +96,10 @@ public class QuestSlotUI : MonoBehaviour
     public QuestData GetQuest()
     {
         return boundQuest;
+    }
+
+    public bool IsDailySlot()
+    {
+        return isDailySlot;
     }
 }
