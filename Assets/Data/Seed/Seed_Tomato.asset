@@ -17,6 +17,7 @@ MonoBehaviour:
   itemIcon: {fileID: 0}
   itemCategory: Seed
   price: 300
+  seedCategory: 1
   plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 11400000, guid: 0189d90933e11354faf6ba4ffb34e421, type: 2}
