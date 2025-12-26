@@ -7,6 +7,9 @@ public enum SlotType { Inventory, Material, Result, Lab_Inventory, Store }
 
 public class ItemSlot : MonoBehaviour, IPointerClickHandler
 {
+    // ★ [수정] 이 변수는 이제 안 씁니다 (삭제함)
+    // public Image icon; 
+
     [Header("Core Info")]
     public ItemData item;
     public SlotType slotType;
@@ -16,15 +19,40 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     public Image slotBackground;
     public TextMeshProUGUI detailText;   // 가격 or 수량
 
-    // ★ [추가] 아이템 이름을 표시할 텍스트
+    // ★ 아이템 이름을 표시할 텍스트
     public TextMeshProUGUI itemNameText;
 
     public Image selectionBorder;
 
     [Header("Selection Sprites")]
     public Sprite selectedSprite;
-    private Sprite defaultSprite;
 
+    // [수정 포인트 1] 배경 이미지가 자꾸 사라져서, 아예 직접 넣을 수 있게 public으로 만들었습니다.
+    // 기존: private Sprite defaultSprite;
+    public Sprite defaultBackground;
+
+    [Header("Settings")]
+    // (연구실) 비어 있을 때 보여줄 기본 이미지 (+ 모양)
+    public Sprite defaultIcon;
+
+    // 테스트용
+    void Start()
+    {
+        // 만약 인스펙터에 아이템을 넣어 놨다면?
+        if (item != null)
+        {
+            int realCount = 1; // 기본은 1개지만
+
+            // 창고(InventoryManager)가 있으면 진짜 개수 물어보기
+            if (InventoryManager.Instance != null && InventoryManager.Instance.items.ContainsKey(item))
+            {
+                realCount = InventoryManager.Instance.items[item];
+            }
+
+            // 진짜 개수로 설정
+            SetSlot(item, realCount);
+        }
+    }
     void Awake()
     {
         if (selectionBorder == null && transform.Find("SelectionBorder") != null)
@@ -33,8 +61,9 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
         if (slotBackground == null)
             slotBackground = GetComponent<Image>();
 
-        if (slotBackground != null)
-            defaultSprite = slotBackground.sprite;
+        // [수정 포인트 3] 실수로 인스펙터에 배경을 안 넣었을 때를 대비한 안전장치
+        if (defaultBackground == null && slotBackground != null)
+            defaultBackground = slotBackground.sprite;
 
         if (selectionBorder != null)
             selectionBorder.gameObject.SetActive(false);
@@ -44,12 +73,12 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     {
         item = newItem;
 
-        // 1. 아이콘
+        // 1. 아이콘 설정 (수정됨)
         if (itemIconDisplay != null)
         {
             itemIconDisplay.sprite = newItem.itemIcon;
             itemIconDisplay.color = Color.white;
-            itemIconDisplay.gameObject.SetActive(true);
+            itemIconDisplay.gameObject.SetActive(true); // 아이템이 들어왔으니 켜기
         }
 
         // 2. ★ [추가] 이름 표시 (이름 텍스트가 연결되어 있다면)
@@ -71,7 +100,7 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
                     break;
 
                 case SlotType.Store:
-                    detailText.text = newItem.price.ToString(); 
+                    detailText.text = newItem.price.ToString();
                     detailText.gameObject.SetActive(true);
                     break;
 
@@ -86,19 +115,40 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     public void ClearSlot()
     {
         item = null;
-        if (itemIconDisplay != null) itemIconDisplay.gameObject.SetActive(false);
-        if (detailText != null) detailText.gameObject.SetActive(false);
-        if (itemNameText != null) itemNameText.gameObject.SetActive(false); // 이름 숨기기
-        if (selectionBorder != null) selectionBorder.gameObject.SetActive(false);
-        if (slotBackground != null) slotBackground.sprite = defaultSprite;
-    }
 
+        // 아이콘 처리 로직 변경
+        if (itemIconDisplay != null)
+        {
+            // 만약 기본 아이콘(+모양)이 설정되어 있다면?
+            if (defaultIcon != null)
+            {
+                itemIconDisplay.sprite = defaultIcon; // + 그림으로 교체
+                itemIconDisplay.color = Color.white;  // 보이게 설정
+                itemIconDisplay.gameObject.SetActive(true); // 오브젝트를 켜야 보임
+            }
+            else
+            {
+                // 설정된 게 없다면 (인벤토리 등) -> 그냥 숨김
+                itemIconDisplay.sprite = null;
+                itemIconDisplay.gameObject.SetActive(false);
+            }
+        }
+
+        if (detailText != null) detailText.gameObject.SetActive(false);
+        if (itemNameText != null) itemNameText.gameObject.SetActive(false);
+        if (selectionBorder != null) selectionBorder.gameObject.SetActive(false);
+
+        // [수정 포인트 4] 배경 복구 시 defaultBackground 사용
+        if (slotBackground != null) slotBackground.sprite = defaultBackground;
+    }
 
     public void SetSelected(bool isSelected)
     {
         if (selectionBorder != null) selectionBorder.gameObject.SetActive(isSelected);
+
+        // [수정 포인트 5] 선택 해제 시에도 defaultBackground 사용
         if (slotBackground != null && selectedSprite != null)
-            slotBackground.sprite = isSelected ? selectedSprite : defaultSprite;
+            slotBackground.sprite = isSelected ? selectedSprite : defaultBackground;
     }
 
     public void OnPointerClick(PointerEventData eventData)

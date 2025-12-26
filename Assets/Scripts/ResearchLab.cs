@@ -3,6 +3,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// 임시
+[System.Serializable]
+public class CategoryTab
+{
+    public string categoryName;       // 예: "Crop", "Potion" (코드랑 똑같이 적어야 함)
+    public Button buttonObj;          // 버튼 컴포넌트
+    public Image buttonBackground;    // 배경 이미지를 바꿀 타겟
+    public TextMeshProUGUI buttonText;// 텍스트 색을 바꿀 타겟
+}
+
 public class ResearchLab : MonoBehaviour
 {
     public static ResearchLab Instance { get; private set; }
@@ -31,12 +41,21 @@ public class ResearchLab : MonoBehaviour
     public TextMeshProUGUI successNameText;
     public TextMeshProUGUI successMessageText;
 
+    [Header("6. Category Tabs UI")] // 새로 추가할 부분
+    public List<CategoryTab> categoryTabs; // 인스펙터에서 버튼들 등록
+    public Sprite tabSelectedSprite;  // 선택됐을 때 배경 그림
+    public Sprite tabNormalSprite;    // 평소 배경 그림
+
+    public Color tabSelectedColor = Color.white; // 선택됐을 때 글자 색
+    public Color tabNormalColor = Color.gray;    // 평소 글자 색
+
     private EvolutionRecipe pendingRecipe; // 찾은 레시피 (없으면 null)
     private int currentEvolutionCost = 0;  // ★ [추가] 이번 진화에 들어갈 비용
 
     private string currentCategory = "Crop";
     public ItemData selectedItem { get; private set; }
     public ItemSlot selectedSlot { get; private set; }
+
 
     void Awake()
     {
@@ -54,11 +73,51 @@ public class ResearchLab : MonoBehaviour
     void OnEnable() { InventoryManager.Instance.OnInventoryChanged += RedrawInventory; SetCategory("Crop"); }
     void OnDisable() { InventoryManager.Instance.OnInventoryChanged -= RedrawInventory; }
 
-    // (기존 UI 그리기 함수들은 생략 - 그대로 두세요)
+   
     public void SelectSlot(ItemSlot slot) { if (selectedSlot != null) selectedSlot.SetSelected(false); if (slot.item != null) { selectedItem = slot.item; selectedSlot = slot; selectedSlot.SetSelected(true); } }
     public void ClearSelection() { if (selectedSlot != null) selectedSlot.SetSelected(false); selectedItem = null; selectedSlot = null; }
-    public void SetCategory(string category) { currentCategory = category; ClearSelection(); RedrawInventory(); }
+    // [2] 카테고리 변경 함수 수정
+    public void SetCategory(string category)
+    {
+        currentCategory = category;
+        ClearSelection();
+        RedrawInventory();
+
+        // ★ 버튼 UI 업데이트 로직 추가
+        UpdateTabUI();
+    }
     private void RedrawInventory() { Dictionary<ItemData, int> allItems = InventoryManager.Instance.items; int i = 0; foreach (KeyValuePair<ItemData, int> itemPair in allItems) { if (currentCategory == "All" || itemPair.Key.itemCategory == currentCategory) { if (i < inventorySlots.Count) { inventorySlots[i].gameObject.SetActive(true); inventorySlots[i].SetSlot(itemPair.Key, itemPair.Value); if (selectedSlot == inventorySlots[i]) selectedSlot.SetSelected(true); i++; } } } for (int j = i; j < inventorySlots.Count; j++) { inventorySlots[j].ClearSlot(); inventorySlots[j].gameObject.SetActive(false); } }
+
+    // ★ [3] 버튼 모양을 바꿔주는 함수 추가
+    private void UpdateTabUI()
+    {
+        foreach (var tab in categoryTabs)
+        {
+            // 이 버튼이 현재 선택된 카테고리인지 확인
+            bool isSelected = (tab.categoryName == currentCategory);
+
+            // 1. 배경 이미지 변경
+            if (tab.buttonBackground != null)
+            {
+                tab.buttonBackground.sprite = isSelected ? tabSelectedSprite : tabNormalSprite;
+            }
+
+            // 2. 텍스트 색상 변경 (혹은 텍스트 내용 변경)
+            if (tab.buttonText != null)
+            {
+                tab.buttonText.color = isSelected ? tabSelectedColor : tabNormalColor;
+
+                // 만약 텍스트 내용도 바꾸고 싶다면? (예: "작물" -> "작물(선택됨)")
+                // tab.buttonText.text = isSelected ? $"[{tab.categoryName}]" : tab.categoryName;
+            }
+
+            // 3. 버튼 인터랙션 (선택된 건 클릭 안 되게 하려면)
+            if (tab.buttonObj != null)
+            {
+                tab.buttonObj.interactable = !isSelected;
+            }
+        }
+    }
 
 
     // [1] 진화 버튼 클릭
@@ -136,6 +195,8 @@ public class ResearchLab : MonoBehaviour
             GameProgressionManager.Instance.UnlockItem(newItem);
             InventoryManager.Instance.AddItem(newItem, 1);
 
+            SoundManager.Instance.PlaySFX("ev_success"); // 소리 추가
+
             // 성공 팝업
             OpenSuccessPopup(newItem);
         }
@@ -143,6 +204,8 @@ public class ResearchLab : MonoBehaviour
         {
             // [CASE B] 실패 (레시피가 없었음) -> 돈과 재료는 이미 날아감
             UIManager.Instance.ShowAlertPopup("아무런 반응이 없습니다...\n 재료가 모두 사라졌습니다.");
+
+            SoundManager.Instance.PlaySFX("ev_fail");
         }
 
         // 초기화

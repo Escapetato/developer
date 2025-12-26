@@ -32,6 +32,22 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    // start랑 update는 테스트 
+    void Start()
+    {
+        // 게임 시작하자마자 테스트 아이템을 10개씩 자동으로 넣기
+        if (testItem != null)
+        {
+            AddItem(testItem, 10);
+        }
+
+        if (testPotion != null)
+        {
+            AddItem(testPotion, 10);
+        }
+    }
+
+    // 'T' 키를 누르면 green_apple 1개 추가
     void Update()
     {
         // 'T' 키를 누르면 green_apple 1개 추가

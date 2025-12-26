@@ -63,13 +63,29 @@ public class UIManager : MonoBehaviour
         if (alertPopup != null) alertPopup.SetActive(false);
         if (itemAcquiredPopup != null) itemAcquiredPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
+
+        SoundManager.Instance.PlayBGM("mainfarm");
     }
 
     // 화면에 떠 있는 모든 메인 팝업을 닫는 함수
     public void CloseAllPopups()
     {
-        if (fertilizerPopup != null)
-            fertilizerPopup.SetActive(false);
+        // 1. [소리 체크] 팝업이 하나라도 열려 있었는지 확인
+        bool wasAnyPopupOpen = (inventoryPopup != null && inventoryPopup.activeSelf) ||
+                               (researchLabPopup != null && researchLabPopup.activeSelf) ||
+                               (storePopup != null && storePopup.activeSelf) ||
+                               (collectionPopup != null && collectionPopup.activeSelf) ||
+                               (fertilizerPopup != null && fertilizerPopup.activeSelf); // 비료 팝업 추가
+
+        // 2. [소리 재생] 팝업이 열려있었다면 농장 BGM으로 복귀
+        if (wasAnyPopupOpen)
+        {
+            SoundManager.Instance.PlayBGM("mainfarm");
+        }
+
+        // 3. [기능] 실제로 팝업들 끄기 (여기에 비료 팝업 끄는 코드도 추가)
+        if (fertilizerPopup != null) fertilizerPopup.SetActive(false); 
+        
         if (inventoryPopup != null) inventoryPopup.SetActive(false);
         if (researchLabPopup != null) researchLabPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
@@ -141,8 +157,8 @@ public class UIManager : MonoBehaviour
         if (researchLabPopup != null)
         {
             researchLabPopup.SetActive(true);
-
             MovePoingUIToPopup(researchLabPopup.transform);
+            SoundManager.Instance.PlayBGM("lab");
         }
     }
 
@@ -153,6 +169,7 @@ public class UIManager : MonoBehaviour
         {
             storePopup.SetActive(true);
             MovePoingUIToPopup(storePopup.transform); // 포잉 바를 상점 창 안으로 이동
+            SoundManager.Instance.PlayBGM("store");
         }
     }
 
