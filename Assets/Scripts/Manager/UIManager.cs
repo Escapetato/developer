@@ -34,6 +34,8 @@ public class UIManager : MonoBehaviour
 
     [Header("Farm Popups")]
     public GameObject seedPopup;
+    public GameObject fertilizerPopup;
+
     private Field currentField; // [추가] 씨앗을 심을 밭
     private Field lastField = null;   // 마지막으로 클릭한 밭
     private bool isSeedPopupOpen = false; // 시드 팝업 열림 여부
@@ -68,17 +70,22 @@ public class UIManager : MonoBehaviour
     // 화면에 떠 있는 모든 메인 팝업을 닫는 함수
     public void CloseAllPopups()
     {
-        // [소리] 팝업이 하나라도 열려 있었다면 닫는 소리 재생
+        // 1. [소리 체크] 팝업이 하나라도 열려 있었는지 확인
         bool wasAnyPopupOpen = (inventoryPopup != null && inventoryPopup.activeSelf) ||
                                (researchLabPopup != null && researchLabPopup.activeSelf) ||
                                (storePopup != null && storePopup.activeSelf) ||
-                               (collectionPopup != null && collectionPopup.activeSelf);
+                               (collectionPopup != null && collectionPopup.activeSelf) ||
+                               (fertilizerPopup != null && fertilizerPopup.activeSelf); // 비료 팝업 추가
 
+        // 2. [소리 재생] 팝업이 열려있었다면 농장 BGM으로 복귀
         if (wasAnyPopupOpen)
         {
             SoundManager.Instance.PlayBGM("mainfarm");
         }
 
+        // 3. [기능] 실제로 팝업들 끄기 (여기에 비료 팝업 끄는 코드도 추가)
+        if (fertilizerPopup != null) fertilizerPopup.SetActive(false); 
+        
         if (inventoryPopup != null) inventoryPopup.SetActive(false);
         if (researchLabPopup != null) researchLabPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
@@ -182,17 +189,34 @@ public class UIManager : MonoBehaviour
     {
         CloseAllPopups();
         currentField = field;
-        seedPopup.SetActive(true);
-        seedPopup.GetComponent<SeedPopupUI>().RefreshButtons(field);
-
+        if (seedPopup != null)
+        {
+            seedPopup.SetActive(true);
+            seedPopup.GetComponent<SeedPopupUI>()?.RefreshButtons(field);
+        }
+        
         isSeedPopupOpen = true;
     }
-
-    public void ToggleSeedPopup(Field field)
+    public void OpenFertilizerPopup(Field field)
     {
-        // 새로운 밭 → 열기
-        lastField = field;
-        OpenSeedPopup(field);
+        CloseAllPopups(); // 다른 모든 팝업 닫기
+        currentField = field;
+        
+        if (fertilizerPopup != null)
+        {
+            fertilizerPopup.SetActive(true);
+            // FertilizerPopupUI 컴포넌트의 Show 함수 호출 (비료 정보 로드)
+            // UIManager는 GameObject만 참조하고, 실제 UI 로직은 해당 스크립트가 처리합니다.
+            FertilizerPopupUI fertilizerUI = fertilizerPopup.GetComponent<FertilizerPopupUI>();
+            if (fertilizerUI != null)
+            {
+                fertilizerUI.Show(field);
+            }
+            else
+            {
+                Debug.LogError("FertilizerPopup에 FertilizerPopupUI 스크립트가 없습니다.");
+            }
+        }
     }
 
     // 현재 열려있는 밭 정보를 반환 (다른 스크립트에서 사용)
@@ -232,26 +256,25 @@ public class UIManager : MonoBehaviour
         poingBarRect.localScale = Vector3.one;
     }
     void Update()
-{
-    if (isSeedPopupOpen && Input.GetMouseButtonDown(0)) // 좌클릭
     {
-        // 클릭한 오브젝트 감지
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit))
+        if (isSeedPopupOpen && Input.GetMouseButtonDown(0)) 
         {
-            // 클릭한 오브젝트가 Field인지 확인
-            Field clickedField = hit.collider.GetComponent<Field>();
+            // 클릭한 오브젝트 감지
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-            // 밭이 아니면 시드 팝업 닫기
-            if (clickedField == null)
+            if (Physics.Raycast(ray, out hit))
             {
-                seedPopup.SetActive(false);
+                // 클릭한 오브젝트가 Field인지 확인
+                Field clickedField = hit.collider.GetComponent<Field>();
+
+                // UI 외부를 클릭했을 때만 팝업을 닫습니다.
+                if (clickedField == null)
+                {
+                    // 팝업을 닫고 상태 플래그도 초기화
+                    CloseAllPopups(); 
+                }
             }
         }
-
     }
-}
-
 }

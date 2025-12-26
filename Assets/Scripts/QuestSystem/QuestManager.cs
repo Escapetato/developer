@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 
 public class QuestManager : MonoBehaviour
@@ -51,6 +50,38 @@ public class QuestManager : MonoBehaviour
                   $"일일 Active={CountActive(dailyQuests)}");
     }
 
+    private QuestData CloneQuest(QuestData src)
+    {
+        var dst = new QuestData();
+
+        // 기본 정보
+        dst.key = src.key;
+        dst.title = src.title;
+        dst.type = src.type;
+        dst.questDesc = src.questDesc;
+
+        // 조건(배열은 깊은 복사)
+        dst.conditionTexts = src.conditionTexts != null ? (string[])src.conditionTexts.Clone() : null;
+        dst.targetCounts = src.targetCounts != null ? (int[])src.targetCounts.Clone() : null;
+
+        // 런타임 상태(새로 생성)
+        dst.state = src.state;               // 혹은 Locked로 통일해도 됨(InitializeQuestStates가 어차피 초기화)
+        dst.currentCount = src.currentCount;
+        dst.rewardClaimed = src.rewardClaimed;
+        dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
+
+        // 보상/체인
+        dst.rewardKey = src.rewardKey;
+        dst.rewardAmount = src.rewardAmount;
+        dst.nextKey = src.nextKey;
+
+        // 일일 퀘스트 설정(참조는 그대로 둬도 OK)
+        dst.dailyDifficulty = src.dailyDifficulty;
+        dst.dailyTargets = src.dailyTargets;
+
+        return dst;
+    }
+
     // DB에서 퀘스트 정보 가져오기 
     private void LoadFromDatabase()
     {
@@ -65,7 +96,7 @@ public class QuestManager : MonoBehaviour
         foreach (var q in questDatabase.quests)
         {
             if (q == null) continue;
-            allQuestList.Add(q);   
+            allQuestList.Add(CloneQuest(q)); // DB 원본 건드리지 않고 클론해서 사용
         }
 
         Debug.Log($"[QuestManager] QuestDatabase에서 {allQuestList.Count}개 퀘스트 로드.");
@@ -128,7 +159,10 @@ public class QuestManager : MonoBehaviour
     {
         MainQuestSlot();
         SubQuestSlot(2);
-        RandomDailyQuestSlot(3);
+
+        // 일일 퀘스트는 별도 로직(DailyQuestSelector)에서 3개(A/B/C) 생성
+        DailyQuestSelector.ConfigureDailyQuests(dailyQuests, 3);
+        Debug.Log("[QuestManager] 일일 퀘스트 생성 완료 (DailyQuestSelector)");
     }
 
     // 메인 퀘스트 슬롯 관리
@@ -184,78 +218,6 @@ public class QuestManager : MonoBehaviour
         }
 
         Debug.Log($"[QuestManager] 서브 퀘스트 슬롯 상태: 진행중 {openCount}/{targetCount}");
-    }
-
-
-    // 일일 퀘스트
-    // 하루 기준으로 전부 리셋, "그룹당 최대 1개" 규칙으로 랜덤 오픈
-    private void RandomDailyQuestSlot(int targetCount)
-    {
-        // 1) 상태 리셋
-        foreach (var q in dailyQuests)
-        {
-            if (q == null) continue;
-
-            q.state = QuestState.Locked;
-            q.currentCount = 0;
-            q.rewardClaimed = false;
-        }
-
-        // 2) 그룹별로 묶기
-        var groupMap = new Dictionary<int, List<QuestData>>();
-
-        foreach (var q in dailyQuests)
-        {
-            if (q == null) continue;
-
-            int groupId = (q.key - 1) / 3;
-
-            if (!groupMap.ContainsKey(groupId))
-            {
-                groupMap[groupId] = new List<QuestData>();
-            }
-
-            groupMap[groupId].Add(q);
-        }
-
-        if (groupMap.Count == 0)
-        {
-            Debug.Log("[QuestManager] 일일 퀘스트 후보 그룹이 없습니다.");
-            return;
-        }
-
-        // 3) 그룹 순서를 랜덤 섞기
-        var groupIds = new List<int>(groupMap.Keys);
-        for (int i = 0; i < groupIds.Count; i++)
-        {
-            int swapIndex = UnityEngine.Random.Range(i, groupIds.Count);
-            int tmp = groupIds[i];
-            groupIds[i] = groupIds[swapIndex];
-            groupIds[swapIndex] = tmp;
-        }
-
-        int opened = 0;
-        int maxOpen = Mathf.Min(targetCount, groupIds.Count);
-
-        // 4) 각 그룹에서 1개씩만 랜덤 선택하여 오픈
-        for (int i = 0; i < maxOpen; i++)
-        {
-            int groupId = groupIds[i];
-            List<QuestData> group = groupMap[groupId];
-
-            if (group == null || group.Count == 0)
-                continue;
-
-            int pickIndex = UnityEngine.Random.Range(0, group.Count);
-            QuestData q = group[pickIndex];
-
-            q.state = QuestState.Active;
-            Debug.Log($"[QuestManager] 오늘의 일일 퀘스트 오픈: key={q.key}, title={q.title}, group={groupId}");
-
-            opened++;
-        }
-
-        Debug.Log($"[QuestManager] 오늘 일일 퀘스트 개수: {opened}/{targetCount}");
     }
 
 
