@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +22,12 @@ public class UIManager : MonoBehaviour
     public GameObject alertPopup;       // 알림창 패널
     public TextMeshProUGUI alertMessageText; // [TMP] 알림 메시지 (예: "돈이 부족합니다")
     public Button alertCloseButton;     // 알림창 닫기(확인) 버튼
+
+    [Header("Confirm Popup (질문 팝업)")]
+    public GameObject confirmPopup;         // 팝업 패널
+    public TextMeshProUGUI confirmText;     // 질문 텍스트
+    public Button confirmYesButton;         // '네' 버튼
+    public Button confirmNoButton;          // '아니오' 버튼
 
     [Header("Item Acquired Popup (아이템 획득 팝업)")]
     public GameObject itemAcquiredPopup;       // 획득 팝업 패널
@@ -56,15 +63,49 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        // 게임 시작 시 모든 팝업을 닫고 시작
-        CloseAllPopups();
+        CloseAllPopups(); 
 
         // 안전장치: 알림창들이 켜져 있다면 강제로 끔
         if (alertPopup != null) alertPopup.SetActive(false);
         if (itemAcquiredPopup != null) itemAcquiredPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
 
+        if (confirmPopup != null) confirmPopup.SetActive(false);
+
         SoundManager.Instance.PlayBGM("mainfarm");
+    }
+
+    public void ShowConfirmPopup(string message, Action onConfirm)
+    {
+        if (confirmPopup == null) return;
+
+        confirmPopup.SetActive(true);
+        if (confirmText != null) confirmText.text = message;
+
+        // '네' 버튼 설정
+        if (confirmYesButton != null)
+        {
+            confirmYesButton.onClick.RemoveAllListeners();
+            confirmYesButton.onClick.AddListener(() =>
+            {
+                onConfirm(); // 진짜 기능 실행 (판매 등)
+                confirmPopup.SetActive(false);
+                SoundManager.Instance.PlaySFX("button");
+            });
+        }
+
+        // '아니오' 버튼 설정
+        if (confirmNoButton != null)
+        {
+            confirmNoButton.onClick.RemoveAllListeners();
+            confirmNoButton.onClick.AddListener(() =>
+            {
+                confirmPopup.SetActive(false); // 그냥 닫기
+                SoundManager.Instance.PlaySFX("button");
+            });
+        }
+
+        SoundManager.Instance.PlaySFX("PopupOpen");
     }
 
     // 화면에 떠 있는 모든 메인 팝업을 닫는 함수
@@ -81,6 +122,7 @@ public class UIManager : MonoBehaviour
         if (wasAnyPopupOpen)
         {
             SoundManager.Instance.PlayBGM("mainfarm");
+            SoundManager.Instance.PlaySFX("button");
         }
 
         // 3. [기능] 실제로 팝업들 끄기 (여기에 비료 팝업 끄는 코드도 추가)
@@ -91,6 +133,7 @@ public class UIManager : MonoBehaviour
         if (seedPopup != null) seedPopup.SetActive(false);
         if (storePopup != null) storePopup.SetActive(false);
         if (collectionPopup != null) collectionPopup.SetActive(false);
+        if (confirmPopup != null) confirmPopup.SetActive(false);
 
         // 팝업이 닫힐 때, 포잉 바(재화 UI)를 원래 위치(메인 화면)로 되돌림
         ResetPoingUIPosition();
@@ -268,7 +311,7 @@ public class UIManager : MonoBehaviour
                 // 클릭한 오브젝트가 Field인지 확인
                 Field clickedField = hit.collider.GetComponent<Field>();
 
-                // UI 외부를 클릭했을 때만 팝업을 닫습니다.
+                // UI 외부를 클릭했을 때만 팝업을 닫음
                 if (clickedField == null)
                 {
                     // 팝업을 닫고 상태 플래그도 초기화
