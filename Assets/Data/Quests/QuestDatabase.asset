@@ -30,6 +30,7 @@ MonoBehaviour:
     - "\uB3C4\uB9DD\uAC10\uC790 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0500000001000000
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 2
@@ -55,8 +56,9 @@ MonoBehaviour:
     - "\uBA4B\uC7C1\uC774 \uD1A0\uB9C8\uD1A0 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0500000001000000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: 165382755a2f6684cb91d6ee842877eb, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 3
     dailyDifficulty: 0
     dailyTargets:
@@ -81,6 +83,7 @@ MonoBehaviour:
     - "\uC54C\uB9AC\uC624\uC62C\uB9AC\uC624 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0300000001000000
     currentCounts: 0300000001000000
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 4
@@ -104,8 +107,9 @@ MonoBehaviour:
     - "\uBA54\uB85C\uB098 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0300000001000000
     currentCounts: 0000000000000000
+    rewardItem: {fileID: 11400000, guid: 2f7f40b2408e9a14fbdb500f84d2c07e, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 5
     dailyDifficulty: 0
     dailyTargets:
@@ -131,6 +135,7 @@ MonoBehaviour:
     - "\uC7AD\uC624\uB79C\uD134 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0100000001000000
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 6
@@ -158,8 +163,9 @@ MonoBehaviour:
     - "\uBCC4\uC0AC\uD0D5 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0100000001000000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: 9f6b5ecc7de7da94aae4f15b60e19f5d, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 0
     dailyDifficulty: 0
     dailyTargets:
@@ -181,8 +187,9 @@ MonoBehaviour:
     - "\uC791\uBB3C \uC528\uC557 10\uAC1C \uAD6C\uB9E4\uD558\uAE30"
     targetCounts: 0a000000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: 78430ef49a53a804bbdec4d89d7d0962, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 2
     dailyDifficulty: 0
     dailyTargets:
@@ -203,8 +210,9 @@ MonoBehaviour:
     - "\uC218\uD655\uB3C4\uAD6C 1\uAC1C \uAD6C\uB9E4\uD558\uAE30"
     targetCounts: 01000000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: c750a806cdddfa54db1a5ac00afb8b69, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 3
     dailyDifficulty: 0
     dailyTargets:
@@ -226,8 +234,9 @@ MonoBehaviour:
     - "\uC791\uBB3C 50\uAC1C \uD310\uB9E4\uD558\uAE30"
     targetCounts: 32000000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: 4eeadc65370f02c42bb3f879f533e9ab, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 4
     dailyDifficulty: 0
     dailyTargets:
@@ -248,8 +257,9 @@ MonoBehaviour:
     - "7\uC77C \uC5F0\uC18D \uC811\uC18D\uD558\uAE30"
     targetCounts: 07000000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: cf50d8519e8d7564cb4a5e8007ce4d50, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 5
     dailyDifficulty: 0
     dailyTargets:
@@ -270,8 +280,9 @@ MonoBehaviour:
     - "\uAFB8\uBBF8\uAE30\uD14C\uB9C8 1\uAC1C \uAD6C\uB9E4\uD558\uAE30"
     targetCounts: 01000000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: 69d52f45f3dbce046a0667d4a6f36275, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 6
     dailyDifficulty: 0
     dailyTargets:
@@ -292,8 +303,9 @@ MonoBehaviour:
     - "5\uB9CC \uACE8\uB4DC \uC18C\uBE44\uD558\uAE30"
     targetCounts: 50c30000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: 45a83d0d29381c64da960d03d796908f, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 7
     dailyDifficulty: 0
     dailyTargets:
@@ -314,8 +326,9 @@ MonoBehaviour:
     - "\uC791\uBB3C \uC9C4\uD654 5\uC5F0\uC18D \uC131\uACF5\uD558\uAE30"
     targetCounts: 05000000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: 7f042aa655193ce4bb50c74cbb64d5a2, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 8
     dailyDifficulty: 0
     dailyTargets:
@@ -337,8 +350,9 @@ MonoBehaviour:
     - "\uC544\uC2A4\uD30C\uB77C\uAC70\uC2A4 1\uC2DC\uAC04 \uC548\uC5D0 \uC218\uD655\uD558\uAE30"
     targetCounts: 00000000
     currentCounts: 
+    rewardItem: {fileID: 11400000, guid: 7abee0038aca19a4ca280f408482bb11, type: 2}
     rewardKey: 0
-    rewardAmount: 0
+    rewardAmount: 1
     nextKey: 0
     dailyDifficulty: 0
     dailyTargets:
@@ -355,6 +369,7 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 0
@@ -373,6 +388,7 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 0
@@ -391,6 +407,7 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 0
@@ -409,6 +426,7 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 0
@@ -427,6 +445,7 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 0
@@ -445,6 +464,7 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 0
@@ -463,6 +483,7 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 0
@@ -481,6 +502,7 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
     nextKey: 0

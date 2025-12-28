@@ -40,6 +40,7 @@ public class QuestData
     public int[] currentCounts;      // 각 조건의 현재 수치
 
     [Header("보상 정보")]
+    public ItemData rewardItem;
     public int rewardKey; // 보상 아이템 ID
     public int rewardAmount; // 보상 수량
 

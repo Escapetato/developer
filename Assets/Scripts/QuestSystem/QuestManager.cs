@@ -74,6 +74,7 @@ public class QuestManager : MonoBehaviour
         dst.rewardKey = src.rewardKey;
         dst.rewardAmount = src.rewardAmount;
         dst.nextKey = src.nextKey;
+        dst.rewardItem = src.rewardItem;
 
         // 일일 퀘스트 설정(참조는 그대로 둬도 OK)
         dst.dailyDifficulty = src.dailyDifficulty;
@@ -236,4 +237,60 @@ public class QuestManager : MonoBehaviour
 
         return cnt;
     }
+
+    public event Action OnQuestChanged;
+
+    private bool IsCompletedByCounts(QuestData q)
+    {
+        if (q == null || q.targetCounts == null || q.currentCounts == null) return false;
+
+        int n = Mathf.Min(q.targetCounts.Length, q.currentCounts.Length);
+        if (n == 0) return false;
+
+        for (int i = 0; i < n; i++)
+        {
+            int target = q.targetCounts[i];
+            int cur = q.currentCounts[i];
+            if (target > 0 && cur < target) return false;
+        }
+        return true;
+    }
+
+    // 메인/서브 퀘스트 - 보상 로직 
+    public bool ClaimRewardMainSub(QuestData quest)
+    {
+        if (quest == null) return false;
+
+        // ⚠️ 일일 제외
+        if (quest.type == QuestType.Daily) return false;
+
+        // 이미 받았으면 종료
+        if (quest.rewardClaimed) return false;
+
+        // 완료 안 됐으면 종료 (테스트로 counts 조작하면 통과 가능)
+        if (!IsCompletedByCounts(quest)) return false;
+
+        // ⚠️ 땅 확장 구현 필요 
+        if (quest.rewardItem == null) return false;
+
+        int amount = Mathf.Max(1, quest.rewardAmount);
+
+        // 인벤 추가, 도감 해금 
+        InventoryManager.Instance.AddItem(quest.rewardItem, amount);
+        GameProgressionManager.Instance?.UnlockItem(quest.rewardItem);
+
+        // 퀘스트 상태 변경: Closed
+        quest.rewardClaimed = true;
+        quest.state = QuestState.Closed;
+
+        // 퀘스트 닫힌 뒤 다음 슬롯 자동 오픈 
+        if (quest.type == QuestType.Main)
+            MainQuestSlot();     // 다음 메인 1개 열기
+        else if (quest.type == QuestType.Sub)
+            SubQuestSlot(2);     // 서브 2개 유지
+
+        OnQuestChanged?.Invoke();
+        return true;
+    }
+
 }

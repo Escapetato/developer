@@ -68,8 +68,12 @@ public class QuestDetailUI : MonoBehaviour
         // 3) QuestData 안의 conditionTexts를 UI에 뿌리기
         if (data.conditionTexts != null)
         {
-            // 데이터 개수와 UI 슬롯 개수 중 작은 쪽까지만 사용
-            int count = Mathf.Min(data.conditionTexts.Length, conditionRows.Length);
+            int count = Mathf.Min(
+                data.conditionTexts.Length,
+                conditionRows.Length,
+                conditionTexts.Length
+               );
+
 
             for (int i = 0; i < count; i++)
             {
@@ -218,6 +222,21 @@ public class QuestDetailUI : MonoBehaviour
             return;
         }
 
+        // ✅ 이미 보상 받았거나 닫힌 퀘스트면 버튼 비활성
+        if (currentQuest.rewardClaimed || currentQuest.state == QuestState.Closed)
+        {
+            if (rewardButton != null) rewardButton.interactable = false;
+            return;
+        }
+
+        // ✅ 아이템 보상이 아니면(땅 확장 등) 이번 범위에서는 버튼 비활성
+        if (currentQuest.type != QuestType.Daily && currentQuest.rewardItem == null)
+        {
+            if (rewardButton != null) rewardButton.interactable = false;
+            return;
+        }
+
+
         if (currentQuest.conditionTexts == null ||
             currentQuest.targetCounts == null ||
             currentQuest.currentCounts == null)
@@ -232,7 +251,8 @@ public class QuestDetailUI : MonoBehaviour
             currentQuest.currentCounts != null ? currentQuest.currentCounts.Length : 0,
             conditionRows.Length,
             conditionTexts.Length,
-            conditionCheckOn.Length
+            conditionCheckOn.Length,
+            conditionStrikeLine.Length
         );
 
         // 조건이 한 개도 없으면 보상 버튼은 비활성
@@ -308,7 +328,7 @@ public class QuestDetailUI : MonoBehaviour
         if (rewardButton != null)
             rewardButton.interactable = false;
     }
-    
+
     private void Awake()
     {
         if (conditionContainer != null && !isConditionPosCached)
@@ -316,5 +336,21 @@ public class QuestDetailUI : MonoBehaviour
             conditionContainerNormalPos = conditionContainer.anchoredPosition;
             isConditionPosCached = true;
         }
+
+        if (rewardButton != null)
+        {
+            rewardButton.onClick.RemoveAllListeners();
+            rewardButton.onClick.AddListener(() =>
+            {
+                if (isDailyQuestView) return;
+                if (currentQuest == null) return;
+
+                if (QuestManager.Instance != null && QuestManager.Instance.ClaimRewardMainSub(currentQuest))
+                {
+                    RefreshConditions();
+                }
+            });
+        }
     }
+
 }
