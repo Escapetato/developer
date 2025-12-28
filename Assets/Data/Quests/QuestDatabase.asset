@@ -48,7 +48,7 @@ MonoBehaviour:
       \uAC70\uC608\uC694! \uC81C\uB2C8 \uC5B8\uB2C8\uCC98\uB7FC\uC694!\" \n\uAF2C\uB9C8
       \uD1A0\uB9C8\uD1A0\uAC00 \uAFC8\uC744 \uC774\uB8F0 \uC218 \uC788\uB3C4\uB85D
       \uB3C4\uC640\uC8FC\uC790. "
-    state: 3
+    state: 1
     currentCount: 0
     rewardClaimed: 0
     conditionTexts:
@@ -75,14 +75,14 @@ MonoBehaviour:
       \uC774\uB807\uAC8C \uB41C \uAC78\uAE4C...\"\n\uCE5C\uAD6C\uAC00 \uC774\uBCC4\uC758
       \uC544\uD514\uC744 \uADF9\uBCF5\uD560 \uC218 \uC788\uB3C4\uB85D \uC704\uB85C\uC758
       \uC74C\uC2DD\uC744 \uB9CC\uB4E4\uC5B4 \uC8FC\uC790. "
-    state: 1
+    state: 0
     currentCount: 0
     rewardClaimed: 0
     conditionTexts:
     - "\uB9C8\uB298 3\uAC1C \uC2EC\uAE30"
     - "\uC54C\uB9AC\uC624\uC62C\uB9AC\uC624 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0300000001000000
-    currentCounts: 0300000001000000
+    currentCounts: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0

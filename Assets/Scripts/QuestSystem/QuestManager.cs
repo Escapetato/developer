@@ -277,6 +277,7 @@ public class QuestManager : MonoBehaviour
 
         // 인벤 추가, 도감 해금 
         InventoryManager.Instance.AddItem(quest.rewardItem, amount);
+        Debug.Log($"[QuestReward] Added {quest.rewardItem.itemName} x{amount}, quest={quest.key} -> Closed");
         GameProgressionManager.Instance?.UnlockItem(quest.rewardItem);
 
         // 퀘스트 상태 변경: Closed
