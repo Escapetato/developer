@@ -347,8 +347,20 @@ public class QuestDetailUI : MonoBehaviour
 
                 if (QuestManager.Instance != null && QuestManager.Instance.ClaimRewardMainSub(currentQuest))
                 {
+                    // 1) 보상 지급 완료 팝업
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowAlertPopup("보상이 지급되었습니다.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[QuestReward] UIManager.Instance가 없어 팝업을 띄울 수 없습니다.");
+                    }
+
+                    // 2) UI 갱신
                     RefreshConditions();
                 }
+
             });
         }
     }
