@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+//using System.Diagnostics;
 using UnityEngine;
 
 public class QuestManager : MonoBehaviour
@@ -73,6 +74,7 @@ public class QuestManager : MonoBehaviour
         // 보상/체인
         dst.rewardKey = src.rewardKey;
         dst.rewardAmount = src.rewardAmount;
+        dst.rewardPoing = src.rewardPoing;
         dst.nextKey = src.nextKey;
         dst.rewardItem = src.rewardItem;
 
@@ -279,6 +281,13 @@ public class QuestManager : MonoBehaviour
         InventoryManager.Instance.AddItem(quest.rewardItem, amount);
         Debug.Log($"[QuestReward] Added {quest.rewardItem.itemName} x{amount}, quest={quest.key} -> Closed");
         GameProgressionManager.Instance?.UnlockItem(quest.rewardItem);
+
+        // 서브 퀘스트: 포잉(정적) 추가 지급
+        if (quest.type == QuestType.Sub && quest.rewardPoing > 0)
+        {
+            PoingManager.Instance.AddPoing(quest.rewardPoing);
+            Debug.Log($"[QuestReward] Added Poing +{quest.rewardPoing}, quest={quest.key}");
+        }
 
         // 퀘스트 상태 변경: Closed
         quest.rewardClaimed = true;
