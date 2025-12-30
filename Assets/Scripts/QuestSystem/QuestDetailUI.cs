@@ -401,7 +401,7 @@ public class QuestDetailUI : MonoBehaviour
         QuestData q = currentDailyQuests[index];
         if (q == null) return;
 
-        if (QuestManager.Instance != null && QuestManager.Instance.ClaimRewardMainSub(q))
+        if (QuestManager.Instance != null && QuestManager.Instance.ClaimRewardDaily(q))
         {
             UIManager.Instance?.ShowAlertPopup("보상이 지급되었습니다.");
             ShowDailyQuests(currentDailyQuests); // 진행도/체크/버튼까지 재갱신

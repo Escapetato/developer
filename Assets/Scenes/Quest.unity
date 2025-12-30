@@ -727,6 +727,15 @@ MonoBehaviour:
   mainQuests: []
   subQuests: []
   dailyQuests: []
+  dailyFertilizerItem: {fileID: 11400000, guid: a65a37f4a42ff9949ae4cfb9ba2dad4b, type: 2}
+  dailyPotionItems:
+  - {fileID: 11400000, guid: ecdc859f7660ad84c91f3122abf59b71, type: 2}
+  - {fileID: 11400000, guid: 4c6bfb90f2c7f044ba65e58180c3d860, type: 2}
+  - {fileID: 11400000, guid: 5b1de8934242f6b43b72dbbbe2c7018a, type: 2}
+  - {fileID: 11400000, guid: 6deaf2a4e67777d4c9119edc844bebd3, type: 2}
+  - {fileID: 11400000, guid: 60ac3b5c96f1f8049ac28a767ca6ff7f, type: 2}
+  - {fileID: 11400000, guid: fc160dc35553f0b4f91068d055162ab8, type: 2}
+  - {fileID: 11400000, guid: 1f64bd9698d9c5440afbed9a4950fc52, type: 2}
 --- !u!1 &374979958
 GameObject:
   m_ObjectHideFlags: 0

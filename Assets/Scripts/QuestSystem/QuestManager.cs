@@ -19,6 +19,10 @@ public class QuestManager : MonoBehaviour
     public List<QuestData> subQuests = new List<QuestData>();
     public List<QuestData> dailyQuests = new List<QuestData>();
 
+    [Header("일일퀘스트 보상 아이템 매핑")]
+    [SerializeField] private ItemData dailyFertilizerItem;   // 비료 ItemData (1개)
+    [SerializeField] private ItemData[] dailyPotionItems;    // 포션 ItemData 8개 (불~무지개 순서)
+
     // 한 플레이 세션에서 한 번만 초기화 
     private bool initialized = false;
 
@@ -40,10 +44,10 @@ public class QuestManager : MonoBehaviour
         if (initialized) return;
         initialized = true;
 
-        LoadFromDatabase();    
-        BuildQuestLists();    
-        InitializeQuestStates();  
-        OpenInitialSlots();      
+        LoadFromDatabase();
+        BuildQuestLists();
+        InitializeQuestStates();
+        OpenInitialSlots();
 
         Debug.Log($"[QuestManager] 초기 슬롯 오픈 완료 - " +
                   $"메인 Active={CountActive(mainQuests)}, " +
@@ -298,6 +302,76 @@ public class QuestManager : MonoBehaviour
             MainQuestSlot();     // 다음 메인 1개 열기
         else if (quest.type == QuestType.Sub)
             SubQuestSlot(2);     // 서브 2개 유지
+
+        OnQuestChanged?.Invoke();
+        return true;
+    }
+    
+    public bool ClaimRewardDaily(QuestData quest)
+    {
+        if (quest == null) return false;
+
+        // 일일만 처리
+        if (quest.type != QuestType.Daily) return false;
+
+        // 이미 받았으면 종료
+        if (quest.rewardClaimed) return false;
+
+        // 완료 안 됐으면 종료
+        if (!IsCompletedByCounts(quest)) return false;
+
+        int amount = Mathf.Max(1, quest.rewardAmount);
+
+        // rewardKey 규칙:
+        // 0 = 포잉, 1 = 비료, 100~107 = 포션(8종)
+        const int KEY_POING = 0;
+        const int KEY_FERTILIZER = 1;
+        const int POTION_BASE = 100;
+
+        // 중복지급 방지: 지급 전에 먼저 true
+        quest.rewardClaimed = true;
+
+        if (quest.rewardKey == KEY_POING)
+        {
+            PoingManager.Instance.AddPoing(amount);
+            Debug.Log($"[DailyReward] Added Poing +{amount}, quest={quest.key}");
+        }
+        else if (quest.rewardKey == KEY_FERTILIZER)
+        {
+            if (dailyFertilizerItem == null)
+            {
+                Debug.LogWarning("[DailyReward] dailyFertilizerItem이 연결되지 않았습니다.");
+                quest.rewardClaimed = false; // 실패 처리(선택)
+                return false;
+            }
+
+            InventoryManager.Instance.AddItem(dailyFertilizerItem, amount);
+            Debug.Log($"[DailyReward] Added Fertilizer {dailyFertilizerItem.itemName} x{amount}, quest={quest.key}");
+        }
+        else if (quest.rewardKey >= POTION_BASE)
+        {
+            int idx = quest.rewardKey - POTION_BASE;
+
+            if (dailyPotionItems == null || idx < 0 || idx >= dailyPotionItems.Length || dailyPotionItems[idx] == null)
+            {
+                Debug.LogWarning($"[DailyReward] dailyPotionItems 매핑이 잘못되었습니다. key={quest.rewardKey}, idx={idx}");
+                quest.rewardClaimed = false; // 실패 처리(선택)
+                return false;
+            }
+
+            var potionItem = dailyPotionItems[idx];
+            InventoryManager.Instance.AddItem(potionItem, amount);
+            Debug.Log($"[DailyReward] Added Potion {potionItem.itemName} x{amount}, quest={quest.key}");
+        }
+        else
+        {
+            Debug.LogWarning($"[DailyReward] Unknown rewardKey={quest.rewardKey}, quest={quest.key}");
+            quest.rewardClaimed = false; // 실패 처리(선택)
+            return false;
+        }
+
+        // 수령 후 상태 처리 (원하면 유지/변경 가능)
+        quest.state = QuestState.Closed;
 
         OnQuestChanged?.Invoke();
         return true;
