@@ -196,7 +196,7 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: 78430ef49a53a804bbdec4d89d7d0962, type: 2}
     rewardKey: 0
     rewardAmount: 1
-    rewardPoing: 500
+    rewardPoing: 100
     nextKey: 2
     dailyDifficulty: 0
     dailyTargets:
@@ -220,7 +220,7 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: c750a806cdddfa54db1a5ac00afb8b69, type: 2}
     rewardKey: 0
     rewardAmount: 1
-    rewardPoing: 500
+    rewardPoing: 100
     nextKey: 3
     dailyDifficulty: 0
     dailyTargets:
@@ -245,7 +245,7 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: 4eeadc65370f02c42bb3f879f533e9ab, type: 2}
     rewardKey: 0
     rewardAmount: 1
-    rewardPoing: 500
+    rewardPoing: 200
     nextKey: 4
     dailyDifficulty: 0
     dailyTargets:
@@ -269,7 +269,7 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: cf50d8519e8d7564cb4a5e8007ce4d50, type: 2}
     rewardKey: 0
     rewardAmount: 1
-    rewardPoing: 500
+    rewardPoing: 200
     nextKey: 5
     dailyDifficulty: 0
     dailyTargets:
@@ -293,7 +293,7 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: 69d52f45f3dbce046a0667d4a6f36275, type: 2}
     rewardKey: 0
     rewardAmount: 1
-    rewardPoing: 500
+    rewardPoing: 400
     nextKey: 6
     dailyDifficulty: 0
     dailyTargets:
@@ -317,7 +317,7 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: 45a83d0d29381c64da960d03d796908f, type: 2}
     rewardKey: 0
     rewardAmount: 1
-    rewardPoing: 500
+    rewardPoing: 400
     nextKey: 7
     dailyDifficulty: 0
     dailyTargets:
@@ -341,7 +341,7 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: 7f042aa655193ce4bb50c74cbb64d5a2, type: 2}
     rewardKey: 0
     rewardAmount: 1
-    rewardPoing: 500
+    rewardPoing: 650
     nextKey: 8
     dailyDifficulty: 0
     dailyTargets:
@@ -366,7 +366,7 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: 7abee0038aca19a4ca280f408482bb11, type: 2}
     rewardKey: 0
     rewardAmount: 1
-    rewardPoing: 500
+    rewardPoing: 700
     nextKey: 0
     dailyDifficulty: 0
     dailyTargets:

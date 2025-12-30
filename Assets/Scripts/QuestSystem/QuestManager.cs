@@ -11,7 +11,7 @@ public class QuestManager : MonoBehaviour
     [Header("퀘스트 데이터베이스 (정적 데이터)")]
     public QuestDatabase questDatabase;
 
-    [Header("원본 퀘스트 리스트 (런타임용)")]
+    [Header("원본 퀘스트 리스트")]
     public List<QuestData> allQuestList = new List<QuestData>();
 
     [Header("타입별 퀘스트 리스트")]
