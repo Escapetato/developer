@@ -370,8 +370,6 @@ public class QuestManager : MonoBehaviour
             return false;
         }
 
-        // 수령 후 상태 처리 (원하면 유지/변경 가능)
-        quest.state = QuestState.Closed;
 
         OnQuestChanged?.Invoke();
         return true;
