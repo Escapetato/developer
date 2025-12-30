@@ -64,7 +64,10 @@ public class UIManager : MonoBehaviour
         if (itemAcquiredPopup != null) itemAcquiredPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
 
-        SoundManager.Instance.PlayBGM("mainfarm");
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayBGM("mainfarm");
+        else
+            Debug.LogWarning("SoundManager.Instance is null (BGM skipped).");
     }
 
     // 화면에 떠 있는 모든 메인 팝업을 닫는 함수
