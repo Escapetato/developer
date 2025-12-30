@@ -78,10 +78,10 @@ public class UIManager : MonoBehaviour
                                (fertilizerPopup != null && fertilizerPopup.activeSelf); // 비료 팝업 추가
 
         // 2. [소리 재생] 팝업이 열려있었다면 농장 BGM으로 복귀
-        if (wasAnyPopupOpen)
-        {
-            SoundManager.Instance.PlayBGM("mainfarm");
-        }
+        if (wasAnyPopupOpen && SoundManager.Instance != null)
+    {
+        SoundManager.Instance.PlayBGM("mainfarm");
+    }
 
         // 3. [기능] 실제로 팝업들 끄기 (여기에 비료 팝업 끄는 코드도 추가)
         if (fertilizerPopup != null) fertilizerPopup.SetActive(false); 

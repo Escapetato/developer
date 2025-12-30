@@ -18,6 +18,7 @@ MonoBehaviour:
   itemCategory: Crop
   collectionCategory: Fruit
   price: 50
+  seedCategory: 0
   plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
