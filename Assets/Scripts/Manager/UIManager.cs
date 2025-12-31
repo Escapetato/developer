@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,11 +17,18 @@ public class UIManager : MonoBehaviour
     public GameObject researchLabPopup; // 연구실 창
     public GameObject storePopup;       // 상점 창
     public GameObject collectionPopup; // 도감 창
+    public GameObject questPopup;       // 퀘스트 창
 
     [Header("Alert Popup (단순 알림창)")]
     public GameObject alertPopup;       // 알림창 패널
     public TextMeshProUGUI alertMessageText; // [TMP] 알림 메시지 (예: "돈이 부족합니다")
     public Button alertCloseButton;     // 알림창 닫기(확인) 버튼
+
+    [Header("Confirm Popup (질문 팝업)")]
+    public GameObject confirmPopup;         // 팝업 패널
+    public TextMeshProUGUI confirmText;     // 질문 텍스트
+    public Button confirmYesButton;         // '네' 버튼
+    public Button confirmNoButton;          // '아니오' 버튼
 
     [Header("Item Acquired Popup (아이템 획득 팝업)")]
     public GameObject itemAcquiredPopup;       // 획득 팝업 패널
@@ -56,43 +64,81 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        // 게임 시작 시 모든 팝업을 닫고 시작
-        CloseAllPopups();
+        CloseAllPopups(); 
 
         // 안전장치: 알림창들이 켜져 있다면 강제로 끔
         if (alertPopup != null) alertPopup.SetActive(false);
         if (itemAcquiredPopup != null) itemAcquiredPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
 
+        if (confirmPopup != null) confirmPopup.SetActive(false);
+
         SoundManager.Instance.PlayBGM("mainfarm");
     }
 
-    // 화면에 떠 있는 모든 메인 팝업을 닫는 함수
-    public void CloseAllPopups()
+    public void ShowConfirmPopup(string message, Action onConfirm)
     {
-        // 1. [소리 체크] 팝업이 하나라도 열려 있었는지 확인
+        if (confirmPopup == null) return;
+
+        confirmPopup.SetActive(true);
+        if (confirmText != null) confirmText.text = message;
+
+        // '네' 버튼 설정
+        if (confirmYesButton != null)
+        {
+            confirmYesButton.onClick.RemoveAllListeners();
+            confirmYesButton.onClick.AddListener(() =>
+            {
+                onConfirm(); // 진짜 기능 실행 (판매 등)
+                confirmPopup.SetActive(false);
+                SoundManager.Instance.PlaySFX("button");
+            });
+        }
+
+        // '아니오' 버튼 설정
+        if (confirmNoButton != null)
+        {
+            confirmNoButton.onClick.RemoveAllListeners();
+            confirmNoButton.onClick.AddListener(() =>
+            {
+                confirmPopup.SetActive(false); // 그냥 닫기
+                SoundManager.Instance.PlaySFX("button");
+            });
+        }
+
+        SoundManager.Instance.PlaySFX("PopupOpen");
+    }
+
+    // 화면에 떠 있는 모든 메인 팝업을 닫는 함수
+    public void CloseAllPopups(bool goToMain = true)
+    {
+        // 1. [소리 체크] 팝업이 하나라도 열려 있었는지 확인 (questPopup 추가)
         bool wasAnyPopupOpen = (inventoryPopup != null && inventoryPopup.activeSelf) ||
                                (researchLabPopup != null && researchLabPopup.activeSelf) ||
                                (storePopup != null && storePopup.activeSelf) ||
                                (collectionPopup != null && collectionPopup.activeSelf) ||
-                               (fertilizerPopup != null && fertilizerPopup.activeSelf); // 비료 팝업 추가
+                               (fertilizerPopup != null && fertilizerPopup.activeSelf) ||
+                               (questPopup != null && questPopup.activeSelf); // 퀘스트 창도 체크
 
         // 2. [소리 재생] 팝업이 열려있었다면 농장 BGM으로 복귀
-        if (wasAnyPopupOpen)
+        if (wasAnyPopupOpen && goToMain)
         {
             SoundManager.Instance.PlayBGM("mainfarm");
+            SoundManager.Instance.PlaySFX("button"); // 
         }
 
-        // 3. [기능] 실제로 팝업들 끄기 (여기에 비료 팝업 끄는 코드도 추가)
-        if (fertilizerPopup != null) fertilizerPopup.SetActive(false); 
-        
+        // 3. [기능] 실제로 팝업들 끄기
+        if (fertilizerPopup != null) fertilizerPopup.SetActive(false);
         if (inventoryPopup != null) inventoryPopup.SetActive(false);
         if (researchLabPopup != null) researchLabPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
         if (storePopup != null) storePopup.SetActive(false);
         if (collectionPopup != null) collectionPopup.SetActive(false);
+        if (confirmPopup != null) confirmPopup.SetActive(false);
 
-        // 팝업이 닫힐 때, 포잉 바(재화 UI)를 원래 위치(메인 화면)로 되돌림
+        // ★ [추가] 퀘스트 창 끄기
+        if (questPopup != null) questPopup.SetActive(false);
+
         ResetPoingUIPosition();
     }
 
@@ -141,9 +187,29 @@ public class UIManager : MonoBehaviour
 
     // --- 팝업 열기 함수들 ---
 
+    // [추가] 퀘스트 팝업 열기
+    public void OpenQuestPopup()
+    {
+        CloseAllPopups(false); // 다른 창 닫기 (음악 유지)
+        if (SideMenuUI.Instance != null) SideMenuUI.Instance.CloseMenu();
+
+        if (questPopup != null)
+        {
+            questPopup.SetActive(true);
+
+            // 퀘스트 창은 보통 꽉 차니까 포잉 바 이동은 선택 (필요하면 아래 주석 해제)
+            // MovePoingUIToPopup(questPopup.transform); 
+
+            // SoundManager.Instance.PlaySFX("PopupOpen");
+        }
+    }
+
     public void OpenInventoryPopup()
     {
         CloseAllPopups(); // 다른 창 닫고
+
+        if (SideMenuUI.Instance != null) SideMenuUI.Instance.CloseMenu();
+
         if (inventoryPopup != null)
         {
             inventoryPopup.SetActive(true); // 인벤토리 열기
@@ -154,6 +220,9 @@ public class UIManager : MonoBehaviour
     public void OpenResearchLabPopup()
     {
         CloseAllPopups();
+
+        if (SideMenuUI.Instance != null) SideMenuUI.Instance.CloseMenu();
+
         if (researchLabPopup != null)
         {
             researchLabPopup.SetActive(true);
@@ -165,6 +234,9 @@ public class UIManager : MonoBehaviour
     public void OpenStorePopup()
     {
         CloseAllPopups();
+
+        if (SideMenuUI.Instance != null) SideMenuUI.Instance.CloseMenu();
+
         if (storePopup != null)
         {
             storePopup.SetActive(true);
@@ -176,6 +248,9 @@ public class UIManager : MonoBehaviour
     public void OpenCollectionPopup()
     {
         CloseAllPopups(); // 다른 창 다 닫고
+
+        if (SideMenuUI.Instance != null) SideMenuUI.Instance.CloseMenu();
+
         if (collectionPopup != null)
         {
             collectionPopup.SetActive(true); // 도감 열기
@@ -268,7 +343,7 @@ public class UIManager : MonoBehaviour
                 // 클릭한 오브젝트가 Field인지 확인
                 Field clickedField = hit.collider.GetComponent<Field>();
 
-                // UI 외부를 클릭했을 때만 팝업을 닫습니다.
+                // UI 외부를 클릭했을 때만 팝업을 닫음
                 if (clickedField == null)
                 {
                     // 팝업을 닫고 상태 플래그도 초기화
