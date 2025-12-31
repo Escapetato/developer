@@ -12,7 +12,20 @@
           "package_name": "com.escapetato.whatthefarm"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "720946891402-9f9v1s5lctpfjed9lfeo0p0fgr8s4c74.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.escapetato.whatthefarm",
+            "certificate_hash": "c5cf661634c3c3c1bc53107bd879cd486af73f7a"
+          }
+        },
+        {
+          "client_id": "720946891402-jqa28vi5u3j2np9u1trvc0fll98s4t51.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB_pLpwZmjw1mH9M9_ZRNjVT43RynJeAeA"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "720946891402-jqa28vi5u3j2np9u1trvc0fll98s4t51.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
