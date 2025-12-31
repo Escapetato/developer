@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "720946891402",
+    "project_id": "whatthefarm-893d5",
+    "storage_bucket": "whatthefarm-893d5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:720946891402:android:2c7993f1143ff3c041fb73",
+        "android_client_info": {
+          "package_name": "com.escapetato.whatthefarm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_pLpwZmjw1mH9M9_ZRNjVT43RynJeAeA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
