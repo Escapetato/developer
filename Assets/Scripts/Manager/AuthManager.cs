@@ -58,8 +58,11 @@ public class AuthManager : MonoBehaviour
             Debug.Log("로그인 성공! 님 ID: " + task.Result.User.UserId);
             if (statusText) statusText.text = "로그인 성공!";
 
+            // [추가] DB 매니저한테 "내 아이디로 500 포잉 저장해 줘!" 라고 시키기
+            FindObjectOfType<DBManager>().LoadGameData(task.Result.User.UserId);
+
             // 여기서 게임 씬으로 넘어가면 됨!
-            // UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Lab");
         });
     }
 }
