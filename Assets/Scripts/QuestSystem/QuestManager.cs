@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -236,4 +236,52 @@ public class QuestManager : MonoBehaviour
 
         return cnt;
     }
-}
+
+    // [추가] 1. 저장할 때: 내 퀘스트 정보를 '저장용 상자(QuestSaveData)'에 담아서 포장하기
+    public List<QuestSaveData> GetQuestSaveList()
+    {
+        List<QuestSaveData> saveList = new List<QuestSaveData>();
+
+        foreach (var q in allQuestList)
+        {
+            // 내 퀘스트(QuestData) 정보를 -> 저장용(QuestSaveData)으로 변환
+            bool isCleared = (q.state == QuestState.Completed);
+
+            // QuestSaveData 생성자: (아이디, 깼는지, 얼마나 했는지)
+            saveList.Add(new QuestSaveData(q.key, isCleared, q.currentCount));
+        }
+
+        return saveList;
+    }
+
+    // [추가] 2. 불러올 때: '저장용 상자'를 받아서 내 퀘스트 목록 업데이트하기
+    public void LoadQuestSaveList(List<QuestSaveData> loadedList)
+    {
+        if (loadedList == null) return;
+
+        foreach (var loadedData in loadedList)
+        {
+            // 저장된 아이디(key)랑 똑같은 퀘스트를 내 목록에서 찾기
+            QuestData myQuest = allQuestList.Find(q => q.key == loadedData.questId);
+
+            if (myQuest != null)
+            {
+                // 찾았으면 상태 복구!
+                myQuest.currentCount = loadedData.progress;
+
+                // 깼던 거면 '완료' 상태로, 하던 중이면 '진행 중'으로
+                if (loadedData.isClear)
+                {
+                    myQuest.state = QuestState.Completed;
+                    myQuest.rewardClaimed = true; // (이미 보상 받았다고 침)
+                }
+                else if (myQuest.currentCount > 0)
+                {
+                    myQuest.state = QuestState.Active;
+                }
+            }
+        }
+
+        Debug.Log("퀘스트 복구 완료!");
+    }
+} 

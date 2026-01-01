@@ -62,7 +62,7 @@ public class AuthManager : MonoBehaviour
             FindObjectOfType<DBManager>().LoadGameData(task.Result.User.UserId);
 
             // 여기서 게임 씬으로 넘어가면 됨!
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Lab");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
         });
     }
 }
