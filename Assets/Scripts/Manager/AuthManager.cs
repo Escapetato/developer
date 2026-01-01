@@ -14,6 +14,7 @@ public class AuthManager : MonoBehaviour
     public TMP_InputField passwordField;
     public Button loginButton;
     public Button registerButton;
+    public Button googleLoginButton;
     public TextMeshProUGUI statusText;
 
     [Header("Google Login")]
@@ -39,6 +40,7 @@ public class AuthManager : MonoBehaviour
     {
         if (loginButton) loginButton.onClick.AddListener(TryLogin);
         if (registerButton) registerButton.onClick.AddListener(TryRegister);
+        if (googleLoginButton) googleLoginButton.onClick.AddListener(TryGoogleLogin);
 
         // FirebaseBootstrap가 Auth를 준비할 때까지 잠깐 대기 (첫 프레임에서 null 방지)
         while (FirebaseBootstrap.Auth == null)
@@ -182,39 +184,104 @@ public class AuthManager : MonoBehaviour
     public void TryGoogleLogin()
     {
         EnsureInitialized();
-        _ = GoogleLoginAsync();
-    }
 
-    async Task GoogleLoginAsync()
-    {
-        try
+        if (!initialized || auth == null)
         {
-            if (googleConfig == null)
-                throw new System.NullReferenceException("googleConfig is null");
+            Debug.LogWarning("[AuthManager] Firebase not initialized yet");
+            if (statusText) statusText.text = "Firebase 초기화 중...";
+            return;
+        }
 
-            GoogleSignIn.Configuration = googleConfig;
+        if (string.IsNullOrEmpty(webClientId) || googleConfig == null)
+        {
+            Debug.LogError("[AuthManager] Web Client ID가 설정되지 않았습니다. (Google 로그인 불가)");
+            if (statusText) statusText.text = "Web Client ID 미설정";
+            return;
+        }
 
-            var googleUser = await GoogleSignIn.DefaultInstance.SignIn();
+        if (statusText) statusText.text = "Google 로그인 시도 중...";
+
+        // 항상 계정 선택 화면이 뜨게 하고 싶으면 SignOut 후 SignIn
+        GoogleSignIn.Configuration = googleConfig;
+        GoogleSignIn.DefaultInstance.SignOut();
+
+        GoogleSignIn.DefaultInstance.SignIn().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogWarning("Google 로그인 취소");
+                if (statusText) statusText.text = "Google 로그인 취소";
+                return;
+            }
+
+            if (task.IsFaulted)
+            {
+                Debug.LogError("Google 로그인 실패: " + task.Exception);
+                if (statusText) statusText.text = "Google 로그인 실패";
+                return;
+            }
+
+            // ContinueWithOnMainThread 콜백 파라미터 타입이 Task로 잡히는 경우가 있어 안전 캐스팅
+            var signInTask = task as Task<GoogleSignInUser>;
+            if (signInTask == null)
+            {
+                Debug.LogError("[AuthManager] Google SignIn Task 타입 캐스팅 실패");
+                if (statusText) statusText.text = "Google 로그인 실패";
+                return;
+            }
+
+            var googleUser = signInTask.Result;
             Debug.Log("Google 로그인 성공: " + googleUser.Email);
 
+            if (string.IsNullOrEmpty(googleUser.IdToken))
+            {
+                Debug.LogError("[AuthManager] Google IdToken이 비어있습니다. WebClientId/RequestIdToken 설정 확인 필요");
+                if (statusText) statusText.text = "IdToken 없음";
+                return;
+            }
+
             var credential = GoogleAuthProvider.GetCredential(googleUser.IdToken, null);
-            var firebaseUser = await auth.SignInWithCredentialAsync(credential);
 
-            Debug.Log("Firebase Google 로그인 UID: " + firebaseUser.UserId);
-            if (statusText) statusText.text = "Google 로그인 성공";
+            auth.SignInWithCredentialAsync(credential).ContinueWithOnMainThread(fbTask =>
+            {
+                if (fbTask.IsCanceled || fbTask.IsFaulted)
+                {
+                    LogAuthException(fbTask.Exception, "Firebase Google 로그인 실패");
+                    if (statusText) statusText.text = "Firebase 로그인 실패";
+                    return;
+                }
 
-            var db = FindObjectOfType<DBManager>();
-            if (db != null)
-                db.LoadGameData(firebaseUser.UserId);
-            else
-                Debug.LogWarning("[AuthManager] DBManager 없음 (Auth 씬)");
+                // Firebase SDK 버전에 따라 반환 타입이 AuthResult 또는 FirebaseUser일 수 있음
+                FirebaseUser firebaseUser = null;
 
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Lab");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError("Google 로그인 실패: " + e);
-            if (statusText) statusText.text = "Google 로그인 실패";
-        }
+                var authResultTask = fbTask as Task<AuthResult>;
+                if (authResultTask != null)
+                    firebaseUser = authResultTask.Result.User;
+                else
+                {
+                    var userTask = fbTask as Task<FirebaseUser>;
+                    if (userTask != null)
+                        firebaseUser = userTask.Result;
+                }
+
+                if (firebaseUser == null)
+                {
+                    Debug.LogError("[AuthManager] Firebase SignInWithCredentialAsync 결과 타입을 해석할 수 없습니다.");
+                    if (statusText) statusText.text = "Firebase 로그인 실패";
+                    return;
+                }
+
+                Debug.Log("Firebase Google 로그인 UID: " + firebaseUser.UserId);
+                if (statusText) statusText.text = "Google 로그인 성공";
+
+                var db = FindObjectOfType<DBManager>();
+                if (db != null)
+                    db.LoadGameData(firebaseUser.UserId);
+                else
+                    Debug.LogWarning("[AuthManager] DBManager 없음 (Auth 씬)");
+
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Lab");
+            });
+        });
     }
 }

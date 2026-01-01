@@ -1720,6 +1720,7 @@ MonoBehaviour:
   passwordField: {fileID: 401797154}
   loginButton: {fileID: 1674452015}
   registerButton: {fileID: 611912604}
+  googleLoginButton: {fileID: 503224659}
   statusText: {fileID: 1415194804}
   webClientId: 720946891402-jqa28vi5u3j2np9u1trvc0fll98s4t51.apps.googleusercontent.com
 --- !u!1 &954571932
