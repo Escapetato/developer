@@ -35,11 +35,6 @@ public class AuthManager : MonoBehaviour
     {
         if (loginButton) loginButton.onClick.AddListener(TryLogin);
         if (registerButton) registerButton.onClick.AddListener(TryRegister);
-
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
-        {
-            Debug.Log("[Firebase] Dependencies: " + task.Result);
-        });
     }
 
     /* =========================
@@ -49,7 +44,12 @@ public class AuthManager : MonoBehaviour
     {
         if (initialized) return;
 
-        auth = FirebaseAuth.DefaultInstance;
+        auth = FirebaseBootstrap.Auth;
+        if (auth == null)
+        {
+            Debug.LogError("[AuthManager] FirebaseAuth not ready");
+            return;
+        }
 
         if (string.IsNullOrEmpty(webClientId))
         {
@@ -68,10 +68,6 @@ public class AuthManager : MonoBehaviour
 
         initialized = true;
     }
-
-    /* =========================
-     * Email / Password Register
-     * ========================= */
     void TryRegister()
     {
         EnsureInitialized();
@@ -92,7 +88,7 @@ public class AuthManager : MonoBehaviour
             {
                 if (task.IsCanceled || task.IsFaulted)
                 {
-                    Debug.LogError("가입 실패: " + task.Exception);
+                    LogAuthException(task.Exception, "가입 실패");
                     if (statusText) statusText.text = "가입 실패";
                     return;
                 }
@@ -102,9 +98,6 @@ public class AuthManager : MonoBehaviour
             });
     }
 
-    /* =========================
-     * Email / Password Login
-     * ========================= */
     void TryLogin()
     {
         EnsureInitialized();
@@ -126,7 +119,7 @@ public class AuthManager : MonoBehaviour
             {
                 if (task.IsCanceled || task.IsFaulted)
                 {
-                    Debug.LogError("로그인 실패: " + task.Exception);
+                    LogAuthException(task.Exception, "로그인 실패");
                     if (statusText) statusText.text = "로그인 실패";
                     return;
                 }
@@ -144,9 +137,30 @@ public class AuthManager : MonoBehaviour
             });
     }
 
-    /* =========================
-     * Google Login
-     * ========================= */
+    void LogAuthException(System.Exception ex, string prefix)
+    {
+        Debug.LogError($"{prefix}: {ex}");
+
+        // AggregateException 풀기
+        if (ex is System.AggregateException ag)
+            ex = ag.Flatten().InnerExceptions[0];
+
+        if (ex is FirebaseException fex)
+        {
+            Debug.LogError($"{prefix}: FirebaseException ErrorCode(int) = {fex.ErrorCode}");
+
+            try
+            {
+                var authError = (AuthError)fex.ErrorCode;
+                Debug.LogError($"{prefix}: AuthError = {authError}");
+            }
+            catch
+            {
+                Debug.LogError($"{prefix}: AuthError cast 실패");
+            }
+        }
+    }
+
     public void TryGoogleLogin()
     {
         EnsureInitialized();
