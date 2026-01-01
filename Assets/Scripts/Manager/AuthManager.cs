@@ -23,18 +23,28 @@ public class AuthManager : MonoBehaviour
     private GoogleSignInConfiguration googleConfig;
     private bool initialized = false;
 
+    private bool loggedAuthNotReady = false;
+    private bool loggedWebClientEmpty = false;
+
     /* =========================
      * Lifecycle
      * ========================= */
+    // FirebaseBootstrap 초기화는 비동기라서, Awake에서 바로 Auth를 잡으면 null일 수 있음
     void Awake()
     {
-        EnsureInitialized();
+        // 의도적으로 여기서는 초기화하지 않음 (Start에서 대기 후 초기화)
     }
 
-    void Start()
+    System.Collections.IEnumerator Start()
     {
         if (loginButton) loginButton.onClick.AddListener(TryLogin);
         if (registerButton) registerButton.onClick.AddListener(TryRegister);
+
+        // FirebaseBootstrap가 Auth를 준비할 때까지 잠깐 대기 (첫 프레임에서 null 방지)
+        while (FirebaseBootstrap.Auth == null)
+            yield return null;
+
+        EnsureInitialized();
     }
 
     /* =========================
@@ -47,13 +57,21 @@ public class AuthManager : MonoBehaviour
         auth = FirebaseBootstrap.Auth;
         if (auth == null)
         {
-            Debug.LogError("[AuthManager] FirebaseAuth not ready");
+            if (!loggedAuthNotReady)
+            {
+                Debug.LogWarning("[AuthManager] FirebaseAuth not ready (FirebaseBootstrap 초기화 대기 중)");
+                loggedAuthNotReady = true;
+            }
             return;
         }
 
         if (string.IsNullOrEmpty(webClientId))
         {
-            Debug.LogError("[AuthManager] Web Client ID가 비어있습니다.");
+            if (!loggedWebClientEmpty)
+            {
+                Debug.LogWarning("[AuthManager] Web Client ID가 비어있습니다. (Google 로그인만 영향)");
+                loggedWebClientEmpty = true;
+            }
         }
         else
         {
