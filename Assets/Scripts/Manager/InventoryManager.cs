@@ -124,47 +124,4 @@ public class InventoryManager : MonoBehaviour
         }
         return 0;
     }
-
-    // [추가] 1. 저장할 때: 현재 인벤토리를 리스트로 포장해서 DBManager에게 줌
-    public List<InvenData> GetInventorySaveData()
-    {
-        List<InvenData> saveDataList = new List<InvenData>();
-
-        foreach (KeyValuePair<ItemData, int> pair in items)
-        {
-            // pair.Key.name은 파일 이름(예: "PotatoSeed"), pair.Value는 개수
-            saveDataList.Add(new InvenData(pair.Key.name, pair.Value));
-        }
-
-        return saveDataList;
-    }
-
-    // [추가] 2. 불러올 때: DB에서 받은 리스트로 인벤토리 복구
-    public void LoadInventoryData(List<InvenData> loadedList)
-    {
-        items.Clear(); // 싹 비우고
-
-        foreach (var data in loadedList)
-        {
-            // 이름으로 아이템 원본 데이터 찾기
-            ItemData foundItem = FindItemDataByName(data.itemId);
-
-            if (foundItem != null)
-            {
-                items.Add(foundItem, data.count);
-            }
-        }
-
-        OnInventoryChanged?.Invoke(); // UI 갱신!
-        Debug.Log("인벤토리 복구 완료!");
-    }
-
-    [Header("★ 게임의 모든 아이템을 여기에 등록하세요!")]
-    public List<ItemData> allGameItems = new List<ItemData>(); // 전체 아이템 도감
-
-    private ItemData FindItemDataByName(string name)
-    {
-        // 아까 만든 리스트(allGameItems)를 뒤져서 이름 같은 애를 찾아냄
-        return allGameItems.Find(x => x.name == name);
-    }
 }

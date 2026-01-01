@@ -55,47 +55,4 @@ public class GameProgressionManager : MonoBehaviour
     {
         return unlockedItems.Contains(item);
     }
-
-    [Header("로딩을 위해 모든 아이템을 여기에 등록")]
-    public List<ItemData> allGameItems;
-
-    // -----------------------------------------------------------
-    //  ★ [저장] 해금된 아이템 이름들 리스트로 포장
-    // -----------------------------------------------------------
-    public List<string> GetUnlockedItemNames()
-    {
-        List<string> names = new List<string>();
-        foreach (var item in unlockedItems)
-        {
-            if (item != null) names.Add(item.name);
-        }
-        return names;
-    }
-
-    // -----------------------------------------------------------
-    //  ★ [로드] 저장된 정보 받아서 복구하기
-    // -----------------------------------------------------------
-    public void LoadProgressionData(bool shopStatus, List<string> savedItemNames)
-    {
-        // 1. 상점 상태 복구
-        isShopUnlocked = shopStatus;
-        Debug.Log($"상점 해금 상태 복구: {isShopUnlocked}");
-
-        // 2. 해금 아이템 복구
-        if (savedItemNames != null)
-        {
-            unlockedItems.Clear(); // 초기화
-
-            foreach (string name in savedItemNames)
-            {
-                // 전체 리스트에서 이름으로 아이템 찾기
-                ItemData foundItem = allGameItems.Find(x => x.name == name);
-                if (foundItem != null)
-                {
-                    unlockedItems.Add(foundItem);
-                }
-            }
-        }
-        Debug.Log($"아이템 해금 상태 복구 완료! ({unlockedItems.Count}개)");
-    }
 }
