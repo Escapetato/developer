@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -235,5 +235,29 @@ public class QuestManager : MonoBehaviour
         }
 
         return cnt;
+    }
+
+    // [추가] DB에 저장
+    public void LoadQuestData(List<QuestSaveData> savedQuests)
+    {
+        // 퀘스트 리스트가 아직 초기화 안 됐으면 초기화 먼저
+        InitializeIfNeeded();
+
+        foreach (var savedQ in savedQuests)
+        {
+            // Key값으로 내 퀘스트 리스트에서 해당 퀘스트 찾기
+            QuestData myQuest = allQuestList.Find(q => q.key == savedQ.key);
+
+            if (myQuest != null)
+            {
+                myQuest.state = (QuestState)savedQ.state; // int -> Enum 변환
+                myQuest.currentCount = savedQ.currentCount;
+                myQuest.rewardClaimed = savedQ.rewardClaimed;
+            }
+        }
+
+        // 상태가 변경되었으니 슬롯 갱신 시도
+        OpenInitialSlots();
+        Debug.Log("퀘스트 상태 복구 완료");
     }
 }
