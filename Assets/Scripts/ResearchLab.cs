@@ -149,8 +149,8 @@ public class ResearchLab : MonoBehaviour
             return;
         }
 
-        ItemData inputMaterial = materialSlot.item;
-        ItemData inputPotion = potionSlot.item;
+        ItemData input1 = materialSlot.item;
+        ItemData input2 = potionSlot.item;
         EvolutionRecipe foundRecipe = null;
 
         // DBManager에서 레시피 검색
@@ -158,7 +158,11 @@ public class ResearchLab : MonoBehaviour
         {
             foreach (var recipe in DBManager.Instance.allGameRecipes)
             {
-                if (recipe.material == inputMaterial && recipe.potion == inputPotion)
+                // [수정됨] A+B 또는 B+A 둘 다 검사하도록 변경!
+                bool matchDirect = (recipe.material == input1 && recipe.potion == input2);
+                bool matchReverse = (recipe.material == input2 && recipe.potion == input1);
+
+                if (matchDirect || matchReverse)
                 {
                     foundRecipe = recipe;
                     break;
