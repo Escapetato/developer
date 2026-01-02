@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using Firebase.Auth; // (내 ID 알아야 저장하니까)
+using Firebase.Auth;
 
 public class PoingManager : MonoBehaviour
 {
     public static PoingManager Instance { get; private set; }
 
-    [SerializeField] private int currentPoing = 500;
+    // ▼▼▼ [수정 1] private -> public으로 변경 (DBManager가 가져갈 수 있게) ▼▼▼
+    public int currentPoing = 500;
 
     public event Action<int> OnPoingChanged;
 
@@ -26,20 +27,24 @@ public class PoingManager : MonoBehaviour
     //  DB에 저장하라고 시키는 함수
     void SaveToDB()
     {
-        // 1. 로그인되어 있는지 확인
         if (FirebaseAuth.DefaultInstance.CurrentUser != null)
         {
             string myId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
-            // 2. DB매니저한테 저장해 달라고 부탁하기
-            FindObjectOfType<DBManager>().SaveGameData(myId, currentPoing);
+
+            // ▼▼▼ [수정 2] SaveGameData -> SaveAllData로 변경 ▼▼▼
+            // (이제 currentPoing을 인자로 넘길 필요 없이, ID만 주면 알아서 가져갑니다)
+            if (DBManager.Instance != null)
+            {
+                DBManager.Instance.SaveAllData(myId);
+            }
         }
     }
 
     // DB에서 불러온 돈을 적용하는 함수 (DBManager가 호출함)
     public void SetLoadedPoing(int loadedPoing)
     {
-        currentPoing = loadedPoing; // 1. 돈 덮어씌우기
-        OnPoingChanged?.Invoke(currentPoing); // 2. UI 갱신
+        currentPoing = loadedPoing;
+        OnPoingChanged?.Invoke(currentPoing);
         Debug.Log("서버에서 불러온 포잉 적용 완료: " + currentPoing);
     }
 
@@ -49,7 +54,7 @@ public class PoingManager : MonoBehaviour
         OnPoingChanged?.Invoke(currentPoing);
         Debug.Log(amount + " 포잉 획득.");
 
-        SaveToDB(); // 돈 벌었으니 저장
+        SaveToDB();
     }
 
     public void IncreasePoing(int amount)
@@ -58,7 +63,7 @@ public class PoingManager : MonoBehaviour
         OnPoingChanged?.Invoke(currentPoing);
         Debug.Log(amount + " 포잉 판매 획득!");
 
-        SaveToDB(); // 돈 벌었으니 저장
+        SaveToDB();
     }
 
     public void DecreasePoing(int amount)
@@ -67,7 +72,7 @@ public class PoingManager : MonoBehaviour
         OnPoingChanged?.Invoke(currentPoing);
         Debug.Log(amount + " 포잉 사용.");
 
-        SaveToDB(); // 돈 썼으니 저장
+        SaveToDB();
     }
 
     public bool HasEnoughPoing(int amount)

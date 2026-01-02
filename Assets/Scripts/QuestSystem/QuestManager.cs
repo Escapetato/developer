@@ -237,51 +237,27 @@ public class QuestManager : MonoBehaviour
         return cnt;
     }
 
-    // [추가] 1. 저장할 때: 내 퀘스트 정보를 '저장용 상자(QuestSaveData)'에 담아서 포장하기
-    public List<QuestSaveData> GetQuestSaveList()
+    // [추가] DB에 저장
+    public void LoadQuestData(List<QuestSaveData> savedQuests)
     {
-        List<QuestSaveData> saveList = new List<QuestSaveData>();
+        // 퀘스트 리스트가 아직 초기화 안 됐으면 초기화 먼저
+        InitializeIfNeeded();
 
-        foreach (var q in allQuestList)
+        foreach (var savedQ in savedQuests)
         {
-            // 내 퀘스트(QuestData) 정보를 -> 저장용(QuestSaveData)으로 변환
-            bool isCleared = (q.state == QuestState.Completed);
-
-            // QuestSaveData 생성자: (아이디, 깼는지, 얼마나 했는지)
-            saveList.Add(new QuestSaveData(q.key, isCleared, q.currentCount));
-        }
-
-        return saveList;
-    }
-
-    // [추가] 2. 불러올 때: '저장용 상자'를 받아서 내 퀘스트 목록 업데이트하기
-    public void LoadQuestSaveList(List<QuestSaveData> loadedList)
-    {
-        if (loadedList == null) return;
-
-        foreach (var loadedData in loadedList)
-        {
-            // 저장된 아이디(key)랑 똑같은 퀘스트를 내 목록에서 찾기
-            QuestData myQuest = allQuestList.Find(q => q.key == loadedData.questId);
+            // Key값으로 내 퀘스트 리스트에서 해당 퀘스트 찾기
+            QuestData myQuest = allQuestList.Find(q => q.key == savedQ.key);
 
             if (myQuest != null)
             {
-                // 찾았으면 상태 복구!
-                myQuest.currentCount = loadedData.progress;
-
-                // 깼던 거면 '완료' 상태로, 하던 중이면 '진행 중'으로
-                if (loadedData.isClear)
-                {
-                    myQuest.state = QuestState.Completed;
-                    myQuest.rewardClaimed = true; // (이미 보상 받았다고 침)
-                }
-                else if (myQuest.currentCount > 0)
-                {
-                    myQuest.state = QuestState.Active;
-                }
+                myQuest.state = (QuestState)savedQ.state; // int -> Enum 변환
+                myQuest.currentCount = savedQ.currentCount;
+                myQuest.rewardClaimed = savedQ.rewardClaimed;
             }
         }
 
-        Debug.Log("퀘스트 복구 완료!");
+        // 상태가 변경되었으니 슬롯 갱신 시도
+        OpenInitialSlots();
+        Debug.Log("퀘스트 상태 복구 완료");
     }
-} 
+}

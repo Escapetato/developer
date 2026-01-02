@@ -2,47 +2,23 @@
 using Firebase.Database;
 using Firebase.Extensions;
 using System.Collections.Generic;
+using System;
 
-// --- 데이터 구조체들 ---
-
-[System.Serializable]
-public class InvenData
-{
-    public string itemId;
-    public int count;
-    public InvenData(string id, int c) { itemId = id; count = c; }
-}
-
-[System.Serializable]
-public class QuestSaveData
-{
-    public int questId;
-    public bool isClear;
-    public int progress;
-
-    public QuestSaveData(int id, bool clear, int prog) { questId = id; isClear = clear; progress = prog; }
-}
-
-[System.Serializable]
-public class DogamData
-{
-    public string unlockedItemId;
-}
-
-[System.Serializable]
+[Serializable]
 public class UserData
 {
     public string userName;
     public int poing;
-
-    public List<InvenData> inventory = new List<InvenData>();
-    public List<QuestSaveData> questList = new List<QuestSaveData>();
-    public List<string> dogamList = new List<string>(); // 레시피 도감
-
-    // ▼ 진행 상황 저장용 변수들
     public bool isShopUnlocked;
-    public List<string> unlockedItemNames = new List<string>(); // 해금된 아이템(씨앗, 작물 등) 이름
 
+    public List<string> unlockedItemNames = new List<string>();
+    public List<InventorySaveData> inventory = new List<InventorySaveData>();
+    public List<QuestSaveData> quests = new List<QuestSaveData>();
+
+    // 해금된 레시피 이름들
+    public List<string> unlockedRecipeNames = new List<string>();
+
+    public UserData() { }
     public UserData(string name, int poing)
     {
         this.userName = name;
@@ -50,15 +26,46 @@ public class UserData
     }
 }
 
+[Serializable]
+public class InventorySaveData
+{
+    public string itemName;
+    public int amount;
+}
+
+[Serializable]
+public class QuestSaveData
+{
+    public int key;
+    public int state;
+    public int currentCount;
+    public bool rewardClaimed;
+}
+
 public class DBManager : MonoBehaviour
 {
     public static DBManager Instance;
+
+    [Header("★ 게임의 모든 아이템 등록")]
+    public List<ItemData> allGameItems = new List<ItemData>();
+
+    // ▼▼▼ [수정됨] 여기가 EvolutionRecipe로 바뀜! ▼▼▼
+    [Header("★ 게임의 모든 레시피 등록")]
+    public List<EvolutionRecipe> allGameRecipes = new List<EvolutionRecipe>();
+
     DatabaseReference reference;
 
     void Awake()
     {
-        if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject); 
+        }
     }
 
     void Start()
@@ -67,46 +74,81 @@ public class DBManager : MonoBehaviour
         reference = FirebaseDatabase.GetInstance(dbUrl).RootReference;
     }
 
+    public ItemData FindItemByName(string name)
+    {
+        return allGameItems.Find(item => item.itemName == name);
+    }
+
+    // ▼▼▼ [수정됨] 레시피 찾는 함수 (파일 이름 .name 사용) ▼▼▼
+    public EvolutionRecipe FindRecipeByName(string name)
+    {
+        return allGameRecipes.Find(recipe => recipe.name == name);
+    }
+
+    // [SAVE]
     public void SaveAllData(string userId)
     {
         int currentPoing = 0;
-        if (PoingManager.Instance != null) currentPoing = PoingManager.Instance.GetPoing();
+        if (PoingManager.Instance != null) currentPoing = PoingManager.Instance.currentPoing;
 
         UserData data = new UserData("감자농부", currentPoing);
 
-        if (InventoryManager.Instance != null)
-        {
-            data.inventory = InventoryManager.Instance.GetInventorySaveData();
-        }
-
-        // 퀘스트 매니저한테 "저장용 데이터(QuestSaveData)" 달라고 하기
-        if (QuestManager.Instance != null)
-        {
-            data.questList = QuestManager.Instance.GetQuestSaveList();
-        }
-
-        // 도감도 추가
-        if (CollectionUI.Instance != null)
-        {
-            data.dogamList = CollectionUI.Instance.GetDogamSaveData();
-        }
-
-        // 5. 진행 상황 (상점, 아이템 해금) 수거 ★ [추가]
+        // 1. 진행도 & 도감 (아이템 + 레시피)
         if (GameProgressionManager.Instance != null)
         {
             data.isShopUnlocked = GameProgressionManager.Instance.isShopUnlocked;
-            data.unlockedItemNames = GameProgressionManager.Instance.GetUnlockedItemNames();
+
+            // 아이템 저장
+            foreach (var item in GameProgressionManager.Instance.unlockedItems)
+            {
+                if (item != null) data.unlockedItemNames.Add(item.itemName);
+            }
+
+            // ▼▼▼ [수정됨] 레시피 저장 (EvolutionRecipe) ▼▼▼
+            foreach (var recipe in GameProgressionManager.Instance.unlockedRecipes)
+            {
+                if (recipe != null) data.unlockedRecipeNames.Add(recipe.name);
+            }
+        }
+
+        // 2. 인벤토리
+        if (InventoryManager.Instance != null)
+        {
+            foreach (var kvp in InventoryManager.Instance.items)
+            {
+                if (kvp.Key != null)
+                {
+                    InventorySaveData invData = new InventorySaveData();
+                    invData.itemName = kvp.Key.itemName;
+                    invData.amount = kvp.Value;
+                    data.inventory.Add(invData);
+                }
+            }
+        }
+
+        // 3. 퀘스트
+        if (QuestManager.Instance != null)
+        {
+            foreach (var q in QuestManager.Instance.allQuestList)
+            {
+                QuestSaveData qData = new QuestSaveData();
+                qData.key = q.key;
+                qData.state = (int)q.state;
+                qData.currentCount = q.currentCount;
+                qData.rewardClaimed = q.rewardClaimed;
+                data.quests.Add(qData);
+            }
         }
 
         string json = JsonUtility.ToJson(data);
-
         reference.Child("users").Child(userId).SetRawJsonValueAsync(json).ContinueWithOnMainThread(task =>
         {
-            if (task.IsCompleted) Debug.Log("전체 저장 성공!");
-            else Debug.LogError("저장 실패" + task.Exception);
+            if (task.IsCompleted) Debug.Log("✅ 저장 성공!");
+            else Debug.LogError("❌ 저장 실패: " + task.Exception);
         });
     }
 
+    // [LOAD]
     public void LoadAllData(string userId)
     {
         reference.Child("users").Child(userId).GetValueAsync().ContinueWithOnMainThread(task =>
@@ -119,47 +161,27 @@ public class DBManager : MonoBehaviour
                     string json = snapshot.GetRawJsonValue();
                     UserData data = JsonUtility.FromJson<UserData>(json);
 
-                    Debug.Log("데이터 로드 성공!");
+                    Debug.Log("📥 로드 시작...");
 
                     if (PoingManager.Instance != null)
                         PoingManager.Instance.SetLoadedPoing(data.poing);
 
-                    // 진행 상황(해금 여부)을 가장 먼저 불러와야 함!
+                    // ▼▼▼ [수정됨] 레시피 이름 리스트도 같이 넘김 ▼▼▼
                     if (GameProgressionManager.Instance != null)
-                    {
-                        GameProgressionManager.Instance.LoadProgressionData(data.isShopUnlocked, data.unlockedItemNames);
-                    }
+                        GameProgressionManager.Instance.LoadProgression(data.isShopUnlocked, data.unlockedItemNames, data.unlockedRecipeNames);
 
-                    // 그 다음 인벤토리 불러오기
                     if (InventoryManager.Instance != null)
-                        InventoryManager.Instance.LoadInventoryData(data.inventory);
+                        InventoryManager.Instance.LoadInventory(data.inventory);
 
-                    // 퀘스트 불러오기
                     if (QuestManager.Instance != null)
-                        QuestManager.Instance.LoadQuestSaveList(data.questList);
-
-                    // 도감은 진행 상황 로드가 끝난 뒤에 불러와야 함!
-                    if (CollectionUI.Instance != null)
-                        CollectionUI.Instance.LoadDogamData(data.dogamList);
+                        QuestManager.Instance.LoadQuestData(data.quests);
                 }
                 else
                 {
-                    Debug.Log("신규 유저입니다.");
+                    Debug.Log("신규 유저 -> 초기 데이터 저장");
                     SaveAllData(userId);
                 }
             }
         });
-    }
-
-    // [에러 해결용 1] 옛날 방식(SaveGameData)으로 불러도 -> SaveAllData로 연결해줌
-    public void SaveGameData(string userId, int poing)
-    {
-        SaveAllData(userId);
-    }
-
-    // [에러 해결용 2] 옛날 방식(LoadGameData)으로 불러도 -> LoadAllData로 연결해줌
-    public void LoadGameData(string userId)
-    {
-        LoadAllData(userId);
     }
 }

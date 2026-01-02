@@ -1,53 +1,85 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Firebase.Auth;
 
 public class GameProgressionManager : MonoBehaviour
 {
     public static GameProgressionManager Instance { get; private set; }
 
-    [Header("--- Shop Status ---")]
-    // 상점이 해금되었는지 여부 (기본값 false = 잠김)
     public bool isShopUnlocked = false;
 
-    [Header("--- Item Unlocks ---")]
-    // 'unlockedItems'로 일반화 (씨앗, 수확도구 등 도감용)
+    // 도감 (아이템)
     public HashSet<ItemData> unlockedItems = new HashSet<ItemData>();
 
-    // [테스트용] Inspector에서 미리 해금할 아이템
+    // 도감 (레시피)
+    public HashSet<EvolutionRecipe> unlockedRecipes = new HashSet<EvolutionRecipe>();
+
     public List<ItemData> startingItems;
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
-
-        // 테스트용 아이템 해금
-        foreach (ItemData item in startingItems)
+        if (Instance == null)
         {
-            UnlockItem(item);
+            Instance = this;
+            DontDestroyOnLoad(gameObject); 
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        // 시작 아이템 해금 로직 (기존 코드 유지)
+        if (startingItems != null)
+        {
+            foreach (ItemData item in startingItems)
+            {
+                UnlockItem(item, false);
+            }
         }
     }
 
-    // 상점 해금 함수
+    void SaveToDB()
+    {
+        if (FirebaseAuth.DefaultInstance.CurrentUser != null && DBManager.Instance != null)
+        {
+            string myId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+            DBManager.Instance.SaveAllData(myId);
+        }
+    }
+
     public void UnlockShop()
     {
         if (!isShopUnlocked)
         {
             isShopUnlocked = true;
-            Debug.Log("🔓 상점 해금 완료! 이제 상점 이용 가능.");
-
-            // (선택사항) 여기서 상점 해금 알림 UI를 띄워도 됨
-            // UIManager.Instance.ShowToastMessage("상점이 오픈되었습니다!");
+            Debug.Log("🔓 상점 해금!");
+            SaveToDB();
         }
     }
 
-    // 아이템 해금 (도감용)
-    public void UnlockItem(ItemData item)
+    // ▼▼▼ [수정됨] save 변수 추가 (기본값 true) ▼▼▼
+    public void UnlockItem(ItemData item, bool save = true)
     {
         if (item != null && !unlockedItems.Contains(item))
         {
             unlockedItems.Add(item);
-            Debug.Log(item.itemName + " 해금!");
+            Debug.Log(item.itemName + " 도감 해금!");
+
+            // save가 true일 때만 저장 (Awake에서는 false로 들어옴)
+            if (save) SaveToDB();
+        }
+    }
+
+    // ▼▼▼ [수정됨] save 변수 추가 (기본값 true) ▼▼▼
+    public void UnlockRecipe(EvolutionRecipe recipe, bool save = true)
+    {
+        if (recipe != null && !unlockedRecipes.Contains(recipe))
+        {
+            unlockedRecipes.Add(recipe);
+            Debug.Log(recipe.name + " 레시피 해금!");
+
+            // save가 true일 때만 저장
+            if (save) SaveToDB();
         }
     }
 
@@ -56,46 +88,35 @@ public class GameProgressionManager : MonoBehaviour
         return unlockedItems.Contains(item);
     }
 
-    [Header("로딩을 위해 모든 아이템을 여기에 등록")]
-    public List<ItemData> allGameItems;
-
-    // -----------------------------------------------------------
-    //  ★ [저장] 해금된 아이템 이름들 리스트로 포장
-    // -----------------------------------------------------------
-    public List<string> GetUnlockedItemNames()
+    public void LoadProgression(bool shopUnlocked, List<string> unlockedItemNames, List<string> unlockedRecipeNames)
     {
-        List<string> names = new List<string>();
-        foreach (var item in unlockedItems)
+        isShopUnlocked = shopUnlocked;
+
+        // 1. 아이템 복구
+        unlockedItems.Clear();
+
+        // 로드할 때는 기본 아이템도 다시 넣어주는 게 안전함
+        foreach (ItemData item in startingItems)
         {
-            if (item != null) names.Add(item.name);
+            if (item != null) unlockedItems.Add(item);
         }
-        return names;
-    }
 
-    // -----------------------------------------------------------
-    //  ★ [로드] 저장된 정보 받아서 복구하기
-    // -----------------------------------------------------------
-    public void LoadProgressionData(bool shopStatus, List<string> savedItemNames)
-    {
-        // 1. 상점 상태 복구
-        isShopUnlocked = shopStatus;
-        Debug.Log($"상점 해금 상태 복구: {isShopUnlocked}");
-
-        // 2. 해금 아이템 복구
-        if (savedItemNames != null)
+        if (DBManager.Instance != null)
         {
-            unlockedItems.Clear(); // 초기화
-
-            foreach (string name in savedItemNames)
+            foreach (string name in unlockedItemNames)
             {
-                // 전체 리스트에서 이름으로 아이템 찾기
-                ItemData foundItem = allGameItems.Find(x => x.name == name);
-                if (foundItem != null)
-                {
-                    unlockedItems.Add(foundItem);
-                }
+                ItemData item = DBManager.Instance.FindItemByName(name);
+                if (item != null) unlockedItems.Add(item);
+            }
+
+            // 2. 레시피 복구
+            unlockedRecipes.Clear();
+            foreach (string name in unlockedRecipeNames)
+            {
+                EvolutionRecipe recipe = DBManager.Instance.FindRecipeByName(name);
+                if (recipe != null) unlockedRecipes.Add(recipe);
             }
         }
-        Debug.Log($"아이템 해금 상태 복구 완료! ({unlockedItems.Count}개)");
+        Debug.Log($"복구 완료: 아이템 {unlockedItems.Count}개 / 레시피 {unlockedRecipes.Count}개");
     }
 }

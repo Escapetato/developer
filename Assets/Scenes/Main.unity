@@ -3454,10 +3454,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1308770880}
+      - m_Target: {fileID: 661835076}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: CloseAllPopups
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -4609,6 +4609,7 @@ GameObject:
   m_Component:
   - component: {fileID: 203589136}
   - component: {fileID: 203589137}
+  - component: {fileID: 203589138}
   m_Layer: 5
   m_Name: sideMenu
   m_TagString: Untagged
@@ -4664,6 +4665,24 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &203589138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203589135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f80221ebad9892148afc84426bcd5197, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menuContainer: {fileID: 203589135}
+  toggleButton: {fileID: 1657429494}
+  arrowIcon: {fileID: 0}
+  inventoryButton: {fileID: 2037576773}
+  collectionButton: {fileID: 1246872446}
+  questButton: {fileID: 417498266}
 --- !u!1 &211106970
 GameObject:
   m_ObjectHideFlags: 0
@@ -9443,7 +9462,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1308770880}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: OpenQuestPopup
         m_Mode: 1
@@ -9832,7 +9851,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1582323854}
-  m_Father: {fileID: 1403673145}
+  m_Father: {fileID: 682262242}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -9883,7 +9902,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1308770880}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: OpenResearchLabPopup
         m_Mode: 1
@@ -14854,6 +14873,70 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 660412127}
   m_CullTransparentMesh: 1
+--- !u!1 &661835074
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 661835075}
+  - component: {fileID: 661835076}
+  m_Layer: 0
+  m_Name: UIManagers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &661835075
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 661835074}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1308770881}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &661835076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 661835074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00e6b96bd42133e4c9d43ee277f44118, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventoryPopup: {fileID: 1201806890}
+  researchLabPopup: {fileID: 2044125548}
+  storePopup: {fileID: 2079449385}
+  collectionPopup: {fileID: 101505698}
+  questPopup: {fileID: 1939744253}
+  alertPopup: {fileID: 2048432726}
+  alertMessageText: {fileID: 412442812}
+  alertCloseButton: {fileID: 1301620122}
+  confirmPopup: {fileID: 0}
+  confirmText: {fileID: 0}
+  confirmYesButton: {fileID: 0}
+  confirmNoButton: {fileID: 0}
+  itemAcquiredPopup: {fileID: 733295105}
+  itemAcquiredIcon: {fileID: 725698376}
+  itemAcquiredNameText: {fileID: 0}
+  itemAcquiredConfirmButton: {fileID: 732409644}
+  poingBarRect: {fileID: 547074930}
+  poingBarOriginalParent: {fileID: 0}
+  seedPopup: {fileID: 0}
+  fertilizerPopup: {fileID: 0}
 --- !u!1 &662971767
 GameObject:
   m_ObjectHideFlags: 0
@@ -15536,6 +15619,58 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 680287641}
   m_CullTransparentMesh: 1
+--- !u!1 &682262241
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 682262242}
+  - component: {fileID: 682262243}
+  m_Layer: 5
+  m_Name: Top_Menu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &682262242
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682262241}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 442378777}
+  - {fileID: 812540464}
+  m_Father: {fileID: 1403673145}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &682262243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682262241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a907247e977fcd4996c472d0da9ba35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  researchLabButton: {fileID: 442378778}
+  storeButton: {fileID: 812540465}
 --- !u!1 &685207544
 GameObject:
   m_ObjectHideFlags: 0
@@ -18815,7 +18950,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 780990006}
-  m_Father: {fileID: 1403673145}
+  m_Father: {fileID: 682262242}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -18866,7 +19001,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1308770880}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: OpenStorePopup
         m_Mode: 1
@@ -22824,10 +22959,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1308770880}
+      - m_Target: {fileID: 661835076}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: CloseAllPopups
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -27224,7 +27359,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1308770880}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: OpenCollectionPopup
         m_Mode: 1
@@ -28581,7 +28716,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1308770881}
-  - component: {fileID: 1308770880}
   m_Layer: 0
   m_Name: '@Managers'
   m_TagString: Untagged
@@ -28589,38 +28723,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1308770880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1308770879}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00e6b96bd42133e4c9d43ee277f44118, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inventoryPopup: {fileID: 1201806890}
-  researchLabPopup: {fileID: 2044125548}
-  storePopup: {fileID: 2079449385}
-  collectionPopup: {fileID: 101505698}
-  questPopup: {fileID: 1939744253}
-  alertPopup: {fileID: 2048432726}
-  alertMessageText: {fileID: 412442812}
-  alertCloseButton: {fileID: 1301620122}
-  confirmPopup: {fileID: 0}
-  confirmText: {fileID: 0}
-  confirmYesButton: {fileID: 0}
-  confirmNoButton: {fileID: 0}
-  itemAcquiredPopup: {fileID: 733295105}
-  itemAcquiredIcon: {fileID: 725698376}
-  itemAcquiredNameText: {fileID: 0}
-  itemAcquiredConfirmButton: {fileID: 732409644}
-  poingBarRect: {fileID: 547074930}
-  poingBarOriginalParent: {fileID: 0}
-  seedPopup: {fileID: 0}
-  fertilizerPopup: {fileID: 0}
 --- !u!4 &1308770881
 Transform:
   m_ObjectHideFlags: 0
@@ -28640,6 +28742,7 @@ Transform:
   - {fileID: 1033524099}
   - {fileID: 1583551919}
   - {fileID: 94640819}
+  - {fileID: 661835075}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1325814101
@@ -28994,10 +29097,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1308770880}
+      - m_Target: {fileID: 661835076}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: CloseAllPopups
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -31719,7 +31822,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1403673145}
-  - component: {fileID: 1403673146}
   m_Layer: 5
   m_Name: Menu
   m_TagString: Untagged
@@ -31739,8 +31841,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 442378777}
-  - {fileID: 812540464}
+  - {fileID: 682262242}
   - {fileID: 203589136}
   - {fileID: 1657429493}
   m_Father: {fileID: 902402766}
@@ -31750,21 +31851,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1403673146
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1403673144}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f80221ebad9892148afc84426bcd5197, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  menuContainer: {fileID: 203589135}
-  toggleButton: {fileID: 1657429494}
-  arrowIcon: {fileID: 0}
 --- !u!1 &1405028663
 GameObject:
   m_ObjectHideFlags: 0
@@ -44389,7 +44475,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1308770880}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: OpenInventoryPopup
         m_Mode: 1
