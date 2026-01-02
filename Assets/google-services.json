@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "720946891402",
+    "firebase_url": "https://whatthefarm-893d5-default-rtdb.firebaseio.com",
     "project_id": "whatthefarm-893d5",
     "storage_bucket": "whatthefarm-893d5.firebasestorage.app"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "720946891402-0n3tsbs3da4lcddjmm5fiqrqcidiudep.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.escapetato.whatthefarm",
+            "certificate_hash": "5de17165cb392fd5c69b3b53c102abd3e1be9d18"
+          }
+        },
         {
           "client_id": "720946891402-9f9v1s5lctpfjed9lfeo0p0fgr8s4c74.apps.googleusercontent.com",
           "client_type": 1,
