@@ -34,6 +34,9 @@ public class QuestData
     public int currentCount = 0; // 현재 달성 수치 
     public bool rewardClaimed = false; // 보상 수령 여부 
 
+    [Header("UI 상태")]
+    public bool isNewlyOpened = false;   // 새로 열린 퀘스트(빨간 점)
+
     [Header("달성 조건")]
     public string[] conditionTexts;  // 조건 설명들
     public int[] targetCounts;       // 각 조건의 목표 수치

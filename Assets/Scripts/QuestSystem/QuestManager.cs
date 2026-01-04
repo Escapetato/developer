@@ -158,6 +158,7 @@ public class QuestManager : MonoBehaviour
             q.state = QuestState.Locked;
             q.currentCount = 0;
             q.rewardClaimed = false;
+            q.isNewlyOpened = false;
         }
     }
 
@@ -191,6 +192,7 @@ public class QuestManager : MonoBehaviour
             if (q.state == QuestState.Locked)
             {
                 q.state = QuestState.Active;
+                q.isNewlyOpened = true;
                 Debug.Log($"[QuestManager] 메인 퀘스트 새로 오픈: key={q.key}, title={q.title}");
                 return;
             }
@@ -219,6 +221,7 @@ public class QuestManager : MonoBehaviour
             if (q.state == QuestState.Locked)
             {
                 q.state = QuestState.Active;
+                q.isNewlyOpened = true;
                 openCount++;
                 Debug.Log($"[QuestManager] 서브 퀘스트 오픈: key={q.key}, title={q.title}");
             }

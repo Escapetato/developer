@@ -163,8 +163,9 @@ public class QuestListController : MonoBehaviour
             // 첫 슬롯 자동 선택 
             if (currentSelectedSlot == null)
             {
-                OnSlotClicked(ui);
+                SelectSlot(ui, false); // ✅ 자동 선택(유저 클릭 아님) → 점 안 꺼짐
             }
+
         }
     }
 
@@ -194,8 +195,13 @@ public class QuestListController : MonoBehaviour
             RefreshSlots();
     }
 
-    // 클릭 이벤트 발생 알림이 올 때 호출되는 함수 
     public void OnSlotClicked(QuestSlotUI clickedSlot)
+    {
+        SelectSlot(clickedSlot, true); // ✅ 유저 클릭
+    }
+
+    // 클릭 이벤트 발생 알림이 올 때 호출되는 함수 
+    private void SelectSlot(QuestSlotUI clickedSlot, bool isUserClick)
     {
         if (clickedSlot == null)
             return;
@@ -209,6 +215,10 @@ public class QuestListController : MonoBehaviour
         // 2) 새 슬롯을 선택 상태로
         currentSelectedSlot = clickedSlot;
         currentSelectedSlot.SetSelected(true);
+
+        // ✅ 유저가 눌렀을 때만 "새로 열림" 해제
+        if (isUserClick)
+            MarkQuestAsSeen(clickedSlot);
 
         // 3) 상세사항 보여주는 오른쪽 패널 업데이트
         if (questDetailUI != null)
@@ -228,6 +238,34 @@ public class QuestListController : MonoBehaviour
         }
     }
 
+
+    private void MarkQuestAsSeen(QuestSlotUI clickedSlot)
+    {
+        QuestData data = clickedSlot.GetQuest();
+        bool isDaily = clickedSlot.IsDailySlot() || (data != null && data.type == QuestType.Daily);
+
+        if (isDaily)
+        {
+            var qm = QuestManager.Instance;
+            if (qm != null && qm.dailyQuests != null)
+            {
+                foreach (var q in qm.dailyQuests)
+                {
+                    if (q == null) continue;
+                    if (q.state == QuestState.Active || q.state == QuestState.Completed)
+                        q.isNewlyOpened = false;
+                }
+            }
+        }
+        else
+        {
+            if (data != null)
+                data.isNewlyOpened = false;
+        }
+
+        // 클릭한 슬롯의 점 즉시 갱신
+        clickedSlot.RefreshNewDot();
+    }
 
     // 자식 모두 삭제
     private void ClearChildren(Transform parent)
