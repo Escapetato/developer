@@ -70,6 +70,7 @@ public class UIManager : MonoBehaviour
         if (alertPopup != null) alertPopup.SetActive(false);
         if (itemAcquiredPopup != null) itemAcquiredPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
+        if (questPopup != null) questPopup.SetActive(false);
 
         if (SoundManager.Instance != null)
             SoundManager.Instance.PlayBGM("mainfarm");
@@ -191,22 +192,24 @@ public class UIManager : MonoBehaviour
 
     // --- 팝업 열기 함수들 ---
 
-    // [추가] 퀘스트 팝업 열기
     public void OpenQuestPopup()
     {
-        CloseAllPopups(false); // 다른 창 닫기 (음악 유지)
+        CloseAllPopups(false); // 다른 창 닫기
         if (SideMenuUI.Instance != null) SideMenuUI.Instance.CloseMenu();
 
         if (questPopup != null)
         {
             questPopup.SetActive(true);
 
-            // 퀘스트 창은 보통 꽉 차니까 포잉 바 이동은 선택 (필요하면 아래 주석 해제)
-            // MovePoingUIToPopup(questPopup.transform); 
+            // ★ [추가] 퀘스트 창 열릴 때 포잉 바 숨기기
+            if (poingBarRect != null)
+                poingBarRect.gameObject.SetActive(false);
 
-            // SoundManager.Instance.PlaySFX("PopupOpen");
+            SoundManager.Instance.PlaySFX("quest");
         }
     }
+
+
 
     public void OpenInventoryPopup()
     {
