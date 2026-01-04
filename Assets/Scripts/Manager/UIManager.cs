@@ -77,7 +77,7 @@ public class UIManager : MonoBehaviour
             Debug.LogWarning("SoundManager.Instance is null (BGM skipped).");
         if (confirmPopup != null) confirmPopup.SetActive(false);
 
-        SoundManager.Instance.PlayBGM("mainfarm");
+        // SoundManager.Instance.PlayBGM("mainfarm");
     }
 
     public void ShowConfirmPopup(string message, Action onConfirm)
