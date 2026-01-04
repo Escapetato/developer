@@ -17,7 +17,8 @@ MonoBehaviour:
   itemIcon: {fileID: 0}
   itemCategory: Crop
   collectionCategory: 
-  price: 50
+  price: 1500
+  seedCategory: 0
   plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}

@@ -32,13 +32,23 @@ public class PoingManager : MonoBehaviour
         OnPoingChanged?.Invoke(currentPoing);
     }
 
-    // 포잉 획득 함수
+    // 포잉 획득 함수 (기존)
     public void AddPoing(int amount)
     {
         currentPoing += amount;
-        // 포잉 변경
+        // 포잉 변경 알림
         OnPoingChanged?.Invoke(currentPoing);
         Debug.Log(amount + " 포잉 획득. 현재 포잉: " + currentPoing);
+    }
+
+    // 포잉 증가시키는 함수 (AddPoing과 똑같이 동작하도록 수정)
+    public void IncreasePoing(int amount)
+    {
+        currentPoing += amount;
+
+        OnPoingChanged?.Invoke(currentPoing);
+
+        Debug.Log(amount + " 포잉 판매 획득! 현재: " + currentPoing);
     }
 
     // 포잉 차감 함수
