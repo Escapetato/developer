@@ -34,13 +34,31 @@ public class QuestListController : MonoBehaviour
     private void Start()
     {
         RefreshSlots();
+
+        if (QuestManager.Instance != null)
+            QuestManager.Instance.OnQuestChanged += HandleQuestChanged;
     }
+
+    private void OnDestroy()
+    {
+        if (QuestManager.Instance != null)
+            QuestManager.Instance.OnQuestChanged -= HandleQuestChanged;
+    }
+
+    private void HandleQuestChanged()
+    {
+        currentSelectedSlot = null; // 기존 슬롯 오브젝트가 Destroy되므로 초기화
+        if (showClosedMains) RefreshClosedMainSlots();
+        else RefreshSlots();
+    }
+
 
     // 현재 열린 퀘스트들을 UI로 나타내는 함수 
     public void RefreshSlots()
     {
         // 1) 기존 슬롯 삭제 
         ClearChildren(slotParent);
+        currentSelectedSlot = null;
 
         // 2) 메인 1개
         QuestData main = FindFirstActiveOrCompleted(QuestManager.Instance.mainQuests);
@@ -69,6 +87,7 @@ public class QuestListController : MonoBehaviour
     private void RefreshClosedMainSlots()
     {
         ClearChildren(slotParent);
+        currentSelectedSlot = null;
 
         var closedList = new List<QuestData>();
         foreach (var q in QuestManager.Instance.mainQuests)
