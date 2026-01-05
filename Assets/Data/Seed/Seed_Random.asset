@@ -14,12 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uB79C\uB364 \uC528\uC557"
   description: 
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 21300000, guid: 9fd0567db076b4f459209de36e08df45, type: 3}
   itemCategory: Seed
+  collectionCategory: 
   price: 500
+  seedCategory: 0
   plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
+  growTimeDisplay: "1\uBD84"
+  harvestToolName: "\uD638\uBBF8"
   toolTier: 0
   growthReductionPercent: 0.25
+  isDefaultUnlocked: 0
+  itemDescription: 
