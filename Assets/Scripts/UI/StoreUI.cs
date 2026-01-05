@@ -45,6 +45,8 @@ public class StoreUI : MonoBehaviour
     private string currentCategory = "All";
     private int currentBuyQuantity = 1; // 현재 설정된 구매 개수
 
+    public TextMeshProUGUI buyButtonText;
+
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -163,16 +165,47 @@ public class StoreUI : MonoBehaviour
         {
             detailPanelObject.SetActive(true);
 
-            // 이미지 & 이름 & 가격 갱신
+            // 이미지 & 이름 갱신
             if (detailImage != null) detailImage.sprite = item.itemIcon;
             if (detailNameText != null) detailNameText.text = item.itemName;
-            if (detailPriceText != null) detailPriceText.text = item.price.ToString();
 
-            // 구매 버튼 활성화 (잠금 해제 여부)
-            if (openBuyPopupButton != null)
+            Debug.Log($"아이템: {item.itemName}, 카테고리: {item.itemCategory}, 내 개수: {InventoryManager.Instance.GetItemCount(item)}");
+
+            detailPanelObject.SetActive(true);
+
+            // 1. 인벤토리 확인
+            int myCount = InventoryManager.Instance.GetItemCount(item);
+
+            // 2. 도구이면서 가지고 있는지 확인
+            bool isOwnedTool = (item.itemCategory == "Tool" && myCount > 0);
+
+            if (isOwnedTool)
             {
-                openBuyPopupButton.gameObject.SetActive(true);
-                openBuyPopupButton.interactable = isUnlocked;
+                // [보유 중일 때]
+                if (detailPriceText != null) detailPriceText.text = "구매할 수 없습니다."; // 가격 텍스트 변경
+
+                if (openBuyPopupButton != null)
+                {
+                    openBuyPopupButton.gameObject.SetActive(true);
+                    openBuyPopupButton.interactable = false; // 버튼 비활성화
+                }
+
+                // ★ 버튼 글자도 "보유 중"으로 변경
+                if (buyButtonText != null) buyButtonText.text = "보유 중";
+            }
+            else
+            {
+                // [미보유 상태일 때]
+                if (detailPriceText != null) detailPriceText.text = item.price.ToString(); // 가격 표시
+
+                if (openBuyPopupButton != null)
+                {
+                    openBuyPopupButton.gameObject.SetActive(true);
+                    openBuyPopupButton.interactable = isUnlocked; // 잠금 해제 여부에 따라 활성
+                }
+
+                // ★ 버튼 글자를 원래대로 "결제"로 복구
+                if (buyButtonText != null) buyButtonText.text = "결제";
             }
         }
     }
@@ -183,6 +216,7 @@ public class StoreUI : MonoBehaviour
         selectedItem = null;
         selectedSlot = null;
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
+        if (openBuyPopupButton != null) openBuyPopupButton.gameObject.SetActive(false);
     }
 
     // [1단계] 구매 버튼 클릭 -> 팝업 열기

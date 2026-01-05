@@ -16,6 +16,7 @@ public class InventoryManager : MonoBehaviour
     public ItemData testPotion;
     public ItemData SeedItem;
     public ItemData FertilizerItem;
+    public ItemData Tools;
 
     void Awake()
     {
@@ -27,6 +28,7 @@ public class InventoryManager : MonoBehaviour
     {
         if (testItem != null) AddItem(testItem, 10);
         if (testPotion != null) AddItem(testPotion, 10);
+        if (Tools != null) AddItem(Tools, 1);
     }
 
     void Update()
@@ -35,6 +37,7 @@ public class InventoryManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Y) && testPotion != null) AddItem(testPotion, 1);
         if (Input.GetKeyDown(KeyCode.J) && SeedItem != null) AddItem(SeedItem, 5);
         if (Input.GetKeyDown(KeyCode.U) && FertilizerItem != null) AddItem(FertilizerItem, 5);
+        if (Input.GetKeyDown(KeyCode.Z) && Tools != null) AddItem(Tools, 1);
     }
 
     void SaveToDB()
