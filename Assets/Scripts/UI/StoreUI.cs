@@ -22,21 +22,28 @@ public class StoreUI : MonoBehaviour
     [Header("Details Panel")]
     public GameObject detailPanelObject;
     public Image detailImage;
-
     public TextMeshProUGUI detailNameText;
     public TextMeshProUGUI detailPriceText;
 
-    public Button purchaseButton;
+    public Button openBuyPopupButton;
 
     [Header("Category Buttons")]
     public List<CategoryButton> categoryButtons;
     public CategoryButton defaultCategoryButton;
 
-    [Header("Popups")]
-    public GameObject confirmPopupObject; // 팝업창 전체 (패널)
-    public TextMeshProUGUI confirmPopupText;
+    // 구매 수량 조절 팝업 (인벤토리 판매 팝업과 비슷한 구조)
+    [Header("Buy Popup Settings")]
+    public GameObject buyPopupObject;       // 팝업 패널
+    public Image popupItemIcon;             // 팝업 안 아이콘
+    public TextMeshProUGUI popupNameText;   // 팝업 안 이름
+    public Slider popupSlider;              // 팝업 안 슬라이더
+    public TextMeshProUGUI popupCountText;  // 팝업 안 수량 텍스트
+    public TextMeshProUGUI popupTotalCostText; // 팝업 안 총 가격 텍스트
+    public Button popupConfirmButton;       // "구매" 확정 버튼
+    public Button popupCancelButton;        // "취소" 버튼
 
     private string currentCategory = "All";
+    private int currentBuyQuantity = 1; // 현재 설정된 구매 개수
 
     void Awake()
     {
@@ -46,32 +53,49 @@ public class StoreUI : MonoBehaviour
         slots = new List<ItemSlot>();
         slotParent.GetComponentsInChildren<ItemSlot>(slots);
 
-        if (detailPanelObject != null)
-            detailPanelObject.SetActive(false);
+        if (detailPanelObject != null) detailPanelObject.SetActive(false);
+        if (buyPopupObject != null) buyPopupObject.SetActive(false); // 시작할 때 팝업 끄기
+
+        // 1. 상세창의 [구매] 버튼 -> 팝업 열기 연결
+        if (openBuyPopupButton != null)
+        {
+            openBuyPopupButton.onClick.RemoveAllListeners();
+            openBuyPopupButton.onClick.AddListener(OnOpenBuyPopupClick);
+        }
+
+        // 2. 팝업 슬라이더 연결
+        if (popupSlider != null)
+        {
+            popupSlider.onValueChanged.RemoveAllListeners();
+            popupSlider.onValueChanged.AddListener(OnSliderValueChanged);
+        }
+
+        // 3. 팝업 확정 버튼 -> 진짜 구매
+        if (popupConfirmButton != null)
+        {
+            popupConfirmButton.onClick.RemoveAllListeners();
+            popupConfirmButton.onClick.AddListener(OnRealPurchaseClick);
+        }
+
+        // 4. 팝업 취소 버튼 -> 닫기
+        if (popupCancelButton != null)
+        {
+            popupCancelButton.onClick.RemoveAllListeners();
+            popupCancelButton.onClick.AddListener(CloseBuyPopup);
+        }
     }
 
     void OnEnable()
     {
-        if (defaultCategoryButton != null)
-        {
-            SetCategory(defaultCategoryButton);
-        }
-        else if (categoryButtons != null && categoryButtons.Count > 0)
-        {
-            SetCategory(categoryButtons[0]);
-        }
+        if (defaultCategoryButton != null) SetCategory(defaultCategoryButton);
+        else if (categoryButtons != null && categoryButtons.Count > 0) SetCategory(categoryButtons[0]);
     }
 
     public void SetCategory(CategoryButton clickedButton)
     {
-        foreach (CategoryButton btn in categoryButtons)
-        {
-            btn.SetSelected(false);
-        }
-
+        foreach (CategoryButton btn in categoryButtons) btn.SetSelected(false);
         clickedButton.SetSelected(true);
         currentCategory = clickedButton.categoryName;
-
         ClearSelection();
         RedrawStore();
     }
@@ -79,48 +103,38 @@ public class StoreUI : MonoBehaviour
     private void RedrawStore()
     {
         int i = 0;
-
         if (storeDB == null) return;
 
         foreach (ItemData item in storeDB.itemsForSale)
         {
             if (i >= slots.Count) break;
 
-            if (item.itemCategory == currentCategory)
+            if (item.itemCategory == currentCategory || currentCategory == "All")
             {
-                // 1. 슬롯 오브젝트를 켠다 (보이게 함)
                 slots[i].gameObject.SetActive(true);
-
                 if (item.isDefaultUnlocked || GameProgressionManager.Instance.IsItemUnlocked(item))
-                {
                     slots[i].SetSlot(item);
-                }
                 else
-                {
                     slots[i].SetSlot(lockedSeedItem);
-                }
                 i++;
             }
         }
 
-        if (currentCategory == "Seed")
+        if (currentCategory == "Seed" || currentCategory == "All")
         {
             if (i < slots.Count && randomSeedItem != null)
             {
-                // 랜덤 씨앗 슬롯도 켠다
                 slots[i].gameObject.SetActive(true);
                 slots[i].SetSlot(randomSeedItem);
                 i++;
             }
         }
 
-        // 2. 남는 슬롯들은 모두 끈다 (숨김)
         for (int j = i; j < slots.Count; j++)
         {
             slots[j].ClearSlot();
-            slots[j].gameObject.SetActive(false); // ★ 핵심: 아예 안 보이게 꺼버림
+            slots[j].gameObject.SetActive(false);
         }
-
         ClearSelection();
     }
 
@@ -138,18 +152,9 @@ public class StoreUI : MonoBehaviour
         selectedSlot = slot;
         selectedSlot.SetSelected(true);
 
-        if (selectedItem == lockedSeedItem)
-        {
-            UpdateDetailPanel(lockedSeedItem, false);
-        }
-        else if (selectedItem == randomSeedItem)
-        {
-            UpdateDetailPanel(randomSeedItem, true);
-        }
-        else
-        {
-            UpdateDetailPanel(selectedItem, true);
-        }
+        if (selectedItem == lockedSeedItem) UpdateDetailPanel(lockedSeedItem, false);
+        else if (selectedItem == randomSeedItem) UpdateDetailPanel(randomSeedItem, true);
+        else UpdateDetailPanel(selectedItem, true);
     }
 
     private void UpdateDetailPanel(ItemData item, bool isUnlocked)
@@ -157,87 +162,120 @@ public class StoreUI : MonoBehaviour
         if (item != null)
         {
             detailPanelObject.SetActive(true);
-            detailImage.sprite = item.itemIcon;
-            detailImage.color = Color.white;
 
-            detailNameText.text = item.itemName;
-            detailPriceText.text = "" + item.price.ToString();
+            // 이미지 & 이름 & 가격 갱신
+            if (detailImage != null) detailImage.sprite = item.itemIcon;
+            if (detailNameText != null) detailNameText.text = item.itemName;
+            if (detailPriceText != null) detailPriceText.text = item.price.ToString();
 
-            purchaseButton.gameObject.SetActive(true);
-            purchaseButton.interactable = isUnlocked;
+            // 구매 버튼 활성화 (잠금 해제 여부)
+            if (openBuyPopupButton != null)
+            {
+                openBuyPopupButton.gameObject.SetActive(true);
+                openBuyPopupButton.interactable = isUnlocked;
+            }
         }
     }
 
     public void ClearSelection()
     {
-        if (selectedSlot != null)
-        {
-            selectedSlot.SetSelected(false);
-        }
+        if (selectedSlot != null) selectedSlot.SetSelected(false);
         selectedItem = null;
         selectedSlot = null;
-
-        if (detailPanelObject != null)
-            detailPanelObject.SetActive(false);
+        if (detailPanelObject != null) detailPanelObject.SetActive(false);
     }
 
-    public void OnPurchaseButtonClick()
+    // [1단계] 구매 버튼 클릭 -> 팝업 열기
+    public void OnOpenBuyPopupClick()
     {
         if (selectedItem == null) return;
 
-        if (confirmPopupText != null)
+        // 1. 현재 내 돈 확인
+        int myPoing = PoingManager.Instance.GetPoing();
+        int price = selectedItem.price;
+
+        if (price <= 0) return; // 공짜 아이템이 아니라면 방어 코드
+
+        // 2. 최대로 살 수 있는 개수 계산 (내 돈 / 가격)
+        int maxCanBuy = myPoing / price;
+
+        if (maxCanBuy <= 0)
         {
-            confirmPopupText.text = selectedItem.price.ToString() + " 포잉으로 결제하시겠습니까?";
+            UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
+            return;
         }
 
-        // 2. 팝업창 켜기
-        if (confirmPopupObject != null)
+        // 3. 팝업 UI 세팅
+        buyPopupObject.SetActive(true);
+        if (popupItemIcon != null) popupItemIcon.sprite = selectedItem.itemIcon;
+        if (popupNameText != null) popupNameText.text = selectedItem.itemName;
+
+        // 4. 슬라이더 세팅
+        if (popupSlider != null)
         {
-            confirmPopupObject.SetActive(true);
+            popupSlider.minValue = 1;
+            popupSlider.maxValue = maxCanBuy; // 내 돈으로 살 수 있는 최대치
+                                              // 너무 많이 사는거 방지하려면 99개 제한 걸어도 됨
+                                              // if (maxCanBuy > 99) popupSlider.maxValue = 99; 
+
+            popupSlider.value = 1;
+            currentBuyQuantity = 1;
+        }
+
+        UpdatePopupTexts();
+        SoundManager.Instance.PlaySFX("PopupOpen");
+    }
+
+    // ★ [2단계] 슬라이더 움직임
+    public void OnSliderValueChanged(float value)
+    {
+        currentBuyQuantity = (int)value;
+        UpdatePopupTexts();
+    }
+
+    private void UpdatePopupTexts()
+    {
+        if (popupCountText != null)
+            popupCountText.text = currentBuyQuantity.ToString();
+
+        if (selectedItem != null && popupTotalCostText != null)
+        {
+            int total = selectedItem.price * currentBuyQuantity;
+            popupTotalCostText.text = total.ToString() + " 포잉";
+        }
+    }
+
+    // ★ [3단계] 진짜 구매 (팝업 내 확인 버튼)
+    public void OnRealPurchaseClick()
+    {
+        if (selectedItem == null) return;
+
+        int totalCost = selectedItem.price * currentBuyQuantity;
+
+        // 돈 확인 (한 번 더 안전장치)
+        if (PoingManager.Instance.HasEnoughPoing(totalCost))
+        {
+            // 1. 돈 차감
+            PoingManager.Instance.DecreasePoing(totalCost);
+
+            // 2. 아이템 추가
+            InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
+
+            // 3. 알림 & 소리
+            UIManager.Instance.ShowAlertPopup($"{selectedItem.itemName} {currentBuyQuantity}개 구매 완료!");
+
+            // 4. 팝업 닫기
+            CloseBuyPopup();
         }
         else
         {
-            OnConfirmPurchase(); // 팝업 없으면 그냥 바로 구매
+            UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
         }
     }
 
-    // 팝업에서 '네' 클릭
-    public void OnConfirmPurchase()
+    public void CloseBuyPopup()
     {
-        if (confirmPopupObject != null) confirmPopupObject.SetActive(false);
-        if (selectedItem == null) return;
-
-        if (selectedItem == randomSeedItem)
-        {
-            if (PoingManager.Instance.HasEnoughPoing(randomSeedItem.price))
-            {
-                PoingManager.Instance.DecreasePoing(randomSeedItem.price);
-                InventoryManager.Instance.AddItem(randomSeedItem, 1);
-                UIManager.Instance.ShowAlertPopup("랜덤 씨앗 구매 완료!");
-            }
-            else
-            {
-                UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
-            }
-        }
-        else if (selectedItem != lockedSeedItem)
-        {
-            if (PoingManager.Instance.HasEnoughPoing(selectedItem.price))
-            {
-                PoingManager.Instance.DecreasePoing(selectedItem.price);
-                InventoryManager.Instance.AddItem(selectedItem, 1);
-                UIManager.Instance.ShowAlertPopup(selectedItem.itemName + " 구매 완료!");
-            }
-            else
-            {
-                UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
-            }
-        }
-    }
-
-    // 팝업에서 '아니오' 클릭
-    public void OnCancelPurchase()
-    {
-        if (confirmPopupObject != null) confirmPopupObject.SetActive(false);
+        if (buyPopupObject != null) buyPopupObject.SetActive(false);
+        SoundManager.Instance.PlaySFX("Button");
     }
 }

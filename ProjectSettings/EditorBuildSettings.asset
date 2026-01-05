@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Auth.unity
+    guid: 11532da2bbd676048acea68b38ded2fc
+  - enabled: 1
+    path: Assets/Scenes/Lab.unity
+    guid: 364e2e3f47adbc94cb316a19772a84a3
+  - enabled: 1
     path: Assets/TestItem/Cainos/Pixel Art Icon Pack - RPG/Scene/SC Pixel Art Icon
       Pack - RPG.unity
     guid: 2cda990e2423bbf4892e6590ba056729

@@ -40,8 +40,12 @@ public class QuestData
     public int[] currentCounts;      // 각 조건의 현재 수치
 
     [Header("보상 정보")]
+    public ItemData rewardItem;
     public int rewardKey; // 보상 아이템 ID
     public int rewardAmount; // 보상 수량
+
+    [Header("보상(포잉)")]
+    [Min(0)] public int rewardPoing = 0;   // 서브퀘스트에서 사용할 정적 포잉 보상
 
     [Header("체인 연결")]
     public int nextKey; // 다음 퀘스트 ID (없으면 0이나 -1로 처리)

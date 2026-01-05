@@ -14,14 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uBE44\uB8CC"
   description: 
-  itemIcon: {fileID: 21300000, guid: b7f77607c82ea4142a2070c0e37e1756, type: 3}
+  itemIcon: {fileID: 21300000, guid: 70525199904d6f1458855067c134c549, type: 3}
   itemCategory: Fertilizer
+  collectionCategory: 
   price: 500
   seedCategory: 0
   plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
+  growTimeDisplay: "1\uBD84"
+  harvestToolName: "\uD638\uBBF8"
   toolTier: 0
   growthReductionPercent: 0.25
   isDefaultUnlocked: 1
+  itemDescription: 
