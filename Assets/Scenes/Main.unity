@@ -2976,6 +2976,7 @@ MonoBehaviour:
   itemAcquiredConfirmButton: {fileID: 1843026299}
   poingBarRect: {fileID: 1840860879}
   poingBarOriginalParent: {fileID: 0}
+  mainToolUI: {fileID: 121949191}
   seedPopup: {fileID: 104481692}
   fertilizerPopup: {fileID: 77210896}
 --- !u!1 &142242546
