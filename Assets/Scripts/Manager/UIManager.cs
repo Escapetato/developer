@@ -71,6 +71,10 @@ public class UIManager : MonoBehaviour
         if (itemAcquiredPopup != null) itemAcquiredPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
 
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayBGM("mainfarm");
+        else
+            Debug.LogWarning("SoundManager.Instance is null (BGM skipped).");
         if (confirmPopup != null) confirmPopup.SetActive(false);
 
         SoundManager.Instance.PlayBGM("mainfarm");

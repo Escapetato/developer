@@ -55,6 +55,14 @@ public static class DailyQuestSelector
         DailyRewardType.Potion
     };
 
+    private static readonly Dictionary<DailyQuestDifficulty, int[]> poingTable
+        = new Dictionary<DailyQuestDifficulty, int[]>
+    {
+        { DailyQuestDifficulty.Low,    new[] { 100, 150, 200 } },
+        { DailyQuestDifficulty.Medium, new[] { 300, 400, 500 } },
+        { DailyQuestDifficulty.High,   new[] { 700, 850, 1000 } },
+    };
+
     private static readonly string[] potionTypes = { "불", "소리", "번개", "바람", "물", "별", "꽃", "무지개" };
 
     // 템플릿(원본) 값을 보관해서 ConfigureDailyQuests가 여러 번 호출되어도 누적되지 않게 한다.
@@ -213,8 +221,15 @@ public static class DailyQuestSelector
         {
             case DailyRewardType.Poing:
                 info.label = "포잉";
-                (int min, int max) range = GetPoingRange(difficulty);
-                info.amount = RollPoingByHundreds(range.min, range.max);
+                if (poingTable.TryGetValue(difficulty, out var candidates) && candidates.Length > 0)
+                {
+                    int pick = UnityEngine.Random.Range(0, candidates.Length);
+                    info.amount = candidates[pick];
+                }
+                else
+                {
+                    info.amount = 0; // 안전장치
+                }
                 break;
 
             case DailyRewardType.Fertilizer:
@@ -233,42 +248,6 @@ public static class DailyQuestSelector
         }
 
         return info;
-    }
-
-    private static (int min, int max) GetPoingRange(DailyQuestDifficulty difficulty)
-    {
-        switch (difficulty)
-        {
-            case DailyQuestDifficulty.High:
-                return (1100, 1500);
-            case DailyQuestDifficulty.Medium:
-                return (600, 1000);
-            default:
-                return (100, 500);
-        }
-    }
-
-    private static int RollPoingByHundreds(int min, int max)
-    {
-        // min~max 범위에서 100 단위로만 랜덤하게 선택
-        // 예: 100~500 -> {100,200,300,400,500} 중 하나
-        if (max < min)
-        {
-            int tmp = min;
-            min = max;
-            max = tmp;
-        }
-
-        // 100 단위 경계로 정렬
-        int start = Mathf.CeilToInt(min / 100f) * 100;
-        int end = Mathf.FloorToInt(max / 100f) * 100;
-
-        if (end < start)
-            return start; // 비정상 범위지만 안전하게 처리
-
-        int steps = ((end - start) / 100) + 1; // 포함
-        int pick = UnityEngine.Random.Range(0, steps);
-        return start + pick * 100;
     }
 
     private static int GetStackCount(DailyQuestDifficulty difficulty)
