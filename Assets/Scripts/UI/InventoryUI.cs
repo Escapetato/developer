@@ -129,6 +129,9 @@ public class InventoryUI : MonoBehaviour
         {
             detailPanelObject.SetActive(true);
 
+            if (openSellPopupButton != null)
+                openSellPopupButton.gameObject.SetActive(true);
+
             if (detailImage != null) detailImage.sprite = item.itemIcon;
             if (detailNameText != null) detailNameText.text = item.itemName;
 
