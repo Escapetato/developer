@@ -36,9 +36,12 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI itemAcquiredNameText; // [TMP] 획득한 아이템 이름
     public Button itemAcquiredConfirmButton;   // 확인 버튼
 
-    [Header("Main UI Elements (재화 UI 이동 관리)")]
-    public RectTransform poingBarRect;        // 포잉(돈) 표시줄 UI
-    public Transform poingBarOriginalParent;  // 포잉 바의 원래 위치(부모)를 기억하는 변수
+    [Header("Main UI Elements (메인 화면 UI)")]
+    public RectTransform poingBarRect;      // 포잉 바
+    public Transform poingBarOriginalParent;
+
+    // ▼▼▼ [추가] 툴 UI (부채꼴 메뉴) 연결용 변수 ▼▼▼
+    public GameObject mainToolUI;
 
     [Header("Farm Popups")]
     public GameObject seedPopup;
@@ -145,6 +148,12 @@ public class UIManager : MonoBehaviour
         if (questPopup != null) questPopup.SetActive(false);
 
         ResetPoingUIPosition();
+
+        // ★ [추가] 모든 팝업이 닫히고 메인 화면이면 -> 툴 UI 다시 켜기!
+        if (goToMain && mainToolUI != null)
+        {
+            mainToolUI.SetActive(true);
+        }
     }
 
     // [기능] 단순 메시지 알림창 띄우기
@@ -339,21 +348,38 @@ public class UIManager : MonoBehaviour
     }
     void Update()
     {
+        // ▼▼▼ [핵심] 자동 감지 로직 추가 (이것만 넣으면 끝!) ▼▼▼
+        if (mainToolUI != null)
+        {
+            // 1. 메인 팝업 중 하나라도 켜져 있는지 검사
+            bool isAnyPopupOpen = 
+                (inventoryPopup != null && inventoryPopup.activeSelf) ||
+                (researchLabPopup != null && researchLabPopup.activeSelf) ||
+                (storePopup != null && storePopup.activeSelf) ||
+                (collectionPopup != null && collectionPopup.activeSelf) ||
+                (questPopup != null && questPopup.activeSelf);
+
+            // 2. 팝업이 열려있으면 툴 UI 끄기 / 없으면 켜기 (반대로 설정)
+            // (이미 상태가 맞다면 굳이 SetActive를 또 호출하지 않게 최적화)
+            if (mainToolUI.activeSelf == isAnyPopupOpen)
+            {
+                mainToolUI.SetActive(!isAnyPopupOpen);
+            }
+        }
+        // ▲▲▲ 자동 감지 끝 ▲▲▲
+
+
+        // 기존 밭 클릭 로직 (그대로 유지)
         if (isSeedPopupOpen && Input.GetMouseButtonDown(0)) 
         {
-            // 클릭한 오브젝트 감지
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit))
             {
-                // 클릭한 오브젝트가 Field인지 확인
                 Field clickedField = hit.collider.GetComponent<Field>();
-
-                // UI 외부를 클릭했을 때만 팝업을 닫음
                 if (clickedField == null)
                 {
-                    // 팝업을 닫고 상태 플래그도 초기화
                     CloseAllPopups(); 
                 }
             }

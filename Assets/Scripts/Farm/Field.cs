@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Field : MonoBehaviour
 {
@@ -112,8 +113,14 @@ public class Field : MonoBehaviour
 
    private void OnMouseDown()
 {
-    Debug.Log($"클릭됨! 현재 상태: {currentState}");
-    if (currentState == FieldState.Empty)
+        // [추가] 마우스가 UI(팝업창, 버튼 등) 위에 있다면 밭 클릭 로직 실행 안 함
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
+        Debug.Log($"클릭됨! 현재 상태: {currentState}");
+        if (currentState == FieldState.Empty)
         {
             UIManager.Instance.OpenSeedPopup(this);
         }
