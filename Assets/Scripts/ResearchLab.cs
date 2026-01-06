@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 [System.Serializable]
 public class CategoryTab
@@ -213,12 +213,21 @@ public class ResearchLab : MonoBehaviour
             InventoryManager.Instance.AddItem(newItem, 1);
             SoundManager.Instance.PlaySFX("ev_success");
             OpenSuccessPopup(newItem);
+
+            // 퀘스트 진행도 : 진화 성공/연속성공 
+            Debug.Log($"[Lab->Quest] Evolve SUCCESS send. result={newItem.itemName}");
+            QuestManager.Instance?.NotifyEvolutionResult(true, newItem);
+
         }
         else
         {
             UIManager.Instance.ShowAlertPopup("아무런 반응이 없습니다...\n 재료가 모두 사라졌습니다.");
             SoundManager.Instance.PlaySFX("ev_fail");
+
+            Debug.Log("[Lab->Quest] Evolve FAIL send.");
+            QuestManager.Instance?.NotifyEvolutionResult(false, null);
         }
+
 
         pendingRecipe = null;
         currentEvolutionCost = 0;

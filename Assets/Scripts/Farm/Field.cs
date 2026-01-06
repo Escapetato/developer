@@ -153,6 +153,9 @@ public class Field : MonoBehaviour
 
         Debug.Log(seed.itemName + "을(를) 심었습니다.");
         UpdateFieldVisual(); // (필요 시 plantedSprite로 변경)
+
+        // 퀘스트 진행도: "심기" 
+        QuestManager.Instance?.NotifyAction(QuestConditionType.PlantCrop, seed, 1);
     }
 
     // 비료 개수에 따른 최종 성장 속도 배율 계산
@@ -191,7 +194,10 @@ public void ApplyFertilizer(int count)
     growCoroutine = StartCoroutine(GrowRoutine(remainingTime));
 
     Debug.Log($"{count}개 비료 적용. 새 배율: {newMultiplier}배. 남은 시간: {remainingTime:F2}초");
-}
+
+    // 퀘스트 진행도: 비료 주입
+    QuestManager.Instance?.NotifyAction(QuestConditionType.UseFertilizer, null, count);
+    }
 
     public void Harvest()
 {
@@ -205,6 +211,9 @@ public void ApplyFertilizer(int count)
     {
         // 성공 로직 (인벤토리 추가 등)
         InventoryManager.Instance.AddItem(plantedSeed.harvestItem, 1);
+
+        // 퀘스트 진행도: 수확(특정 작물 필터는 conditionItems로 처리)
+        QuestManager.Instance?.NotifyAction(QuestConditionType.HarvestCrop, plantedSeed.harvestItem, 1);
 
         if (plantInstance != null) Destroy(plantInstance);
         plantedSeed = null;

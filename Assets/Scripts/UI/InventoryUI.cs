@@ -233,6 +233,9 @@ public class InventoryUI : MonoBehaviour
         InventoryManager.Instance.RemoveItem(selectedItem, currentSellQuantity);
         PoingManager.Instance.IncreasePoing(totalPrice);
 
+        // 퀘스트 진행도 : 판매 
+        QuestManager.Instance?.NotifyAction(QuestConditionType.SellItem, selectedItem, currentSellQuantity);
+
         UIManager.Instance.ShowAlertPopup($"판매 완료! (+{totalPrice} 포잉)");
         SoundManager.Instance.PlaySFX("button");
 

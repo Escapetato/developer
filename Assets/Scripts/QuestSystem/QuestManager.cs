@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-//using System.Diagnostics;
 using UnityEngine;
 
 public class QuestManager : MonoBehaviour
@@ -48,6 +47,8 @@ public class QuestManager : MonoBehaviour
         BuildQuestLists();
         InitializeQuestStates();
         OpenInitialSlots();
+        RebuildActiveConditionIndex(); 
+
 
         Debug.Log($"[QuestManager] 초기 슬롯 오픈 완료 - " +
                   $"메인 Active={CountActive(mainQuests)}, " +
@@ -69,11 +70,22 @@ public class QuestManager : MonoBehaviour
         dst.conditionTexts = src.conditionTexts != null ? (string[])src.conditionTexts.Clone() : null;
         dst.targetCounts = src.targetCounts != null ? (int[])src.targetCounts.Clone() : null;
 
+        // ⭐ 추가: 추적용 조건 정보 복사
+        dst.conditionTypes = src.conditionTypes != null ? (QuestConditionType[])src.conditionTypes.Clone() : null;
+        dst.conditionItems = src.conditionItems != null ? (ItemData[])src.conditionItems.Clone() : null;
+        dst.countByAmount = src.countByAmount != null ? (bool[])src.countByAmount.Clone() : null;
+
+        // ⭐ currentCounts도 src에 저장된 값이 있다면 복사(없으면 0으로 새로)
+        if (src.currentCounts != null && src.currentCounts.Length > 0)
+            dst.currentCounts = (int[])src.currentCounts.Clone();
+        else
+            dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
+
         // 런타임 상태(새로 생성)
         dst.state = src.state;               // 혹은 Locked로 통일해도 됨(InitializeQuestStates가 어차피 초기화)
         dst.currentCount = src.currentCount;
         dst.rewardClaimed = src.rewardClaimed;
-        dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
+        //dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
 
         // 보상/체인
         dst.rewardKey = src.rewardKey;
@@ -155,10 +167,18 @@ public class QuestManager : MonoBehaviour
                 continue;
             }
 
-            q.state = QuestState.Locked;
+            //q.state = QuestState.Locked;
+
+            EnsureConditionArrays(q);
+            if (q.currentCounts != null)
+            {
+                for (int i = 0; i < q.currentCounts.Length; i++)
+                    q.currentCounts[i] = 0;
+            }
             q.currentCount = 0;
-            q.rewardClaimed = false;
+            q.rewardClaimed = false; // 세이브 시스템 후 수정 필요
             q.isNewlyOpened = false;
+
         }
     }
 
@@ -268,6 +288,7 @@ public class QuestManager : MonoBehaviour
 
         // 상태가 변경되었으니 슬롯 갱신 시도
         OpenInitialSlots();
+        RebuildActiveConditionIndex();
         Debug.Log("퀘스트 상태 복구 완료");
     }
     public event Action OnQuestChanged;
@@ -322,6 +343,7 @@ public class QuestManager : MonoBehaviour
         // 퀘스트 상태 변경: Closed
         quest.rewardClaimed = true;
         quest.state = QuestState.Closed;
+        RebuildActiveConditionIndex();
 
         // 퀘스트 닫힌 뒤 다음 슬롯 자동 오픈 
         if (quest.type == QuestType.Main)
@@ -399,6 +421,179 @@ public class QuestManager : MonoBehaviour
 
         OnQuestChanged?.Invoke();
         return true;
+    }
+
+    // [유틸] 퀘스트 조건 배열(Types/Items/Counts)의 null/길이 불일치 방지.
+    // targetCounts 길이를 기준으로 currentCounts/conditionTypes/conditionItems/countByAmount를 자동 보정한다.
+    private void EnsureConditionArrays(QuestData q)
+    {
+        if (q == null) return;
+
+        int n = (q.targetCounts != null) ? q.targetCounts.Length : 0;
+        if (n <= 0) return;
+
+        if (q.currentCounts == null || q.currentCounts.Length != n) q.currentCounts = new int[n];
+        if (q.conditionTypes == null || q.conditionTypes.Length != n) q.conditionTypes = new QuestConditionType[n];
+        if (q.conditionItems == null || q.conditionItems.Length != n) q.conditionItems = new ItemData[n];
+        if (q.countByAmount == null || q.countByAmount.Length != n) q.countByAmount = new bool[n];
+
+        if (n == 1) q.currentCount = q.currentCounts[0]; // 레거시 동기화(옵션)
+    }
+
+    private class ConditionBinding
+    {
+        public QuestData quest;
+        public int index;
+    }
+
+    private readonly Dictionary<QuestConditionType, List<ConditionBinding>> _activeBindings
+        = new Dictionary<QuestConditionType, List<ConditionBinding>>();
+
+    private int _evolveSuccessStreak = 0;
+
+    // 인덱스 리빌드 함수 
+    private void RebuildActiveConditionIndex()
+    {
+        _activeBindings.Clear();
+
+        foreach (var q in allQuestList)
+        {
+            if (q == null) continue;
+
+            EnsureConditionArrays(q);
+
+            if (q.state != QuestState.Active) continue;
+
+            for (int i = 0; i < q.conditionTypes.Length; i++)
+            {
+                var type = q.conditionTypes[i];
+                if (type == QuestConditionType.None) continue;
+
+                if (!_activeBindings.TryGetValue(type, out var list))
+                {
+                    list = new List<ConditionBinding>();
+                    _activeBindings[type] = list;
+                }
+
+                list.Add(new ConditionBinding { quest = q, index = i });
+            }
+        }
+    }
+
+    // 퀘스트 진행도 추적 - 알림 함수 ! 
+    public void NotifyAction(QuestConditionType type, ItemData item = null, int amount = 1)
+    {
+        if (!_activeBindings.TryGetValue(type, out var list) || list == null || list.Count == 0)
+            return;
+
+        bool changedAny = false;
+
+        foreach (var b in list)
+        {
+            var q = b.quest;
+            int i = b.index;
+
+            if (q == null || q.state != QuestState.Active) continue;
+            EnsureConditionArrays(q);
+
+            // 아이템 필터(조건에 특정 아이템이 지정된 경우만)
+            ItemData required = q.conditionItems[i];
+            if (required != null && item != required) continue;
+
+            int target = q.targetCounts[i];
+            int before = q.currentCounts[i];
+
+            // countByAmount: true면 amount 만큼 증가(개수/금액), false면 1회로 증가
+            int delta = q.countByAmount[i] ? Mathf.Max(0, amount) : 1;
+
+            int after = Mathf.Clamp(before + delta, 0, target);
+
+            if (after != before)
+            {
+                q.currentCounts[i] = after;
+                if (q.targetCounts.Length == 1) q.currentCount = q.currentCounts[0];
+                changedAny = true;
+            }
+
+            if (IsCompletedByCounts(q) && q.state == QuestState.Active)
+            {
+                q.state = QuestState.Completed;
+                changedAny = true;
+            }
+        }
+
+        if (changedAny)
+            OnQuestChanged?.Invoke();
+    }
+
+    // 진화 결과 추적용 함수 
+    public void NotifyEvolutionResult(bool success, ItemData resultItem = null)
+    {
+        Debug.Log($"[Quest<-Lab] NotifyEvolutionResult RECEIVED. success={success}, item={(resultItem != null ? resultItem.itemName : "null")}");
+
+        if (success)
+        {
+            _evolveSuccessStreak++;
+            NotifyAction(QuestConditionType.EvolveSuccess, resultItem, 1);
+
+            // 5연속 성공 타입은 '스트릭 값'으로
+            if (_activeBindings.TryGetValue(QuestConditionType.EvolveSuccessStreak, out var list))
+            {
+                bool changed = false;
+
+                foreach (var b in list)
+                {
+                    var q = b.quest;
+                    int i = b.index;
+                    if (q == null || q.state != QuestState.Active) continue;
+
+                    EnsureConditionArrays(q);
+
+                    int target = q.targetCounts[i];
+                    int newValue = Mathf.Clamp(_evolveSuccessStreak, 0, target);
+
+                    if (q.currentCounts[i] != newValue)
+                    {
+                        q.currentCounts[i] = newValue;
+                        changed = true;
+                    }
+
+                    if (IsCompletedByCounts(q) && q.state == QuestState.Active)
+                    {
+                        q.state = QuestState.Completed;
+                        changed = true;
+                    }
+                }
+
+                if (changed) OnQuestChanged?.Invoke();
+            }
+        }
+        else
+        {
+            _evolveSuccessStreak = 0;
+            NotifyAction(QuestConditionType.EvolveFail, null, 1);
+
+            // 실패하면 연속 성공 스트릭이 0
+            if (_activeBindings.TryGetValue(QuestConditionType.EvolveSuccessStreak, out var list))
+            {
+                bool changed = false;
+                foreach (var b in list)
+                {
+                    var q = b.quest;
+                    int i = b.index;
+                    if (q == null || q.state != QuestState.Active) continue;
+
+                    EnsureConditionArrays(q);
+
+                    if (q.currentCounts[i] != 0)
+                    {
+                        q.currentCounts[i] = 0;
+                        changed = true;
+                    }
+                }
+                if (changed) OnQuestChanged?.Invoke();
+            }
+        }
     }
 
 }
