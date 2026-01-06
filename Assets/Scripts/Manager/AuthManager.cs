@@ -248,7 +248,7 @@ public class AuthManager : MonoBehaviour
                 else
                     Debug.LogWarning("[AuthManager] DBManager 없음");
 
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Lab");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
             });
         });
     }

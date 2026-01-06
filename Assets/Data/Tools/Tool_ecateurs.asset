@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uC804\uC9C0\uAC00\uC704"
   description: 
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 21300000, guid: 57c62205715e8604e9e38583be112ecd, type: 3}
   itemCategory: Tool
   collectionCategory: 
   price: 23550

@@ -31,19 +31,20 @@ public class StoreUI : MonoBehaviour
     public List<CategoryButton> categoryButtons;
     public CategoryButton defaultCategoryButton;
 
-    // 구매 수량 조절 팝업 (인벤토리 판매 팝업과 비슷한 구조)
     [Header("Buy Popup Settings")]
-    public GameObject buyPopupObject;       // 팝업 패널
-    public Image popupItemIcon;             // 팝업 안 아이콘
-    public TextMeshProUGUI popupNameText;   // 팝업 안 이름
-    public Slider popupSlider;              // 팝업 안 슬라이더
-    public TextMeshProUGUI popupCountText;  // 팝업 안 수량 텍스트
-    public TextMeshProUGUI popupTotalCostText; // 팝업 안 총 가격 텍스트
-    public Button popupConfirmButton;       // "구매" 확정 버튼
-    public Button popupCancelButton;        // "취소" 버튼
+    public GameObject buyPopupObject;
+    public Image popupItemIcon;
+    public TextMeshProUGUI popupNameText;
+    public Slider popupSlider;
+    public TextMeshProUGUI popupCountText;
+    public TextMeshProUGUI popupTotalCostText;
+    public Button popupConfirmButton;
+    public Button popupCancelButton;
 
     private string currentCategory = "All";
-    private int currentBuyQuantity = 1; // 현재 설정된 구매 개수
+    private int currentBuyQuantity = 1;
+
+    public TextMeshProUGUI buyButtonText;
 
     void Awake()
     {
@@ -54,30 +55,26 @@ public class StoreUI : MonoBehaviour
         slotParent.GetComponentsInChildren<ItemSlot>(slots);
 
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
-        if (buyPopupObject != null) buyPopupObject.SetActive(false); // 시작할 때 팝업 끄기
+        if (buyPopupObject != null) buyPopupObject.SetActive(false);
 
-        // 1. 상세창의 [구매] 버튼 -> 팝업 열기 연결
         if (openBuyPopupButton != null)
         {
             openBuyPopupButton.onClick.RemoveAllListeners();
             openBuyPopupButton.onClick.AddListener(OnOpenBuyPopupClick);
         }
 
-        // 2. 팝업 슬라이더 연결
         if (popupSlider != null)
         {
             popupSlider.onValueChanged.RemoveAllListeners();
             popupSlider.onValueChanged.AddListener(OnSliderValueChanged);
         }
 
-        // 3. 팝업 확정 버튼 -> 진짜 구매
         if (popupConfirmButton != null)
         {
             popupConfirmButton.onClick.RemoveAllListeners();
             popupConfirmButton.onClick.AddListener(OnRealPurchaseClick);
         }
 
-        // 4. 팝업 취소 버튼 -> 닫기
         if (popupCancelButton != null)
         {
             popupCancelButton.onClick.RemoveAllListeners();
@@ -163,16 +160,79 @@ public class StoreUI : MonoBehaviour
         {
             detailPanelObject.SetActive(true);
 
-            // 이미지 & 이름 & 가격 갱신
+            // 아이템 선택 시 구매 버튼 켜주기 (ClearSelection으로 꺼졌던 것 복구)
+            if (openBuyPopupButton != null)
+                openBuyPopupButton.gameObject.SetActive(true);
+
             if (detailImage != null) detailImage.sprite = item.itemIcon;
             if (detailNameText != null) detailNameText.text = item.itemName;
-            if (detailPriceText != null) detailPriceText.text = item.price.ToString();
 
-            // 구매 버튼 활성화 (잠금 해제 여부)
-            if (openBuyPopupButton != null)
+            // ★ [중요] 내 보유 개수 확인 (계산만 하고, 텍스트 표시는 안 함)
+            int myCount = InventoryManager.Instance.GetItemCount(item);
+
+            // ▼▼▼ [삭제됨] 수량 텍스트 갱신 코드 삭제 ▼▼▼
+            // if (detailQuantityText != null) detailQuantityText.text = myCount.ToString();
+
+
+            // ▼▼▼ [수정] 잠긴 아이템("???")인지 확인 ▼▼▼
+            if (item.itemName == "???")
             {
-                openBuyPopupButton.gameObject.SetActive(true);
-                openBuyPopupButton.interactable = isUnlocked;
+                if (detailPriceText != null)
+                {
+                    detailPriceText.gameObject.SetActive(true);
+                    detailPriceText.text = "???"; // 가격 물음표
+                }
+
+                if (openBuyPopupButton != null)
+                {
+                    openBuyPopupButton.interactable = false;
+                    if (buyButtonText != null) buyButtonText.text = "해금 필요";
+                }
+            }
+            // ▼▼▼ 기존 로직 (도구/일반 아이템 구분) ▼▼▼
+            else if (item.itemCategory == "Tool")
+            {
+                bool isOwnedTool = (myCount > 0); // 보유 여부 확인
+
+                if (isOwnedTool)
+                {
+                    // 보유 중이면 가격 숨기기
+                    if (detailPriceText != null) detailPriceText.gameObject.SetActive(false);
+
+                    if (openBuyPopupButton != null)
+                    {
+                        openBuyPopupButton.interactable = false;
+                        if (buyButtonText != null) buyButtonText.text = "보유 중";
+                    }
+                }
+                else
+                {
+                    if (detailPriceText != null)
+                    {
+                        detailPriceText.gameObject.SetActive(true);
+                        detailPriceText.text = item.price.ToString();
+                    }
+                    if (openBuyPopupButton != null)
+                    {
+                        openBuyPopupButton.interactable = isUnlocked;
+                        if (buyButtonText != null) buyButtonText.text = "결제";
+                    }
+                }
+            }
+            else
+            {
+                // [일반 아이템]
+                if (detailPriceText != null)
+                {
+                    detailPriceText.gameObject.SetActive(true);
+                    detailPriceText.text = item.price.ToString();
+                }
+
+                if (openBuyPopupButton != null)
+                {
+                    openBuyPopupButton.interactable = isUnlocked;
+                    if (buyButtonText != null) buyButtonText.text = "결제";
+                }
             }
         }
     }
@@ -183,20 +243,18 @@ public class StoreUI : MonoBehaviour
         selectedItem = null;
         selectedSlot = null;
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
+        if (openBuyPopupButton != null) openBuyPopupButton.gameObject.SetActive(false);
     }
 
-    // [1단계] 구매 버튼 클릭 -> 팝업 열기
     public void OnOpenBuyPopupClick()
     {
         if (selectedItem == null) return;
 
-        // 1. 현재 내 돈 확인
         int myPoing = PoingManager.Instance.GetPoing();
         int price = selectedItem.price;
 
-        if (price <= 0) return; // 공짜 아이템이 아니라면 방어 코드
+        if (price <= 0) return;
 
-        // 2. 최대로 살 수 있는 개수 계산 (내 돈 / 가격)
         int maxCanBuy = myPoing / price;
 
         if (maxCanBuy <= 0)
@@ -205,19 +263,14 @@ public class StoreUI : MonoBehaviour
             return;
         }
 
-        // 3. 팝업 UI 세팅
         buyPopupObject.SetActive(true);
         if (popupItemIcon != null) popupItemIcon.sprite = selectedItem.itemIcon;
         if (popupNameText != null) popupNameText.text = selectedItem.itemName;
 
-        // 4. 슬라이더 세팅
         if (popupSlider != null)
         {
             popupSlider.minValue = 1;
-            popupSlider.maxValue = maxCanBuy; // 내 돈으로 살 수 있는 최대치
-                                              // 너무 많이 사는거 방지하려면 99개 제한 걸어도 됨
-                                              // if (maxCanBuy > 99) popupSlider.maxValue = 99; 
-
+            popupSlider.maxValue = maxCanBuy;
             popupSlider.value = 1;
             currentBuyQuantity = 1;
         }
@@ -226,7 +279,6 @@ public class StoreUI : MonoBehaviour
         SoundManager.Instance.PlaySFX("PopupOpen");
     }
 
-    // ★ [2단계] 슬라이더 움직임
     public void OnSliderValueChanged(float value)
     {
         currentBuyQuantity = (int)value;
@@ -245,27 +297,23 @@ public class StoreUI : MonoBehaviour
         }
     }
 
-    // ★ [3단계] 진짜 구매 (팝업 내 확인 버튼)
     public void OnRealPurchaseClick()
     {
         if (selectedItem == null) return;
 
         int totalCost = selectedItem.price * currentBuyQuantity;
 
-        // 돈 확인 (한 번 더 안전장치)
         if (PoingManager.Instance.HasEnoughPoing(totalCost))
         {
-            // 1. 돈 차감
             PoingManager.Instance.DecreasePoing(totalCost);
-
-            // 2. 아이템 추가
             InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
 
-            // 3. 알림 & 소리
             UIManager.Instance.ShowAlertPopup($"{selectedItem.itemName} {currentBuyQuantity}개 구매 완료!");
 
-            // 4. 팝업 닫기
             CloseBuyPopup();
+
+            // ★ 구매 후 수량 즉시 갱신을 위해 패널 업데이트 호출
+            UpdateDetailPanel(selectedItem, true);
         }
         else
         {
