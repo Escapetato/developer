@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Field : MonoBehaviour
 {
@@ -112,8 +113,14 @@ public class Field : MonoBehaviour
 
    private void OnMouseDown()
 {
-    Debug.Log($"클릭됨! 현재 상태: {currentState}");
-    if (currentState == FieldState.Empty)
+        // [추가] 마우스가 UI(팝업창, 버튼 등) 위에 있다면 밭 클릭 로직 실행 안 함
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
+        Debug.Log($"클릭됨! 현재 상태: {currentState}");
+        if (currentState == FieldState.Empty)
         {
             UIManager.Instance.OpenSeedPopup(this);
         }
@@ -187,26 +194,28 @@ public void ApplyFertilizer(int count)
 }
 
     public void Harvest()
+{
+    if (currentState != FieldState.Ready) return;
+
+    // 매니저에서 현재 클릭으로 선택해둔 티어를 가져옴
+    int myTier = HarvestToolManager.Instance.currentToolTier;
+
+    // 작물의 요구 티어와 비교
+    if (myTier == plantedSeed.requiredToolTier)
     {
-        if (currentState != FieldState.Ready) return;
+        // 성공 로직 (인벤토리 추가 등)
+        InventoryManager.Instance.AddItem(plantedSeed.harvestItem, 1);
 
-        // [수정] ItemData.cs에 harvestItem을 추가했으므로 이 코드가 작동
-        if (plantedSeed.harvestItem != null)
-        {
-            InventoryManager.Instance.AddItem(plantedSeed.harvestItem, 1);
-            UIManager.Instance.ShowItemAcquiredPopup(plantedSeed.harvestItem);
-        }
-
-        // [추가] 심겨진 식물 오브젝트 삭제
-        if (plantInstance != null)
-        {
-            Destroy(plantInstance);
-        }
-
-        // 밭 초기화
+        if (plantInstance != null) Destroy(plantInstance);
         plantedSeed = null;
         currentState = FieldState.Empty;
         UpdateFieldVisual();
-        Debug.Log("수확 완료!");
     }
+    else
+    {
+        // 실패: 작물 데이터에 적어둔 도구 이름가져옴
+        string neededTool = plantedSeed.harvestToolName;
+        Debug.Log($"{neededTool}(이)가 필요합니다!");
+    }
+}
 }

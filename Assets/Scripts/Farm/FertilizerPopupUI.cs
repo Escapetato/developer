@@ -21,7 +21,7 @@ public class FertilizerPopupUI : MonoBehaviour
     
     private int maxAvailableAmount = 0; // 현재 보유하고 있는 최대 비료 개수
     private int currentApplyAmount = 1; // 현재 설정된 비료 개수
-    
+
     // UIManager에서 호출될 함수
     public void Show(Field field)
     {
@@ -40,11 +40,11 @@ public class FertilizerPopupUI : MonoBehaviour
         // 팝업 초기 상태 설정
         maxAvailableAmount = InventoryManager.Instance.GetItemCount(fertilizerData);
         fertilizerCountText.text = $"보유 비료: {maxAvailableAmount} 개";
-        
+
         // 초기 개수 설정 및 UI 업데이트
-        currentApplyAmount = 1; 
+        currentApplyAmount = 1;
         if (maxAvailableAmount == 0) currentApplyAmount = 0; // 비료가 없으면 0으로 시작
-        
+
         UpdateApplyAmountUI(); // UI에 현재 개수 반영
 
         // 기존 확인/닫기 버튼 리스너 연결 
@@ -52,26 +52,42 @@ public class FertilizerPopupUI : MonoBehaviour
         confirmButton.onClick.AddListener(OnConfirmClicked);
         closeButton.onClick.RemoveAllListeners();
         closeButton.onClick.AddListener(() => UIManager.Instance.CloseAllPopups());
-        
+
         // 증가/감소 버튼 리스너 연결
         increaseButton.onClick.RemoveAllListeners();
         increaseButton.onClick.AddListener(() => ChangeApplyAmount(1)); // 1 증가
         decreaseButton.onClick.RemoveAllListeners();
         decreaseButton.onClick.AddListener(() => ChangeApplyAmount(-1)); // 1 감소
-        
-        applyAmountInput.onValueChanged.RemoveAllListeners(); 
+
+        applyAmountInput.onValueChanged.RemoveAllListeners();
+
+        if (appliedFieldImage != null)
+        {
+            Sprite fieldSprite = field.GetFieldSprite(); // 밭에서 이미지를 가져옴
+
+            if (fieldSprite == null)
+            {
+                Debug.LogError($"{field.name}으로부터 가져온 스프라이트가 null입니다! Field 인스펙터를 확인하세요.");
+            }
+            else
+            {
+                appliedFieldImage.sprite = fieldSprite;
+                appliedFieldImage.enabled = true; // 혹시 꺼져있을지 모르니 켜줌
+                Debug.Log($"{field.name}의 이미지를 팝업에 적용했습니다: {fieldSprite.name}");
+            }
+        }
     }
     // 개수 변경 로직
     private void ChangeApplyAmount(int delta)
     {
         int newAmount = currentApplyAmount + delta;
-        
+
         // 1. 유효성 검사 (최소값 1, 최대값 maxAvailableAmount)
         newAmount = Mathf.Clamp(newAmount, 1, maxAvailableAmount);
-        
+
         // (비료가 0개일 경우, 증가/감소 버튼을 비활성화하는 것이 더 좋지만, 로직 상으로는 0으로 고정)
-        if (maxAvailableAmount == 0) newAmount = 0; 
-        
+        if (maxAvailableAmount == 0) newAmount = 0;
+
         if (newAmount != currentApplyAmount)
         {
             currentApplyAmount = newAmount;
