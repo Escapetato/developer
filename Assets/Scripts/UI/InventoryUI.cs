@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -234,7 +235,15 @@ public class InventoryUI : MonoBehaviour
         PoingManager.Instance.IncreasePoing(totalPrice);
 
         // 퀘스트 진행도 : 판매 
-        QuestManager.Instance?.NotifyAction(QuestConditionType.SellItem, selectedItem, currentSellQuantity);
+        if (QuestManager.Instance != null && selectedItem != null)
+        {
+            // 작물만 카운트
+            if (selectedItem.itemCategory == "Crop")
+            {
+                QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, selectedItem, sellQuantity);
+            }
+        }
+
 
         UIManager.Instance.ShowAlertPopup($"판매 완료! (+{totalPrice} 포잉)");
         SoundManager.Instance.PlaySFX("button");

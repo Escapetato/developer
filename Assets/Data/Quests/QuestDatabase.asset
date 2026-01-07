@@ -25,11 +25,17 @@ MonoBehaviour:
     state: 3
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uAC10\uC790 5\uAC1C \uD310\uB9E4\uD558\uAE30"
     - "\uB3C4\uB9DD\uAC10\uC790 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0500000001000000
-    currentCounts: 
+    currentCounts: 0000000000000000
+    conditionTypes: 0400000009000000
+    conditionItems:
+    - {fileID: 11400000, guid: 48d7f29a3bd99d842b1450283f0823e4, type: 2}
+    - {fileID: 11400000, guid: 2d77699aea346e14bad47554c5b37023, type: 2}
+    countByAmount: 0101
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -52,11 +58,17 @@ MonoBehaviour:
     state: 1
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uD1A0\uB9C8\uD1A0 5\uAC1C \uC218\uD655\uD558\uAE30"
     - "\uBA4B\uC7C1\uC774 \uD1A0\uB9C8\uD1A0 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0500000001000000
-    currentCounts: 
+    currentCounts: 0000000000000000
+    conditionTypes: 0200000009000000
+    conditionItems:
+    - {fileID: 11400000, guid: 0189d90933e11354faf6ba4ffb34e421, type: 2}
+    - {fileID: 11400000, guid: 5f77868eb7ff7124292b829eeab8d705, type: 2}
+    countByAmount: 0101
     rewardItem: {fileID: 11400000, guid: 165382755a2f6684cb91d6ee842877eb, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -80,11 +92,17 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uB9C8\uB298 3\uAC1C \uC2EC\uAE30"
     - "\uC54C\uB9AC\uC624\uC62C\uB9AC\uC624 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0300000001000000
-    currentCounts: 
+    currentCounts: 0000000000000000
+    conditionTypes: 0100000009000000
+    conditionItems:
+    - {fileID: 11400000, guid: c750a806cdddfa54db1a5ac00afb8b69, type: 2}
+    - {fileID: 11400000, guid: 10faf0077e11050498008c4e07d3d020, type: 2}
+    countByAmount: 0101
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -105,11 +123,17 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uBA54\uB860 3\uAC1C \uD310\uB9E4\uD558\uAE30"
     - "\uBA54\uB85C\uB098 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0300000001000000
     currentCounts: 0000000000000000
+    conditionTypes: 0400000009000000
+    conditionItems:
+    - {fileID: 11400000, guid: cdd542ae1919f9743a54088d6e19a46a, type: 2}
+    - {fileID: 11400000, guid: 85bcbe743956b524f9a280b790a85b6d, type: 2}
+    countByAmount: 0101
     rewardItem: {fileID: 11400000, guid: 2f7f40b2408e9a14fbdb500f84d2c07e, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -134,11 +158,17 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uD638\uBC15 1\uAC1C \uC218\uD655\uD558\uAE30"
     - "\uC7AD\uC624\uB79C\uD134 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0100000001000000
-    currentCounts: 
+    currentCounts: 0000000000000000
+    conditionTypes: 0200000009000000
+    conditionItems:
+    - {fileID: 11400000, guid: 3f9d23aa25892e846baf2ccdbd7a371e, type: 2}
+    - {fileID: 11400000, guid: 70aaa14332b73d041afd5bf727cdb3cd, type: 2}
+    countByAmount: 0101
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -163,11 +193,17 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uC0AC\uD0D5\uC218\uC218 1\uAC1C \uC2EC\uAE30"
     - "\uBCC4\uC0AC\uD0D5 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0100000001000000
-    currentCounts: 
+    currentCounts: 0000000000000000
+    conditionTypes: 0100000009000000
+    conditionItems:
+    - {fileID: 11400000, guid: 45a83d0d29381c64da960d03d796908f, type: 2}
+    - {fileID: 11400000, guid: cfb522275ce02bf47af1e608e6d2281f, type: 2}
+    countByAmount: 0101
     rewardItem: {fileID: 11400000, guid: 9f6b5ecc7de7da94aae4f15b60e19f5d, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -189,10 +225,15 @@ MonoBehaviour:
     state: 1
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uC791\uBB3C \uC528\uC557 10\uAC1C \uAD6C\uB9E4\uD558\uAE30"
     targetCounts: 0a000000
-    currentCounts: 
+    currentCounts: 00000000
+    conditionTypes: 05000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 11400000, guid: 78430ef49a53a804bbdec4d89d7d0962, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -213,10 +254,15 @@ MonoBehaviour:
     state: 1
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uC218\uD655\uB3C4\uAD6C 1\uAC1C \uAD6C\uB9E4\uD558\uAE30"
     targetCounts: 01000000
-    currentCounts: 
+    currentCounts: 00000000
+    conditionTypes: 07000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 11400000, guid: c750a806cdddfa54db1a5ac00afb8b69, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -238,10 +284,15 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uC791\uBB3C 50\uAC1C \uD310\uB9E4\uD558\uAE30"
     targetCounts: 32000000
-    currentCounts: 
+    currentCounts: 00000000
+    conditionTypes: 04000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 11400000, guid: 4eeadc65370f02c42bb3f879f533e9ab, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -262,10 +313,15 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "7\uC77C \uC5F0\uC18D \uC811\uC18D\uD558\uAE30"
     targetCounts: 07000000
-    currentCounts: 
+    currentCounts: 00000000
+    conditionTypes: 00000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 00
     rewardItem: {fileID: 11400000, guid: cf50d8519e8d7564cb4a5e8007ce4d50, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -286,10 +342,15 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uAFB8\uBBF8\uAE30\uD14C\uB9C8 1\uAC1C \uAD6C\uB9E4\uD558\uAE30"
     targetCounts: 01000000
-    currentCounts: 
+    currentCounts: 00000000
+    conditionTypes: 08000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 11400000, guid: 69d52f45f3dbce046a0667d4a6f36275, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -310,10 +371,15 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "5\uB9CC \uACE8\uB4DC \uC18C\uBE44\uD558\uAE30"
     targetCounts: 50c30000
-    currentCounts: 
+    currentCounts: 00000000
+    conditionTypes: 0c000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 11400000, guid: 45a83d0d29381c64da960d03d796908f, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -334,10 +400,15 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
     - "\uC791\uBB3C \uC9C4\uD654 5\uC5F0\uC18D \uC131\uACF5\uD558\uAE30"
     targetCounts: 05000000
-    currentCounts: 
+    currentCounts: 00000000
+    conditionTypes: 0b000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 00
     rewardItem: {fileID: 11400000, guid: 7f042aa655193ce4bb50c74cbb64d5a2, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -359,10 +430,15 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts:
-    - "\uC544\uC2A4\uD30C\uB77C\uAC70\uC2A4 1\uC2DC\uAC04 \uC548\uC5D0 \uC218\uD655\uD558\uAE30"
-    targetCounts: 00000000
-    currentCounts: 
+    - "\uC544\uC2A4\uD30C\uB77C\uAC70\uC2A4 1\uAC1C \uC218\uD655\uD558\uAE30"
+    targetCounts: 01000000
+    currentCounts: 00000000
+    conditionTypes: 02000000
+    conditionItems:
+    - {fileID: 11400000, guid: d610bf3fa42cdad42b18e4b755464ac4, type: 2}
+    countByAmount: 01
     rewardItem: {fileID: 11400000, guid: 7abee0038aca19a4ca280f408482bb11, type: 2}
     rewardKey: 0
     rewardAmount: 1
@@ -380,9 +456,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -400,9 +480,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -420,9 +504,13 @@ MonoBehaviour:
     state: 1
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -440,9 +528,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -460,9 +552,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -480,9 +576,13 @@ MonoBehaviour:
     state: 1
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -500,9 +600,13 @@ MonoBehaviour:
     state: 1
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -520,9 +624,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0

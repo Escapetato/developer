@@ -454,6 +454,8 @@ public class QuestManager : MonoBehaviour
     // 인덱스 리빌드 함수 
     private void RebuildActiveConditionIndex()
     {
+        Debug.Log("[Quest][Bind] RebuildActiveConditionIndex() CALLED");
+
         _activeBindings.Clear();
 
         foreach (var q in allQuestList)
@@ -478,6 +480,10 @@ public class QuestManager : MonoBehaviour
                 list.Add(new ConditionBinding { quest = q, index = i });
             }
         }
+
+        Debug.Log($"[Quest][Bind] rebuilt. types={_activeBindings.Count}");
+        foreach (var kv in _activeBindings) Debug.Log($"[Quest][Bind] type={kv.Key} bindings={kv.Value.Count}");
+
     }
 
     // ✨ 퀘스트 진행도 추적 - 알림 함수 ! 
@@ -486,7 +492,10 @@ public class QuestManager : MonoBehaviour
         Debug.Log($"[Quest][Action][RECV] type={type} item={(item != null ? item.itemName : "null")} amount={amount}");
 
         if (!_activeBindings.TryGetValue(type, out var list) || list == null || list.Count == 0)
+        {
+            Debug.Log($"[Quest][Action][DROP] type={type} (no active binding)");
             return;
+        }
 
         bool changedAny = false;
 
@@ -500,7 +509,11 @@ public class QuestManager : MonoBehaviour
 
             // 아이템 필터(조건에 특정 아이템이 지정된 경우만)
             ItemData required = q.conditionItems[i];
-            if (required != null && item != required) continue;
+            if (required != null && item != required)
+            {
+                Debug.Log($"[Quest][Action][SKIP] type={type} required={required.itemName} got={(item != null ? item.itemName : "null")}");
+                continue;
+            }
 
             int target = q.targetCounts[i];
             int before = q.currentCounts[i];
@@ -515,6 +528,8 @@ public class QuestManager : MonoBehaviour
                 q.currentCounts[i] = after;
                 if (q.targetCounts.Length == 1) q.currentCount = q.currentCounts[0];
                 changedAny = true;
+
+                Debug.Log($"[Quest][Action][APPLY] quest={q.key} idx={i} {before}->{after}/{target} delta={delta}");
             }
 
             if (IsCompletedByCounts(q) && q.state == QuestState.Active)
@@ -528,10 +543,10 @@ public class QuestManager : MonoBehaviour
             OnQuestChanged?.Invoke();
     }
 
-    // 진화 결과 추적용 함수 
+    // 진화 결과 추적용 함수 (연속 횟수)
     public void NotifyEvolutionResult(bool success, ItemData resultItem = null)
     {
-        //Debug.Log($"[Quest<-Lab] NotifyEvolutionResult RECEIVED. success={success}, item={(resultItem != null ? resultItem.itemName : "null")}");
+        Debug.Log($"[Quest<-Lab] NotifyEvolutionResult RECEIVED. success={success}, item={(resultItem != null ? resultItem.itemName : "null")}");
 
         if (success)
         {
