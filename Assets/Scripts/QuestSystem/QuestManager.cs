@@ -480,9 +480,11 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    // 퀘스트 진행도 추적 - 알림 함수 ! 
+    // ✨ 퀘스트 진행도 추적 - 알림 함수 ! 
     public void NotifyAction(QuestConditionType type, ItemData item = null, int amount = 1)
     {
+        Debug.Log($"[Quest][Action][RECV] type={type} item={(item != null ? item.itemName : "null")} amount={amount}");
+
         if (!_activeBindings.TryGetValue(type, out var list) || list == null || list.Count == 0)
             return;
 
@@ -529,7 +531,7 @@ public class QuestManager : MonoBehaviour
     // 진화 결과 추적용 함수 
     public void NotifyEvolutionResult(bool success, ItemData resultItem = null)
     {
-        Debug.Log($"[Quest<-Lab] NotifyEvolutionResult RECEIVED. success={success}, item={(resultItem != null ? resultItem.itemName : "null")}");
+        //Debug.Log($"[Quest<-Lab] NotifyEvolutionResult RECEIVED. success={success}, item={(resultItem != null ? resultItem.itemName : "null")}");
 
         if (success)
         {

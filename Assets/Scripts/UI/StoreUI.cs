@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class StoreUI : MonoBehaviour
 {
@@ -354,9 +354,10 @@ public class StoreUI : MonoBehaviour
                 break;
 
             default:
-                // 필요 시 카테고리 추가
                 break;
         }
     }
+
+
 
 }

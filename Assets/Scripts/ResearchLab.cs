@@ -215,7 +215,6 @@ public class ResearchLab : MonoBehaviour
             OpenSuccessPopup(newItem);
 
             // 퀘스트 진행도 : 진화 성공/연속성공 
-            Debug.Log($"[Lab->Quest] Evolve SUCCESS send. result={newItem.itemName}");
             QuestManager.Instance?.NotifyEvolutionResult(true, newItem);
 
         }
@@ -224,7 +223,7 @@ public class ResearchLab : MonoBehaviour
             UIManager.Instance.ShowAlertPopup("아무런 반응이 없습니다...\n 재료가 모두 사라졌습니다.");
             SoundManager.Instance.PlaySFX("ev_fail");
 
-            Debug.Log("[Lab->Quest] Evolve FAIL send.");
+            // 퀘스트 진행도 : 진화 실패 
             QuestManager.Instance?.NotifyEvolutionResult(false, null);
         }
 
