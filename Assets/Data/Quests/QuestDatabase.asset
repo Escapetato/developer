@@ -460,9 +460,10 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
-    conditionTypes: 
-    conditionItems: []
-    countByAmount: 
+    conditionTypes: 01000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -484,9 +485,10 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
-    conditionTypes: 
-    conditionItems: []
-    countByAmount: 
+    conditionTypes: 02000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -508,9 +510,10 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
-    conditionTypes: 
-    conditionItems: []
-    countByAmount: 
+    conditionTypes: 04000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -532,9 +535,10 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
-    conditionTypes: 
-    conditionItems: []
-    countByAmount: 
+    conditionTypes: 09000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -556,9 +560,10 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
-    conditionTypes: 
-    conditionItems: []
-    countByAmount: 
+    conditionTypes: 0a000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -580,9 +585,10 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
-    conditionTypes: 
-    conditionItems: []
-    countByAmount: 
+    conditionTypes: 03000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -604,9 +610,10 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
-    conditionTypes: 
-    conditionItems: []
-    countByAmount: 
+    conditionTypes: 05000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -628,9 +635,10 @@ MonoBehaviour:
     conditionTexts: []
     targetCounts: 
     currentCounts: 
-    conditionTypes: 
-    conditionItems: []
-    countByAmount: 
+    conditionTypes: 06000000
+    conditionItems:
+    - {fileID: 0}
+    countByAmount: 01
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0

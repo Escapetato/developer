@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -240,10 +239,9 @@ public class InventoryUI : MonoBehaviour
             // 작물만 카운트
             if (selectedItem.itemCategory == "Crop")
             {
-                QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, selectedItem, sellQuantity);
+                QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, selectedItem, currentSellQuantity);
             }
         }
-
 
         UIManager.Instance.ShowAlertPopup($"판매 완료! (+{totalPrice} 포잉)");
         SoundManager.Instance.PlaySFX("button");
