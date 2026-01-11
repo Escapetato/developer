@@ -8645,7 +8645,9 @@ MonoBehaviour:
   detailImage: {fileID: 1049221365}
   detailNameText: {fileID: 0}
   detailPriceText: {fileID: 0}
+  detailQuantityText: {fileID: 0}
   openSellPopupButton: {fileID: 0}
+  sellButtonText: {fileID: 0}
   sellPopupObject: {fileID: 0}
   popupItemIcon: {fileID: 0}
   popupNameText: {fileID: 0}
@@ -10572,6 +10574,7 @@ MonoBehaviour:
   testPotion: {fileID: 11400000, guid: a9f2d6e5448e4da4ea36a85ad9d00154, type: 2}
   SeedItem: {fileID: 11400000, guid: 338f645ecbeda448cb27ea9fe07caf8c, type: 2}
   FertilizerItem: {fileID: 11400000, guid: a65a37f4a42ff9949ae4cfb9ba2dad4b, type: 2}
+  Tools: {fileID: 0}
 --- !u!1 &965756018
 GameObject:
   m_ObjectHideFlags: 0
@@ -11339,6 +11342,7 @@ MonoBehaviour:
   popupTotalCostText: {fileID: 0}
   popupConfirmButton: {fileID: 0}
   popupCancelButton: {fileID: 0}
+  buyButtonText: {fileID: 0}
 --- !u!114 &1022685274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15476,90 +15480,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1402692641}
   m_CullTransparentMesh: 1
---- !u!1 &1435301246
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1435301248}
-  - component: {fileID: 1435301247}
-  m_Layer: 0
-  m_Name: "sample_\u110C\u1165\u11AB\u110E\u1166\u1100\u116E\u1109\u1161\u11BC\u1103\u1169"
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!212 &1435301247
-SpriteRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1435301246}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: 8d20f331495a240fb9e1b63866c2756b, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 76.799995, y: 43.199997}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
---- !u!4 &1435301248
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1435301246}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.2, y: -1, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1436708687
 GameObject:
   m_ObjectHideFlags: 0
@@ -17190,6 +17110,7 @@ MonoBehaviour:
   itemAcquiredConfirmButton: {fileID: 1921637270}
   poingBarRect: {fileID: 0}
   poingBarOriginalParent: {fileID: 0}
+  mainToolUI: {fileID: 0}
   seedPopup: {fileID: 1255917745}
   fertilizerPopup: {fileID: 1623552297}
 --- !u!4 &1574965463
@@ -22383,4 +22304,3 @@ SceneRoots:
   - {fileID: 1644953033}
   - {fileID: 21513709}
   - {fileID: 2128294615}
-  - {fileID: 1435301248}
