@@ -9,7 +9,10 @@ public class QuestSlotUI : MonoBehaviour
 
     [Header("슬롯 이미지 (클릭 시 테두리)")]
     [SerializeField] private Sprite normalSprite;     
-    [SerializeField] private Sprite selectedSprite;   
+    [SerializeField] private Sprite selectedSprite;
+
+    [Header("새로 열린 퀘스트 (빨간 점)")]
+    [SerializeField] private GameObject newDotObject; 
 
     private QuestData boundQuest;
     private bool isDailySlot = false;
@@ -51,6 +54,8 @@ public class QuestSlotUI : MonoBehaviour
 
         // 새로운 데이터 바인딩 시 초기화 
         SetSelected(false);
+        RefreshNewDot(); 
+
     }
 
     public void SetOwner(QuestListController controller)
@@ -102,4 +107,42 @@ public class QuestSlotUI : MonoBehaviour
     {
         return isDailySlot;
     }
+
+    public void RefreshNewDot()
+    {
+        if (newDotObject == null)
+            return;
+
+        bool show = false;
+
+        if (boundQuest == null)
+        {
+            newDotObject.SetActive(false);
+            return;
+        }
+
+        if (isDailySlot)
+        {
+            var qm = QuestManager.Instance;
+            if (qm != null && qm.dailyQuests != null)
+            {
+                foreach (var q in qm.dailyQuests)
+                {
+                    if (q == null) continue;
+                    if ((q.state == QuestState.Active || q.state == QuestState.Completed) && q.isNewlyOpened)
+                    {
+                        show = true;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            show = boundQuest.isNewlyOpened;
+        }
+
+        newDotObject.SetActive(show);
+    }
+
 }
