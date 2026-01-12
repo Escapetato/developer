@@ -28,7 +28,10 @@ public class QuestManager : MonoBehaviour
     // 변수 추가
     private string lastSavedDate = "";
 
-   private void Awake()
+    // DB에서 불러오기가 끝났는지 확인하는 변수
+    private bool isLoaded = false;
+
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -301,51 +304,73 @@ public class QuestManager : MonoBehaviour
     // 수정
     public void LoadQuestData(List<QuestSaveData> savedQuests, string dateStr)
     {
-        lastSavedDate = dateStr; // 불러온 날짜 저장
+        Debug.Log($"[QuestManager] LoadQuestData 호출됨. 저장된 퀘스트 수: {(savedQuests != null ? savedQuests.Count : 0)}");
 
-        // 혹시 Awake에서 성격 급하게 미리 만들어둔 퀘스트가 있다면 싹 초기화
+        lastSavedDate = dateStr;
+
+        // 1. 일단 초기화
         InitializeIfNeeded();
 
-        foreach (var q in allQuestList)
+        // [CASE 1] 저장된 데이터가 없는 경우 (신규 유저 / DB 초기화)
+        if (savedQuests == null || savedQuests.Count == 0)
         {
-            q.state = QuestState.Locked; // 일단 전부 잠금 (DB 데이터로 다시 풀기 위해)
-            q.currentCount = 0;
-            q.rewardClaimed = false;
+            Debug.Log("[QuestManager] 저장된 퀘스트 데이터가 없습니다. (신규 시작)");
 
-            // 배열도 0으로 초기화
-            if (q.currentCounts != null)
-            {
-                for (int i = 0; i < q.currentCounts.Length; i++) q.currentCounts[i] = 0;
-            }
+            if (string.IsNullOrEmpty(lastSavedDate))
+                lastSavedDate = System.DateTime.Today.ToString("yyyy-MM-dd");
+
+            // ★★★ [수정 1] 신규 유저도 로딩 끝난 걸로 쳐줘야 함!
+            isLoaded = true;
+
+            // ★★★ [수정 2] 이제 저장 가능하니, 초기 슬롯 열면서 바로 DB에 "나 시작했어"라고 저장하게 함
+            OpenInitialSlots();
+            return;
         }
 
-        // 2. DB에서 가져온 데이터 덮어씌우기
+        // [CASE 2] 저장된 데이터가 있는 경우 (기존 유저)
+
+        // 상태 리셋
+        foreach (var q in allQuestList)
+        {
+            q.state = QuestState.Locked;
+            q.currentCount = 0;
+            q.rewardClaimed = false;
+            q.isNewlyOpened = false;
+            if (q.currentCounts != null)
+                for (int i = 0; i < q.currentCounts.Length; i++) q.currentCounts[i] = 0;
+        }
+
+        // 데이터 덮어쓰기
         foreach (var savedQ in savedQuests)
         {
-            // Key값으로 내 퀘스트 리스트에서 해당 퀘스트 찾기
-            QuestData myQuest = allQuestList.Find(q => q.key == savedQ.key);
+            if (savedQ == null) continue;
 
+            QuestData myQuest = allQuestList.Find(q => q.key == savedQ.key);
             if (myQuest != null)
             {
-                myQuest.state = (QuestState)savedQ.state; // 상태 복구 (Active, Completed 등)
-                myQuest.currentCount = savedQ.currentCount; // 단순 카운트 복구
+                myQuest.state = (QuestState)savedQ.state;
+                myQuest.currentCount = savedQ.currentCount;
                 myQuest.rewardClaimed = savedQ.rewardClaimed;
 
-                // 저장된 카운트를 실제 로직이 사용하는 배열(currentCounts)에도 넣어줘야 함
+                EnsureConditionArrays(myQuest);
                 if (myQuest.currentCounts != null && myQuest.currentCounts.Length > 0)
                 {
-                    // 현재 DB 구조상 숫자 1개만 저장되므로, 첫 번째 조건에 값을 넣어줌
                     myQuest.currentCounts[0] = savedQ.currentCount;
                 }
             }
         }
 
-        // 3. 상태가 변경되었으니 슬롯 갱신 시도 (날짜 비교 로직 포함)
+        // ★★★ [수정 3] 로딩 완료 도장을 "먼저" 찍어야 함!
+        // 그래야 아래 OpenInitialSlots()가 실행될 때 변화된 내용을 저장할 수 있음.
+        isLoaded = true;
+
+        // 슬롯 갱신 (이 안에서 SaveToDB가 호출되는데, 이제 isLoaded가 true라 저장됨)
         OpenInitialSlots();
         RebuildActiveConditionIndex();
 
-        Debug.Log($"[QuestManager] 퀘스트 복구 완료! (날짜: {lastSavedDate})");
+        Debug.Log($"[QuestManager] 퀘스트 복구 최종 완료! 메인 진행중: {CountActive(mainQuests)}개");
     }
+
 
     public event Action OnQuestChanged;
 
@@ -686,7 +711,9 @@ public class QuestManager : MonoBehaviour
     // 추가
     private void SaveToDB()
     {
-        // 로그인된 상태이고, DBManager가 있을 때만 저장
+        // ★ 아직 DB에서 로딩이 안 끝났으면 저장 x (초기화 덮어쓰기 방지)
+        if (!isLoaded) return;
+
         if (Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null && DBManager.Instance != null)
         {
             string myId = Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.UserId;

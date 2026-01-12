@@ -144,21 +144,26 @@ public class DBManager : MonoBehaviour
             }
 
 
-            // --- [4] 퀘스트 저장 (★ 여기가 문제일 확률 99%) ---
+            // --- [4] 퀘스트 저장
             if (QuestManager.Instance != null)
             {
-                // allQuestList 자체가 null이면 터짐 -> 체크
                 if (QuestManager.Instance.allQuestList != null)
                 {
                     foreach (var q in QuestManager.Instance.allQuestList)
                     {
-                        // 리스트 안에 null인 퀘스트가 섞여 있으면 터짐 -> 체크
                         if (q != null)
                         {
                             QuestSaveData qData = new QuestSaveData();
                             qData.key = q.key;
                             qData.state = (int)q.state;
-                            qData.currentCount = q.currentCount;
+
+                            if (q.currentCounts != null && q.currentCounts.Length > 0)
+                            {
+                                q.currentCount = q.currentCounts[0];
+                            }
+                            // ▲▲▲▲▲ [추가 끝] ▲▲▲▲▲
+
+                            qData.currentCount = q.currentCount; // 이제 올바른 값이 저장됨
                             qData.rewardClaimed = q.rewardClaimed;
                             data.quests.Add(qData);
                         }
@@ -191,7 +196,6 @@ public class DBManager : MonoBehaviour
         }
     }
 
-    // [LOAD]
     public void LoadAllData(string userId)
     {
         reference.Child("users").Child(userId).GetValueAsync().ContinueWithOnMainThread(task =>
@@ -199,6 +203,8 @@ public class DBManager : MonoBehaviour
             if (task.IsCompleted)
             {
                 DataSnapshot snapshot = task.Result;
+
+                // [CASE 1] 데이터가 있을 때 (기존 유저)
                 if (snapshot.Exists)
                 {
                     string json = snapshot.GetRawJsonValue();
@@ -209,7 +215,6 @@ public class DBManager : MonoBehaviour
                     if (PoingManager.Instance != null)
                         PoingManager.Instance.SetLoadedPoing(data.poing);
 
-                    // ▼▼▼ [수정됨] 레시피 이름 리스트도 같이 넘김 ▼▼▼
                     if (GameProgressionManager.Instance != null)
                         GameProgressionManager.Instance.LoadProgression(data.isShopUnlocked, data.unlockedItemNames, data.unlockedRecipeNames);
 
@@ -219,9 +224,22 @@ public class DBManager : MonoBehaviour
                     if (QuestManager.Instance != null)
                         QuestManager.Instance.LoadQuestData(data.quests, data.lastLoginDate);
                 }
+                // [CASE 2] 데이터가 없을 때 (신규 유저 / DB 초기화 직후)
                 else
                 {
                     Debug.Log("신규 유저 -> 초기 데이터 저장");
+
+                    if (QuestManager.Instance != null)
+                    {
+                        Debug.Log("[DBManager] QuestManager 찾음. 로딩 완료 신호 보냄.");
+                        QuestManager.Instance.LoadQuestData(null, "");
+                    }
+                    else
+                    {
+                        // ★ 만약 이 로그가 뜬다면, QuestManager가 너무 늦게 켜지는 것임!
+                        Debug.LogError("[DBManager] QuestManager가 아직 없습니다! (Instance is null)");
+                    }
+
                     SaveAllData(userId);
                 }
             }
