@@ -345,6 +345,9 @@ public class UIManager : MonoBehaviour
         poingBarRect.pivot = new Vector2(0, 1);
         poingBarRect.anchoredPosition = new Vector2(50, -50);
         poingBarRect.localScale = Vector3.one;
+
+        // 다시 켜기
+        poingBarRect.gameObject.SetActive(true);
     }
     void Update()
     {
