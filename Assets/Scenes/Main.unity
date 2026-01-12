@@ -3902,7 +3902,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 918368481}
   slotBackground: {fileID: 173025643}
@@ -4757,7 +4757,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 1514263449}
   slotBackground: {fileID: 217702590}
@@ -10680,7 +10680,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 1434590671}
   slotBackground: {fileID: 432893950}
@@ -12293,7 +12293,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 257551867}
   slotBackground: {fileID: 488171772}
@@ -26844,7 +26844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 1283278998}
   slotBackground: {fileID: 1190186482}
@@ -28593,7 +28593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 1586067457}
   slotBackground: {fileID: 1232941746}
@@ -30368,7 +30368,7 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 1246507287}
         m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
@@ -38403,7 +38403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 352213445}
   slotBackground: {fileID: 1559023662}
@@ -40178,7 +40178,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 1092062400}
   slotBackground: {fileID: 1647749771}
@@ -45467,8 +45467,16 @@ MonoBehaviour:
       highTarget: 0
   subQuests: []
   dailyQuests: []
-  dailyFertilizerItem: {fileID: 0}
-  dailyPotionItems: []
+  dailyFertilizerItem: {fileID: 11400000, guid: a65a37f4a42ff9949ae4cfb9ba2dad4b, type: 2}
+  dailyPotionItems:
+  - {fileID: 11400000, guid: ecdc859f7660ad84c91f3122abf59b71, type: 2}
+  - {fileID: 11400000, guid: 4c6bfb90f2c7f044ba65e58180c3d860, type: 2}
+  - {fileID: 11400000, guid: 5b1de8934242f6b43b72dbbbe2c7018a, type: 2}
+  - {fileID: 11400000, guid: 6deaf2a4e67777d4c9119edc844bebd3, type: 2}
+  - {fileID: 11400000, guid: 60ac3b5c96f1f8049ac28a767ca6ff7f, type: 2}
+  - {fileID: 11400000, guid: 937a18249d2f73e47b9332aa4e592597, type: 2}
+  - {fileID: 11400000, guid: fc160dc35553f0b4f91068d055162ab8, type: 2}
+  - {fileID: 11400000, guid: 1f64bd9698d9c5440afbed9a4950fc52, type: 2}
 --- !u!1 &1864282257
 GameObject:
   m_ObjectHideFlags: 0
@@ -46801,7 +46809,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 72839698}
   slotBackground: {fileID: 1910515166}
@@ -47113,7 +47121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6557d6feb504261478eac9adb96981d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: ec664f198cc5b944e9d8cda175b87412, type: 2}
+  item: {fileID: 0}
   slotType: 0
   itemIconDisplay: {fileID: 206358763}
   slotBackground: {fileID: 1916836694}
@@ -47205,7 +47213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bc1431e60e861d4a9935a0f0b616f34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentPoing: 500
+  currentPoing: 5000
 --- !u!1 &1925724371
 GameObject:
   m_ObjectHideFlags: 0
