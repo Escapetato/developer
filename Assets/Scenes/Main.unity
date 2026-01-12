@@ -45369,9 +45369,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -45389,9 +45393,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -45409,9 +45417,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -45429,9 +45441,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -45449,9 +45465,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0
@@ -45469,9 +45489,13 @@ MonoBehaviour:
     state: 0
     currentCount: 0
     rewardClaimed: 0
+    isNewlyOpened: 0
     conditionTexts: []
     targetCounts: 
     currentCounts: 
+    conditionTypes: 
+    conditionItems: []
+    countByAmount: 
     rewardItem: {fileID: 0}
     rewardKey: 0
     rewardAmount: 0

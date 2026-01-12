@@ -137,6 +137,7 @@ public static class DailyQuestSelector
             quest.rewardAmount = rewardInfo.amount;
 
             quest.state = QuestState.Active;
+            quest.isNewlyOpened = true;   // 빨간 점 추가
             quest.currentCount = 0;
             quest.rewardClaimed = false;
 
@@ -171,6 +172,7 @@ public static class DailyQuestSelector
             quest.state = QuestState.Locked;
             quest.currentCount = 0;
             quest.rewardClaimed = false;
+            quest.isNewlyOpened = false; // 빨간점 잔상 추가 
 
             // 일일 퀘스트는 1조건만 사용
             quest.currentCounts = new int[1] { 0 };

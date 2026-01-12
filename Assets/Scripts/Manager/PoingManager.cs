@@ -72,6 +72,10 @@ public class PoingManager : MonoBehaviour
         OnPoingChanged?.Invoke(currentPoing);
         Debug.Log(amount + " 포잉 사용.");
 
+        // 퀘스트 진행도 : 포잉 소비 누적
+        if (QuestManager.Instance != null)
+            QuestManager.Instance.NotifyAction(QuestConditionType.SpendPoing, null, amount);
+
         SaveToDB();
     }
 

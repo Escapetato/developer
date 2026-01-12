@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class StoreUI : MonoBehaviour
 {
@@ -308,6 +308,9 @@ public class StoreUI : MonoBehaviour
             PoingManager.Instance.DecreasePoing(totalCost);
             InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
 
+            // 퀘스트 진행도 : 구매 (종류별로 분기)
+            NotifyPurchaseToQuest(selectedItem, currentBuyQuantity);
+
             UIManager.Instance.ShowAlertPopup($"{selectedItem.itemName} {currentBuyQuantity}개 구매 완료!");
 
             CloseBuyPopup();
@@ -326,4 +329,35 @@ public class StoreUI : MonoBehaviour
         if (buyPopupObject != null) buyPopupObject.SetActive(false);
         SoundManager.Instance.PlaySFX("Button");
     }
+
+    // 퀘스트 진행도 : 구매 종류 구별 함수 
+    private void NotifyPurchaseToQuest(ItemData item, int quantity)
+    {
+        if (QuestManager.Instance == null || item == null) return;
+
+        switch (item.itemCategory)
+        {
+            case "Seed":
+                QuestManager.Instance.NotifyAction(QuestConditionType.BuySeed, item, quantity);
+                break;
+
+            case "Potion":
+                QuestManager.Instance.NotifyAction(QuestConditionType.BuyPotion, item, quantity);
+                break;
+
+            case "Tool":
+                QuestManager.Instance.NotifyAction(QuestConditionType.BuyTool, item, quantity);
+                break;
+
+            case "Theme":
+                QuestManager.Instance.NotifyAction(QuestConditionType.BuyTheme, item, quantity);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
+
 }
