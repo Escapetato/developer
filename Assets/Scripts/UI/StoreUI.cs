@@ -311,7 +311,9 @@ public class StoreUI : MonoBehaviour
             // 퀘스트 진행도 : 구매 (종류별로 분기)
             NotifyPurchaseToQuest(selectedItem, currentBuyQuantity);
 
-            UIManager.Instance.ShowAlertPopup($"{selectedItem.itemName} {currentBuyQuantity}개 구매 완료!");
+            UIManager.Instance.ShowItemAcquiredPopup(selectedItem);
+
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
             CloseBuyPopup();
 

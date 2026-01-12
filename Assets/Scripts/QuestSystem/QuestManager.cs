@@ -189,36 +189,60 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    // [수정] OpenInitialSlots 함수
+    // [QuestManager.cs] OpenInitialSlots 함수 수정
+    // QuestManager.cs -> OpenInitialSlots 함수 (이걸로 교체!)
     private void OpenInitialSlots()
     {
         MainQuestSlot();
         SubQuestSlot(2);
 
-        // ▼▼▼ [핵심 수정] 날짜 비교 로직 ▼▼▼
         string today = System.DateTime.Today.ToString("yyyy-MM-dd");
+        bool needSave = false;
 
-        // 1. 저장된 날짜가 있고, 오늘과 같다면? -> 기존 일일 퀘스트 유지!
+        // [상황 A] 같은 날짜 접속 (유지해야 함)
         if (!string.IsNullOrEmpty(lastSavedDate) && lastSavedDate == today)
         {
             Debug.Log($"[QuestManager] 같은 날({today}) 접속. 일일 퀘스트 유지.");
-            // 이미 LoadQuestData에서 DB 데이터를 덮어씌웠으므로, 새로 생성(Configure) 안 해도 됨.
-            // 다만 리스트가 비어있다면 생성해야 함.
-            if (dailyQuests.Count == 0 || CountActive(dailyQuests) == 0)
+
+            // ★ [핵심] 불러온 일일 퀘스트의 '목표 수치'가 0으로 날아갔다면 복구해줘야 함!
+            foreach (var q in dailyQuests)
+            {
+                if (q.state == QuestState.Active || q.state == QuestState.Completed)
+                {
+                    // 목표가 없거나 0이면 -> 기본값으로 복구
+                    if (q.targetCounts == null || q.targetCounts.Length == 0 || q.targetCounts[0] == 0)
+                    {
+                        int fallbackTarget = 3; // 기본 목표 3회
+                        if (q.dailyTargets != null) fallbackTarget = q.dailyTargets.lowTarget; // 설정된 Low 값 있으면 그걸로
+
+                        q.targetCounts = new int[] { fallbackTarget };
+                        if (q.currentCounts == null || q.currentCounts.Length == 0) q.currentCounts = new int[] { 0 };
+
+                        Debug.Log($"[복구] 일일 퀘스트({q.title}) 목표 수치 복구 완료: {fallbackTarget}");
+                    }
+                }
+            }
+
+            // 만약 활성화된 게 하나도 없다면(오류 등) 새로 생성
+            if (CountActive(dailyQuests) == 0)
             {
                 DailyQuestSelector.ConfigureDailyQuests(dailyQuests, 3);
+                needSave = true;
             }
         }
+        // [상황 B] 날짜가 변경됨 or 첫 시작 (리셋)
         else
         {
-            // 2. 날짜가 다르거나(다음날), 처음 시작 -> 새로 생성!
             Debug.Log($"[QuestManager] 새로운 날({today}) 접속. 일일 퀘스트 리셋!");
-
-            // 기존 일일 퀘스트 싹 초기화 (Locked로)
             foreach (var q in dailyQuests) q.state = QuestState.Locked;
-
-            // 새로 3개 뽑기
             DailyQuestSelector.ConfigureDailyQuests(dailyQuests, 3);
+            needSave = true;
+        }
+
+        // ★★★ [중요] 새로 만들었으면 즉시 저장해야, 껐다 켜도 안 바뀜!
+        if (needSave)
+        {
+            SaveToDB();
         }
     }
 
@@ -308,7 +332,7 @@ public class QuestManager : MonoBehaviour
 
         lastSavedDate = dateStr;
 
-        // 1. 일단 초기화
+        // 1. 초기화 (일일 퀘스트 내용/목표 설정됨)
         InitializeIfNeeded();
 
         // [CASE 1] 저장된 데이터가 없는 경우 (신규 유저 / DB 초기화)
@@ -319,11 +343,8 @@ public class QuestManager : MonoBehaviour
             if (string.IsNullOrEmpty(lastSavedDate))
                 lastSavedDate = System.DateTime.Today.ToString("yyyy-MM-dd");
 
-            // ★★★ [수정 1] 신규 유저도 로딩 끝난 걸로 쳐줘야 함!
-            isLoaded = true;
-
-            // ★★★ [수정 2] 이제 저장 가능하니, 초기 슬롯 열면서 바로 DB에 "나 시작했어"라고 저장하게 함
-            OpenInitialSlots();
+            isLoaded = true; // 로딩 완료 도장
+            OpenInitialSlots(); // 초기 슬롯 오픈 + 저장
             return;
         }
 
@@ -348,23 +369,44 @@ public class QuestManager : MonoBehaviour
             QuestData myQuest = allQuestList.Find(q => q.key == savedQ.key);
             if (myQuest != null)
             {
+                // 저장된 상태 복구
                 myQuest.state = (QuestState)savedQ.state;
                 myQuest.currentCount = savedQ.currentCount;
                 myQuest.rewardClaimed = savedQ.rewardClaimed;
 
                 EnsureConditionArrays(myQuest);
+
+                // 배열에도 값 동기화
                 if (myQuest.currentCounts != null && myQuest.currentCounts.Length > 0)
                 {
                     myQuest.currentCounts[0] = savedQ.currentCount;
                 }
+
+                // ▼▼▼ [여기 추가됨!] 일일 퀘스트 완료 체크 보정 ▼▼▼
+                // 불러온 카운트가 목표치 이상이면, 상태를 'Completed(완료)'로 강제 변경
+                if (myQuest.type == QuestType.Daily && myQuest.state == QuestState.Active)
+                {
+                    if (myQuest.targetCounts != null && myQuest.targetCounts.Length > 0)
+                    {
+                        int target = myQuest.targetCounts[0];
+                        int current = myQuest.currentCounts[0];
+
+                        // 목표 달성했으면 완료 상태로!
+                        if (target > 0 && current >= target)
+                        {
+                            myQuest.state = QuestState.Completed;
+                            Debug.Log($"[Load] 일일 퀘스트({myQuest.title}) 완료 상태로 보정됨 ({current}/{target})");
+                        }
+                    }
+                }
+                // ▲▲▲ [추가 끝] ▲▲▲
             }
         }
 
-        // ★★★ [수정 3] 로딩 완료 도장을 "먼저" 찍어야 함!
-        // 그래야 아래 OpenInitialSlots()가 실행될 때 변화된 내용을 저장할 수 있음.
+        // 로딩 완료 도장 찍기 (먼저 찍어야 OpenInitialSlots에서 저장됨)
         isLoaded = true;
 
-        // 슬롯 갱신 (이 안에서 SaveToDB가 호출되는데, 이제 isLoaded가 true라 저장됨)
+        // 슬롯 갱신
         OpenInitialSlots();
         RebuildActiveConditionIndex();
 
