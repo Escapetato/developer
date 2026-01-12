@@ -25,19 +25,23 @@ public class QuestManager : MonoBehaviour
     // 한 플레이 세션에서 한 번만 초기화 
     private bool initialized = false;
 
-    private void Awake()
+    // 변수 추가
+    private string lastSavedDate = "";
+
+   private void Awake()
     {
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
-        DontDestroyOnLoad(transform.root.gameObject); // 씬이 바뀌어도 유지 
+        transform.SetParent(null); // 부모(@Managers)에서 탈출
+        DontDestroyOnLoad(gameObject); // 파괴 방지
 
         InitializeIfNeeded();
     }
-
     private void InitializeIfNeeded()
     {
         if (initialized) return;
@@ -182,15 +186,37 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    // 초기 퀘스트 슬롯 오픈 
+    // [수정] OpenInitialSlots 함수
     private void OpenInitialSlots()
     {
         MainQuestSlot();
         SubQuestSlot(2);
 
-        // 일일 퀘스트는 별도 로직(DailyQuestSelector)에서 3개(A/B/C) 생성
-        DailyQuestSelector.ConfigureDailyQuests(dailyQuests, 3);
-        Debug.Log("[QuestManager] 일일 퀘스트 생성 완료 (DailyQuestSelector)");
+        // ▼▼▼ [핵심 수정] 날짜 비교 로직 ▼▼▼
+        string today = System.DateTime.Today.ToString("yyyy-MM-dd");
+
+        // 1. 저장된 날짜가 있고, 오늘과 같다면? -> 기존 일일 퀘스트 유지!
+        if (!string.IsNullOrEmpty(lastSavedDate) && lastSavedDate == today)
+        {
+            Debug.Log($"[QuestManager] 같은 날({today}) 접속. 일일 퀘스트 유지.");
+            // 이미 LoadQuestData에서 DB 데이터를 덮어씌웠으므로, 새로 생성(Configure) 안 해도 됨.
+            // 다만 리스트가 비어있다면 생성해야 함.
+            if (dailyQuests.Count == 0 || CountActive(dailyQuests) == 0)
+            {
+                DailyQuestSelector.ConfigureDailyQuests(dailyQuests, 3);
+            }
+        }
+        else
+        {
+            // 2. 날짜가 다르거나(다음날), 처음 시작 -> 새로 생성!
+            Debug.Log($"[QuestManager] 새로운 날({today}) 접속. 일일 퀘스트 리셋!");
+
+            // 기존 일일 퀘스트 싹 초기화 (Locked로)
+            foreach (var q in dailyQuests) q.state = QuestState.Locked;
+
+            // 새로 3개 뽑기
+            DailyQuestSelector.ConfigureDailyQuests(dailyQuests, 3);
+        }
     }
 
     // 메인 퀘스트 슬롯 관리
@@ -272,12 +298,28 @@ public class QuestManager : MonoBehaviour
         return cnt;
     }
 
-    // [추가] DB에 저장
-    public void LoadQuestData(List<QuestSaveData> savedQuests)
+    // 수정
+    public void LoadQuestData(List<QuestSaveData> savedQuests, string dateStr)
     {
-        // 퀘스트 리스트가 아직 초기화 안 됐으면 초기화 먼저
+        lastSavedDate = dateStr; // 불러온 날짜 저장
+
+        // 혹시 Awake에서 성격 급하게 미리 만들어둔 퀘스트가 있다면 싹 초기화
         InitializeIfNeeded();
 
+        foreach (var q in allQuestList)
+        {
+            q.state = QuestState.Locked; // 일단 전부 잠금 (DB 데이터로 다시 풀기 위해)
+            q.currentCount = 0;
+            q.rewardClaimed = false;
+
+            // 배열도 0으로 초기화
+            if (q.currentCounts != null)
+            {
+                for (int i = 0; i < q.currentCounts.Length; i++) q.currentCounts[i] = 0;
+            }
+        }
+
+        // 2. DB에서 가져온 데이터 덮어씌우기
         foreach (var savedQ in savedQuests)
         {
             // Key값으로 내 퀘스트 리스트에서 해당 퀘스트 찾기
@@ -285,17 +327,26 @@ public class QuestManager : MonoBehaviour
 
             if (myQuest != null)
             {
-                myQuest.state = (QuestState)savedQ.state; // int -> Enum 변환
-                myQuest.currentCount = savedQ.currentCount;
+                myQuest.state = (QuestState)savedQ.state; // 상태 복구 (Active, Completed 등)
+                myQuest.currentCount = savedQ.currentCount; // 단순 카운트 복구
                 myQuest.rewardClaimed = savedQ.rewardClaimed;
+
+                // 저장된 카운트를 실제 로직이 사용하는 배열(currentCounts)에도 넣어줘야 함
+                if (myQuest.currentCounts != null && myQuest.currentCounts.Length > 0)
+                {
+                    // 현재 DB 구조상 숫자 1개만 저장되므로, 첫 번째 조건에 값을 넣어줌
+                    myQuest.currentCounts[0] = savedQ.currentCount;
+                }
             }
         }
 
-        // 상태가 변경되었으니 슬롯 갱신 시도
+        // 3. 상태가 변경되었으니 슬롯 갱신 시도 (날짜 비교 로직 포함)
         OpenInitialSlots();
         RebuildActiveConditionIndex();
-        Debug.Log("퀘스트 상태 복구 완료");
+
+        Debug.Log($"[QuestManager] 퀘스트 복구 완료! (날짜: {lastSavedDate})");
     }
+
     public event Action OnQuestChanged;
 
     private bool IsCompletedByCounts(QuestData q)

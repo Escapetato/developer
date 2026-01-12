@@ -10,6 +10,8 @@ public class UserData
     public string userName;
     public int poing;
     public bool isShopUnlocked;
+    // ▼▼▼ [추가] 마지막 접속 날짜
+    public string lastLoginDate;
 
     public List<string> unlockedItemNames = new List<string>();
     public List<InventorySaveData> inventory = new List<InventorySaveData>();
@@ -85,67 +87,108 @@ public class DBManager : MonoBehaviour
         return allGameRecipes.Find(recipe => recipe.name == name);
     }
 
-    // [SAVE]
+    // DBManager.cs 안에 있는 SaveAllData를 이걸로 교체하세요
+
+    // DBManager.cs의 SaveAllData 함수를 이걸로 덮어씌우세요!
+
     public void SaveAllData(string userId)
     {
-        int currentPoing = 0;
-        if (PoingManager.Instance != null) currentPoing = PoingManager.Instance.currentPoing;
+        // 1. 디버깅 시작 로그
+        Debug.Log($"💾 [저장 시작] User ID: {userId}");
 
-        UserData data = new UserData("감자농부", currentPoing);
-
-        // 1. 진행도 & 도감 (아이템 + 레시피)
-        if (GameProgressionManager.Instance != null)
+        try
         {
-            data.isShopUnlocked = GameProgressionManager.Instance.isShopUnlocked;
+            UserData data = new UserData();
 
-            // 아이템 저장
-            foreach (var item in GameProgressionManager.Instance.unlockedItems)
+            // --- [1] 포잉 저장 ---
+            if (PoingManager.Instance != null)
             {
-                if (item != null) data.unlockedItemNames.Add(item.itemName);
+                data.poing = PoingManager.Instance.currentPoing;
             }
+            data.userName = "감자농부"; // (닉네임 시스템 있으면 교체)
+            data.lastLoginDate = System.DateTime.Today.ToString("yyyy-MM-dd");
 
-            // ▼▼▼ [수정됨] 레시피 저장 (EvolutionRecipe) ▼▼▼
-            foreach (var recipe in GameProgressionManager.Instance.unlockedRecipes)
-            {
-                if (recipe != null) data.unlockedRecipeNames.Add(recipe.name);
-            }
-        }
 
-        // 2. 인벤토리
-        if (InventoryManager.Instance != null)
-        {
-            foreach (var kvp in InventoryManager.Instance.items)
+            // --- [2] 도감 & 진행도 저장 (안전장치 추가) ---
+            if (GameProgressionManager.Instance != null)
             {
-                if (kvp.Key != null)
+                data.isShopUnlocked = GameProgressionManager.Instance.isShopUnlocked;
+
+                if (GameProgressionManager.Instance.unlockedItems != null)
                 {
-                    InventorySaveData invData = new InventorySaveData();
-                    invData.itemName = kvp.Key.itemName;
-                    invData.amount = kvp.Value;
-                    data.inventory.Add(invData);
+                    foreach (var item in GameProgressionManager.Instance.unlockedItems)
+                        if (item != null) data.unlockedItemNames.Add(item.itemName);
+                }
+
+                if (GameProgressionManager.Instance.unlockedRecipes != null)
+                {
+                    foreach (var recipe in GameProgressionManager.Instance.unlockedRecipes)
+                        if (recipe != null) data.unlockedRecipeNames.Add(recipe.name);
                 }
             }
-        }
 
-        // 3. 퀘스트
-        if (QuestManager.Instance != null)
-        {
-            foreach (var q in QuestManager.Instance.allQuestList)
+
+            // --- [3] 인벤토리 저장 ---
+            if (InventoryManager.Instance != null && InventoryManager.Instance.items != null)
             {
-                QuestSaveData qData = new QuestSaveData();
-                qData.key = q.key;
-                qData.state = (int)q.state;
-                qData.currentCount = q.currentCount;
-                qData.rewardClaimed = q.rewardClaimed;
-                data.quests.Add(qData);
+                foreach (var kvp in InventoryManager.Instance.items)
+                {
+                    if (kvp.Key != null)
+                    {
+                        InventorySaveData invData = new InventorySaveData();
+                        invData.itemName = kvp.Key.itemName;
+                        invData.amount = kvp.Value;
+                        data.inventory.Add(invData);
+                    }
+                }
             }
-        }
 
-        string json = JsonUtility.ToJson(data);
-        reference.Child("users").Child(userId).SetRawJsonValueAsync(json).ContinueWithOnMainThread(task =>
+
+            // --- [4] 퀘스트 저장 (★ 여기가 문제일 확률 99%) ---
+            if (QuestManager.Instance != null)
+            {
+                // allQuestList 자체가 null이면 터짐 -> 체크
+                if (QuestManager.Instance.allQuestList != null)
+                {
+                    foreach (var q in QuestManager.Instance.allQuestList)
+                    {
+                        // 리스트 안에 null인 퀘스트가 섞여 있으면 터짐 -> 체크
+                        if (q != null)
+                        {
+                            QuestSaveData qData = new QuestSaveData();
+                            qData.key = q.key;
+                            qData.state = (int)q.state;
+                            qData.currentCount = q.currentCount;
+                            qData.rewardClaimed = q.rewardClaimed;
+                            data.quests.Add(qData);
+                        }
+                    }
+                }
+            }
+
+
+            // --- [5] 파이어베이스 전송 ---
+            string json = JsonUtility.ToJson(data);
+
+            if (reference == null)
+            {
+                // 혹시 연결 끊겼으면 재연결
+                string dbUrl = "https://whatthefarm-893d5-default-rtdb.firebaseio.com/";
+                reference = FirebaseDatabase.GetInstance(dbUrl).RootReference;
+            }
+
+            reference.Child("users").Child(userId).SetRawJsonValueAsync(json).ContinueWithOnMainThread(task =>
+            {
+                if (task.IsCompleted) Debug.Log("✅ [최종 저장 성공] 데이터 클라우드 업로드 완료!");
+                else Debug.LogError("❌ [업로드 실패] : " + task.Exception);
+            });
+
+        }
+        catch (System.Exception e)
         {
-            if (task.IsCompleted) Debug.Log("✅ 저장 성공!");
-            else Debug.LogError("❌ 저장 실패: " + task.Exception);
-        });
+            // ★★★ 여기서 범인을 잡습니다! ★★★
+            Debug.LogError($"❌ [저장 중단됨] 저장하다가 에러가 났습니다!\n내용: {e.Message}\n위치: {e.StackTrace}");
+        }
     }
 
     // [LOAD]
@@ -174,7 +217,7 @@ public class DBManager : MonoBehaviour
                         InventoryManager.Instance.LoadInventory(data.inventory);
 
                     if (QuestManager.Instance != null)
-                        QuestManager.Instance.LoadQuestData(data.quests);
+                        QuestManager.Instance.LoadQuestData(data.quests, data.lastLoginDate);
                 }
                 else
                 {
