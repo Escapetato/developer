@@ -214,6 +214,9 @@ public class QuestManager : MonoBehaviour
                 q.state = QuestState.Active;
                 q.isNewlyOpened = true;
                 Debug.Log($"[QuestManager] 메인 퀘스트 새로 오픈: key={q.key}, title={q.title}");
+
+                // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+                SaveToDB();
                 return;
             }
         }
@@ -244,6 +247,8 @@ public class QuestManager : MonoBehaviour
                 q.isNewlyOpened = true;
                 openCount++;
                 Debug.Log($"[QuestManager] 서브 퀘스트 오픈: key={q.key}, title={q.title}");
+                // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+                SaveToDB();
             }
         }
 
@@ -352,6 +357,10 @@ public class QuestManager : MonoBehaviour
             SubQuestSlot(2);     // 서브 2개 유지
 
         OnQuestChanged?.Invoke();
+
+        // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+        SaveToDB();
+
         return true;
     }
     
@@ -420,6 +429,10 @@ public class QuestManager : MonoBehaviour
 
 
         OnQuestChanged?.Invoke();
+
+        // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+        SaveToDB();
+
         return true;
     }
 
@@ -541,6 +554,9 @@ public class QuestManager : MonoBehaviour
 
         if (changedAny)
             OnQuestChanged?.Invoke();
+
+        // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+        SaveToDB();
     }
 
     // 진화 결과 추적용 함수 (연속 횟수)
@@ -611,6 +627,19 @@ public class QuestManager : MonoBehaviour
                 if (changed) OnQuestChanged?.Invoke();
             }
         }
+
+        // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+        SaveToDB();
     }
 
+    // 추가
+    private void SaveToDB()
+    {
+        // 로그인된 상태이고, DBManager가 있을 때만 저장
+        if (Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null && DBManager.Instance != null)
+        {
+            string myId = Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+            DBManager.Instance.SaveAllData(myId);
+        }
+    }
 }
