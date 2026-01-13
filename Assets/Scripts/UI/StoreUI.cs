@@ -308,16 +308,21 @@ public class StoreUI : MonoBehaviour
             PoingManager.Instance.DecreasePoing(totalCost);
             InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
 
-            // 퀘스트 진행도 : 구매 (종류별로 분기)
+            // 퀘스트 진행도 알림
             NotifyPurchaseToQuest(selectedItem, currentBuyQuantity);
 
-            UIManager.Instance.ShowItemAcquiredPopup(selectedItem);
+            // ▼▼▼▼▼ [여기 수정] 아이템 획득 팝업 -> 다시 '단순 알림창'으로 변경 ▼▼▼▼▼
 
-            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+            // (지운 코드) UIManager.Instance.ShowItemAcquiredPopup(selectedItem);
+
+            // [새로 넣을 코드] 그냥 글자만 뜨게 하기
+            UIManager.Instance.ShowAlertPopup($"{selectedItem.itemName} {currentBuyQuantity}개 구매 완료!");
+
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
             CloseBuyPopup();
 
-            // ★ 구매 후 수량 즉시 갱신을 위해 패널 업데이트 호출
+            // 패널 갱신
             UpdateDetailPanel(selectedItem, true);
         }
         else
