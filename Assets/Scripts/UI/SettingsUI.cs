@@ -1,3 +1,7 @@
+using System;
+using System.Linq;
+using System.Reflection;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,6 +28,10 @@ public class SettingsUI : MonoBehaviour
     [Tooltip("비워두면 SoundManager.Instance를 사용합니다")]
     [SerializeField] private SoundManager soundManager;
 
+    [Header("Auth")]
+    [SerializeField] private Button logoutButton;        // Settings_Popup/LogoutButton
+    [SerializeField] private string authSceneName = "Auth";
+
     private const string PREF_SFX_MUTED = "PREF_SFX_MUTED";
     private const string PREF_BGM_MUTED = "PREF_BGM_MUTED";
 
@@ -47,6 +55,9 @@ public class SettingsUI : MonoBehaviour
 
         if (closeButton != null)
             closeButton.onClick.AddListener(ClosePopup);
+
+        if (logoutButton != null)
+            logoutButton.onClick.AddListener(LogoutAndGoToAuthScene);
 
         if (sfxButton != null)
             sfxButton.onClick.AddListener(ToggleSfx);
@@ -139,5 +150,118 @@ public class SettingsUI : MonoBehaviour
 
         if (bgmIconImage != null && bgmOnSprite != null && bgmOffSprite != null)
             bgmIconImage.sprite = _bgmMuted ? bgmOffSprite : bgmOnSprite;
+    }
+
+    // =====================
+    // Logout + Scene 이동
+    // =====================
+
+    private void LogoutAndGoToAuthScene()
+    {
+        // 팝업은 우선 닫아주기
+        ClosePopup();
+
+        // 1) FirebaseAuth SignOut 시도
+        TryFirebaseSignOut();
+
+        // 2) Google Sign-In SignOut/Disconnect 시도
+        TryGoogleSignOut();
+
+        // 3) Auth 씬으로 이동
+        if (string.IsNullOrEmpty(authSceneName))
+        {
+            Debug.LogError("[SettingsUI] authSceneName is empty. Set it in Inspector.");
+            return;
+        }
+
+        SceneManager.LoadScene(authSceneName);
+    }
+
+    private static void TryFirebaseSignOut()
+    {
+        try
+        {
+            // Firebase.Auth.FirebaseAuth.DefaultInstance.SignOut();
+            var firebaseAuthType = FindTypeByFullName("Firebase.Auth.FirebaseAuth");
+            if (firebaseAuthType == null) return;
+
+            var defaultInstanceProp = firebaseAuthType.GetProperty("DefaultInstance", BindingFlags.Static | BindingFlags.Public);
+            if (defaultInstanceProp == null) return;
+
+            var authInstance = defaultInstanceProp.GetValue(null);
+            if (authInstance == null) return;
+
+            var signOutMethod = firebaseAuthType.GetMethod("SignOut", BindingFlags.Instance | BindingFlags.Public);
+            if (signOutMethod == null) return;
+
+            signOutMethod.Invoke(authInstance, null);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SettingsUI] Firebase SignOut failed: {e.Message}");
+        }
+    }
+
+    private static void TryGoogleSignOut()
+    {
+        try
+        {
+            // 플러그인별로 타입/메서드명이 다를 수 있어서 몇 가지 케이스를 시도
+
+            // Case A) GoogleSignIn.DefaultInstance.SignOut() / Disconnect()
+            var googleSignInType = FindTypeByName("GoogleSignIn");
+            if (googleSignInType == null) return;
+
+            var defaultInstanceProp = googleSignInType.GetProperty("DefaultInstance", BindingFlags.Static | BindingFlags.Public);
+            var instance = defaultInstanceProp?.GetValue(null);
+            if (instance == null) return;
+
+            // SignOut 우선
+            var signOut = googleSignInType.GetMethod("SignOut", BindingFlags.Instance | BindingFlags.Public);
+            if (signOut != null)
+            {
+                signOut.Invoke(instance, null);
+                return;
+            }
+
+            // 없으면 Disconnect
+            var disconnect = googleSignInType.GetMethod("Disconnect", BindingFlags.Instance | BindingFlags.Public);
+            if (disconnect != null)
+            {
+                disconnect.Invoke(instance, null);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SettingsUI] Google SignOut failed: {e.Message}");
+        }
+    }
+
+    private static Type FindTypeByFullName(string fullName)
+    {
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            try
+            {
+                var t = asm.GetType(fullName, throwOnError: false);
+                if (t != null) return t;
+            }
+            catch { }
+        }
+        return null;
+    }
+
+    private static Type FindTypeByName(string typeName)
+    {
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            try
+            {
+                var t = asm.GetTypes().FirstOrDefault(x => x.Name == typeName);
+                if (t != null) return t;
+            }
+            catch { }
+        }
+        return null;
     }
 }
