@@ -157,7 +157,9 @@ public class QuestDetailUI : MonoBehaviour
     {
         isDailyQuestView = true;
         ApplyDailyLayout(true);
-        currentDailyQuests = dailyQuests;
+
+        var orderedDaily = OrderDailyQuestsForUI(dailyQuests);
+        currentDailyQuests = orderedDaily;
 
         // 1) 제목 통합 변경
         if (titleText != null) titleText.text = "일일퀘스트";
@@ -187,7 +189,7 @@ public class QuestDetailUI : MonoBehaviour
         }
 
         // 단일 버튼 비활성화 
-        if (dailyQuests == null || dailyQuests.Count == 0)
+        if (orderedDaily == null || orderedDaily.Count == 0)
         {
             if (rewardButton != null)
             {
@@ -214,12 +216,12 @@ public class QuestDetailUI : MonoBehaviour
             Debug.LogWarning($"일일퀘스트는 {DailyQuestSlotCount}개 슬롯이 필요합니다. Hierarchy에서 conditionRow와 Text 슬롯을 추가하세요.");
         }
 
-        int rowCount = Mathf.Min(DailyQuestSlotCount, dailyQuests.Count, conditionRows.Length, conditionTexts.Length);
+        int rowCount = Mathf.Min(DailyQuestSlotCount, orderedDaily.Count, conditionRows.Length, conditionTexts.Length);
 
         bool anyClaimable = false;
         for (int i = 0; i < rowCount; i++)
         {
-            QuestData q = dailyQuests[i];
+            QuestData q = orderedDaily[i];
 
             if (conditionRows[i] != null)
                 conditionRows[i].SetActive(true);
@@ -297,7 +299,7 @@ public class QuestDetailUI : MonoBehaviour
             //rewardButton.interactable = anyClaimable;
 
             if (rewardBoxRoot != null) rewardBoxRoot.SetActive(true);
-            UpdateRewardUI_Daily(dailyQuests);
+            UpdateRewardUI_Daily(orderedDaily);
 
         }
 
@@ -860,6 +862,33 @@ public class QuestDetailUI : MonoBehaviour
             rewardButton.interactable = anyOn; // 수령 가능한 게 있을 때만 true
 
     }
+
+    // 일일퀘스트 UI 표시 순서를 "포잉 -> 비료 -> 물약"으로 고정
+    private List<QuestData> OrderDailyQuestsForUI(List<QuestData> dailyQuests)
+    {
+        if (dailyQuests == null) return null;
+
+        QuestData qPoing = null;
+        QuestData qFert = null;
+        QuestData qPotion = null;
+
+        foreach (var q in dailyQuests)
+        {
+            if (q == null) continue;
+
+            if (q.rewardKey >= 100) qPotion = q;     // 물약(100~)
+            else if (q.rewardKey == 0) qPoing = q;   // 포잉(0)
+            else if (q.rewardKey == 1) qFert = q;    // 비료(1)
+        }
+
+        var orderedDaily = new List<QuestData>(3);
+        if (qPoing != null) orderedDaily.Add(qPoing);
+        if (qFert != null) orderedDaily.Add(qFert);
+        if (qPotion != null) orderedDaily.Add(qPotion);
+
+        return orderedDaily;
+    }
+
 
     // 일퀘 보상 수령 후 체크표시 
     private void SetRewardClaimCheck(int idx, bool on)
