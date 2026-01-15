@@ -15,6 +15,7 @@ public class ItemData : ScriptableObject
     public string itemName;
     public string description;
     public Sprite itemIcon;
+    public Sprite itemIconOffVer;
     public string itemCategory; // "Seed", "Tool", "Potion", "Fertilizer", "Theme"
 
     // [도감용] 세부 분류 (예: "Vegetable", "Fruit", "Grain")

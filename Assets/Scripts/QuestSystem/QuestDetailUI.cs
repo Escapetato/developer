@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class QuestDetailUI : MonoBehaviour
@@ -29,6 +29,43 @@ public class QuestDetailUI : MonoBehaviour
 
     [Header("보상 UI 루트(박스)")]
     [SerializeField] private GameObject rewardBoxRoot; // 보상 박스 전체(배경+아이콘+텍스트 포함)
+
+    [Header("보상 슬롯 UI")]
+    [SerializeField] private GameObject[] rewardSlotRoots;       // Slot0~2 루트
+    [SerializeField] private Image[] rewardSlotIcons;            // Slot0~2 아이콘 Image
+    [SerializeField] private TextMeshProUGUI[] rewardSlotTexts;  // Slot0~2 텍스트 TMP
+
+    [Header("보상 아이콘 - 땅, 도구 (메인)")]
+    [SerializeField] private Sprite iconLand;   // 땅
+    [SerializeField] private Sprite iconNat;    // 낫
+    [SerializeField] private Sprite iconSap;    // 모종삽
+    [SerializeField] private Sprite iconGawi;   // 전지가위
+
+    [SerializeField] private Sprite iconLandOff;
+    [SerializeField] private Sprite iconNatOff;
+    [SerializeField] private Sprite iconSapOff;
+    [SerializeField] private Sprite iconGawiOff;
+
+    [Header("보상 아이콘 - 포잉, 비료 (공통)")]
+    [SerializeField] private Sprite iconPoing;
+    [SerializeField] private Sprite iconFertilizer;
+
+    [SerializeField] private Sprite iconPoingOff;
+    [SerializeField] private Sprite iconFertilizerOff;
+
+    [Header("보상 아이콘 - 물약 (rewardKey 100~107)")]
+    [SerializeField] private Sprite[] potionIcons = new Sprite[8];
+    [SerializeField] private Sprite[] potionIconsOff = new Sprite[8];
+
+
+    private static readonly string[] PotionNames =
+{
+    "불", "소리", "번개", "바람", "물", "별", "꽃", "무지개" 
+};
+
+    [Header("아이템 아이콘 fallback")]
+    [SerializeField] private Sprite defaultItemSprite;
+    [SerializeField] private Sprite defaultItemSpriteOff;
 
     private QuestData currentQuest;
     private List<QuestData> currentDailyQuests;
@@ -60,9 +97,16 @@ public class QuestDetailUI : MonoBehaviour
             return;
         }
 
-        // 1) 제목 / 본문 설명 세팅
+        // 1) 제목 / 본문 설명 세팅 (+보상 슬롯)
         titleText.text = data.title;
         descText.text = data.questDesc;
+
+        // 보상 박스는 기본 표시
+        if (rewardBoxRoot != null) rewardBoxRoot.SetActive(true);
+
+        // 보상 슬롯 UI 채우기
+        if (data.type == QuestType.Main) UpdateRewardUI_Main(data);
+        else if (data.type == QuestType.Sub) UpdateRewardUI_Sub(data);
 
         // 2) 모든 조건 행/체크 초기화 (일단 다 끄기)
         for (int i = 0; i < conditionRows.Length; i++)
@@ -148,6 +192,10 @@ public class QuestDetailUI : MonoBehaviour
                 rewardButton.gameObject.SetActive(true);
                 rewardButton.interactable = false;
             }
+
+            HideAllRewardSlots();
+            if (rewardBoxRoot != null) rewardBoxRoot.SetActive(false);
+
             return;
         }
 
@@ -244,7 +292,11 @@ public class QuestDetailUI : MonoBehaviour
         if (rewardButton != null)
         {
             rewardButton.gameObject.SetActive(true);
-            rewardButton.interactable = anyClaimable;
+            //rewardButton.interactable = anyClaimable;
+
+            if (rewardBoxRoot != null) rewardBoxRoot.SetActive(true);
+            UpdateRewardUI_Daily(dailyQuests);
+
         }
 
     }
@@ -291,12 +343,12 @@ public class QuestDetailUI : MonoBehaviour
             return;
         }
 
-        // 아이템 보상이 아니면(땅 확장 등) 이번 범위에서는 버튼 비활성
-        if (currentQuest.type != QuestType.Daily && currentQuest.rewardItem == null)
-        {
-            if (rewardButton != null) rewardButton.interactable = false;
-            return;
-        }
+        //// 아이템 보상이 아니면(땅 확장 등) 이번 범위에서는 버튼 비활성
+        //if (currentQuest.type != QuestType.Daily && currentQuest.rewardItem == null)
+        //{
+        //    if (rewardButton != null) rewardButton.interactable = false;
+        //    return;
+        //}
 
 
         if (currentQuest.conditionTexts == null ||
@@ -346,7 +398,9 @@ public class QuestDetailUI : MonoBehaviour
             }
 
             // 2) 취소선 on/off
-            conditionStrikeLine[i].SetActive(completed);
+            if (i < conditionStrikeLine.Length && conditionStrikeLine[i] != null)
+                conditionStrikeLine[i].SetActive(completed);
+
 
             // 3) 빨간 체크 on/off
             if (checkGO != null)
@@ -359,6 +413,10 @@ public class QuestDetailUI : MonoBehaviour
         // 4) 모든 조건 달성 시 보상 버튼 활성화
         if (rewardButton != null)
             rewardButton.interactable = allCompleted;
+
+        // 추가: 메인/서브는 조건 변화에 따라 아이콘도 즉시 갱신
+        if (currentQuest.type == QuestType.Main) UpdateRewardUI_Main(currentQuest);
+        else if (currentQuest.type == QuestType.Sub) UpdateRewardUI_Sub(currentQuest);
     }
 
     public void Clear()
@@ -567,6 +625,206 @@ public class QuestDetailUI : MonoBehaviour
             if (i < conditionCheckOn.Length && conditionCheckOn[i] != null)
                 conditionCheckOn[i].SetActive(true);
         }
+    }
+
+    private void HideAllRewardSlots()
+    {
+        if (rewardSlotRoots == null) return;
+        for (int i = 0; i < rewardSlotRoots.Length; i++)
+            if (rewardSlotRoots[i] != null) rewardSlotRoots[i].SetActive(false);
+    }
+
+    private void SetRewardSlot(int idx, Sprite icon, string textOrEmpty)
+    {
+        if (rewardSlotRoots == null || idx < 0 || idx >= rewardSlotRoots.Length) return;
+
+        if (rewardSlotRoots[idx] != null) rewardSlotRoots[idx].SetActive(true);
+
+        if (rewardSlotIcons != null && idx < rewardSlotIcons.Length && rewardSlotIcons[idx] != null)
+            rewardSlotIcons[idx].sprite = icon;
+
+        if (rewardSlotTexts != null && idx < rewardSlotTexts.Length && rewardSlotTexts[idx] != null)
+        {
+            bool hasText = !string.IsNullOrEmpty(textOrEmpty);
+            rewardSlotTexts[idx].text = hasText ? textOrEmpty : "";
+            rewardSlotTexts[idx].gameObject.SetActive(hasText);
+        }
+    }
+
+    // 보상 아이콘 찾기 (on, off)
+    private Sprite TryGetItemIcon(ItemData item)
+    {
+        return item != null ? item.itemIcon : null;
+    }
+
+    private Sprite TryGetItemIconOff(ItemData item)
+    {
+        if (item == null) return null;
+        return item.itemIconOffVer != null ? item.itemIconOffVer : item.itemIcon;
+    }
+
+
+
+    private bool IsQuestClaimable(QuestData q)
+    {
+        if (q == null) return false;
+        if (q.rewardClaimed || q.state == QuestState.Closed) return false;
+
+        if (q.targetCounts == null || q.currentCounts == null) return false;
+
+        int count = Mathf.Min(q.targetCounts.Length, q.currentCounts.Length);
+        if (count <= 0) return false;
+
+        for (int i = 0; i < count; i++)
+        {
+            int target = q.targetCounts[i];
+            int cur = q.currentCounts[i];
+            if (!(target > 0 && cur >= target)) return false;
+        }
+        return true;
+    }
+
+    private bool IsDailyClaimable(QuestData q)
+    {
+        if (q == null) return false;
+        if (q.rewardClaimed || q.state == QuestState.Closed) return false;
+
+        int cur = 0;
+        int target = 0;
+
+        if (q.currentCounts != null && q.currentCounts.Length > 0) cur = q.currentCounts[0];
+        else cur = q.currentCount;
+
+        if (q.targetCounts != null && q.targetCounts.Length > 0) target = q.targetCounts[0];
+
+        return (target > 0) && (cur >= target);
+    }
+
+    private Sprite TryGetItemIconOff(object item)
+    {
+        if (item == null) return null;
+
+        string[] names = { "iconOff", "IconOff", "spriteOff", "SpriteOff", "itemSpriteOff", "ItemSpriteOff", "itemIconOff", "ItemIconOff" };
+        var t = item.GetType();
+
+        foreach (var n in names)
+        {
+            var f = t.GetField(n, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (f != null && typeof(Sprite).IsAssignableFrom(f.FieldType))
+                return f.GetValue(item) as Sprite;
+
+            var p = t.GetProperty(n, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (p != null && typeof(Sprite).IsAssignableFrom(p.PropertyType))
+                return p.GetValue(item) as Sprite;
+        }
+        return null;
+    }
+
+
+    // 메인 1칸 고정 
+    private void UpdateRewardUI_Main(QuestData q)
+    {
+        HideAllRewardSlots();
+        if (q == null) return;
+
+        bool on = IsQuestClaimable(q);
+
+        Sprite land = on ? iconLand : (iconLandOff != null ? iconLandOff : iconLand);
+        Sprite nat = on ? iconNat : (iconNatOff != null ? iconNatOff : iconNat);
+        Sprite sap = on ? iconSap : (iconSapOff != null ? iconSapOff : iconSap);
+        Sprite gawi = on ? iconGawi : (iconGawiOff != null ? iconGawiOff : iconGawi);
+
+        switch (q.key)
+        {
+            case 1: SetRewardSlot(1, land, "1단계"); break;
+            case 2: SetRewardSlot(1, nat, ""); break;
+            case 3: SetRewardSlot(1, land, "2단계"); break;
+            case 4: SetRewardSlot(1, sap, ""); break;
+            case 5: SetRewardSlot(1, land, "3단계"); break;
+            case 6: SetRewardSlot(1, gawi, ""); break;
+            default: SetRewardSlot(1, land, ""); break;
+        }
+    }
+
+    // 서브 2칸 : 씨앗 + 포잉 
+    private void UpdateRewardUI_Sub(QuestData q)
+    {
+        HideAllRewardSlots();
+        if (q == null) return;
+
+        bool on = IsQuestClaimable(q);
+
+        Sprite seedOn = TryGetItemIcon(q.rewardItem) ?? defaultItemSprite;
+        Sprite seedOff = TryGetItemIconOff(q.rewardItem) ?? defaultItemSpriteOff ?? defaultItemSprite;
+
+        Sprite seedIcon = on ? seedOn : seedOff;
+        Sprite poingIcon = on ? iconPoing : (iconPoingOff != null ? iconPoingOff : iconPoing);
+
+        SetRewardSlot(3, seedIcon, "");
+        SetRewardSlot(4, poingIcon, $"{q.rewardPoing}");
+
+    }
+
+    // 일일 3칸 
+    private void UpdateRewardUI_Daily(List<QuestData> daily)
+    {
+        HideAllRewardSlots();
+        if (daily == null) return;
+
+        QuestData qPoing = null;
+        QuestData qFert = null;
+        QuestData qPotion = null;
+
+        // rewardKey로 A/B/C 분류
+        foreach (var q in daily)
+        {
+            if (q == null) continue;
+
+            if (q.rewardKey >= 100) qPotion = q;        // 물약
+            else if (q.rewardKey == 0) qPoing = q;      // 포잉
+            else if (q.rewardKey == 1) qFert = q;       // 비료
+        }
+
+        bool anyOn = false;
+
+        // A: 포잉
+        if (qPoing != null)
+        {
+            bool onA = IsDailyClaimable(qPoing);
+            anyOn |= onA;
+            Sprite iconA = onA ? iconPoing : (iconPoingOff != null ? iconPoingOff : iconPoing);
+            SetRewardSlot(0, iconA, $"{qPoing.rewardAmount}");
+        }
+
+        // B: 비료
+        if (qFert != null)
+        {
+            bool onB = IsDailyClaimable(qFert);
+            anyOn |= onB;
+            Sprite iconB = onB ? iconFertilizer : (iconFertilizerOff != null ? iconFertilizerOff : iconFertilizer);
+            SetRewardSlot(1, iconB, $"{qFert.rewardAmount}");
+        }
+
+        // C: 물약
+        if (qPotion != null)
+        {
+            bool onC = IsDailyClaimable(qPotion);
+            anyOn |= onC;
+
+            int idx = qPotion.rewardKey - 100; // 100~107
+            string name = (idx >= 0 && idx < PotionNames.Length) ? PotionNames[idx] : "물약";
+
+            Sprite onIcon = (idx >= 0 && idx < potionIcons.Length) ? potionIcons[idx] : defaultItemSprite;
+            Sprite offIcon =
+                (potionIconsOff != null && idx >= 0 && idx < potionIconsOff.Length && potionIconsOff[idx] != null)
+                ? potionIconsOff[idx]
+                : (defaultItemSpriteOff != null ? defaultItemSpriteOff : onIcon);
+
+            SetRewardSlot(2, onC ? onIcon : offIcon, $"{qPotion.rewardAmount}");
+        }
+
+        if (rewardButton != null)
+            rewardButton.interactable = anyOn;
     }
 
 }
