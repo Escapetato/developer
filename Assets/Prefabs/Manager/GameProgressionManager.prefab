@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2609397563464140960
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1778743536659441761}
+  - component: {fileID: 2211377787915204319}
+  m_Layer: 0
+  m_Name: GameProgressionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1778743536659441761
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2609397563464140960}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2211377787915204319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2609397563464140960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4156c2c151d0e4248aa8a2ec4a696bb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isShopUnlocked: 0
+  startingItems:
+  - {fileID: 11400000, guid: c750a806cdddfa54db1a5ac00afb8b69, type: 2}
+  - {fileID: 11400000, guid: c1edb44d15c8f3a4199d472ece42d97c, type: 2}
+  - {fileID: 11400000, guid: dcfb69a9af18e9e4fb690b5db3124344, type: 2}
+  - {fileID: 11400000, guid: eaa77d76b2039774c9230adfceb61aca, type: 2}
+  - {fileID: 11400000, guid: a9f2d6e5448e4da4ea36a85ad9d00154, type: 2}
