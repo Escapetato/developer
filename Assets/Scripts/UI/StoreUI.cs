@@ -19,32 +19,31 @@ public class StoreUI : MonoBehaviour
     private ItemData selectedItem;
     private ItemSlot selectedSlot;
 
-    [Header("Details Panel")]
+    [Header("Details Panel UI")]
     public GameObject detailPanelObject;
     public Image detailImage;
     public TextMeshProUGUI detailNameText;
-    public TextMeshProUGUI detailPriceText;
 
-    public Button openBuyPopupButton;
+    // ▼ [기존] 총 가격 표시 (코인 아이콘 옆)
+    public TextMeshProUGUI detailTotalPriceText;
+
+    // ▼▼▼ [추가] 현재 보유 개수 표시 (박스 아이콘 옆) ▼▼▼
+    public TextMeshProUGUI detailOwnedText;
+
+    [Header("Quantity Controls")]
+    public Button decreaseButton;      // 수량 감소 (<)
+    public Button increaseButton;      // 수량 증가 (>)
+    public TextMeshProUGUI quantityText; // 가운데 구매할 수량 숫자 (1)
+
+    public Button buyButton;
+    public TextMeshProUGUI buyButtonText;
 
     [Header("Category Buttons")]
     public List<CategoryButton> categoryButtons;
     public CategoryButton defaultCategoryButton;
 
-    [Header("Buy Popup Settings")]
-    public GameObject buyPopupObject;
-    public Image popupItemIcon;
-    public TextMeshProUGUI popupNameText;
-    public Slider popupSlider;
-    public TextMeshProUGUI popupCountText;
-    public TextMeshProUGUI popupTotalCostText;
-    public Button popupConfirmButton;
-    public Button popupCancelButton;
-
     private string currentCategory = "All";
     private int currentBuyQuantity = 1;
-
-    public TextMeshProUGUI buyButtonText;
 
     void Awake()
     {
@@ -55,30 +54,21 @@ public class StoreUI : MonoBehaviour
         slotParent.GetComponentsInChildren<ItemSlot>(slots);
 
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
-        if (buyPopupObject != null) buyPopupObject.SetActive(false);
 
-        if (openBuyPopupButton != null)
+        if (decreaseButton != null)
         {
-            openBuyPopupButton.onClick.RemoveAllListeners();
-            openBuyPopupButton.onClick.AddListener(OnOpenBuyPopupClick);
+            decreaseButton.onClick.RemoveAllListeners();
+            decreaseButton.onClick.AddListener(OnDecreaseQuantity);
         }
-
-        if (popupSlider != null)
+        if (increaseButton != null)
         {
-            popupSlider.onValueChanged.RemoveAllListeners();
-            popupSlider.onValueChanged.AddListener(OnSliderValueChanged);
+            increaseButton.onClick.RemoveAllListeners();
+            increaseButton.onClick.AddListener(OnIncreaseQuantity);
         }
-
-        if (popupConfirmButton != null)
+        if (buyButton != null)
         {
-            popupConfirmButton.onClick.RemoveAllListeners();
-            popupConfirmButton.onClick.AddListener(OnRealPurchaseClick);
-        }
-
-        if (popupCancelButton != null)
-        {
-            popupCancelButton.onClick.RemoveAllListeners();
-            popupCancelButton.onClick.AddListener(CloseBuyPopup);
+            buyButton.onClick.RemoveAllListeners();
+            buyButton.onClick.AddListener(OnRealPurchaseClick);
         }
     }
 
@@ -99,6 +89,7 @@ public class StoreUI : MonoBehaviour
 
     private void RedrawStore()
     {
+        // (기존과 동일하여 생략 가능하지만 복붙 편의를 위해 유지)
         int i = 0;
         if (storeDB == null) return;
 
@@ -149,6 +140,8 @@ public class StoreUI : MonoBehaviour
         selectedSlot = slot;
         selectedSlot.SetSelected(true);
 
+        currentBuyQuantity = 1;
+
         if (selectedItem == lockedSeedItem) UpdateDetailPanel(lockedSeedItem, false);
         else if (selectedItem == randomSeedItem) UpdateDetailPanel(randomSeedItem, true);
         else UpdateDetailPanel(selectedItem, true);
@@ -160,141 +153,124 @@ public class StoreUI : MonoBehaviour
         {
             detailPanelObject.SetActive(true);
 
-            // 아이템 선택 시 구매 버튼 켜주기 (ClearSelection으로 꺼졌던 것 복구)
-            if (openBuyPopupButton != null)
-                openBuyPopupButton.gameObject.SetActive(true);
-
             if (detailImage != null) detailImage.sprite = item.itemIcon;
             if (detailNameText != null) detailNameText.text = item.itemName;
 
-            // ★ [중요] 내 보유 개수 확인 (계산만 하고, 텍스트 표시는 안 함)
+            if (buyButton != null) buyButton.gameObject.SetActive(true);
+
+            // ▼▼▼ [수정됨] 현재 보유량(Owned) 표시 로직 ▼▼▼
             int myCount = InventoryManager.Instance.GetItemCount(item);
+            if (detailOwnedText != null)
+            {
+                // 박스 아이콘 옆 텍스트에 내 개수 표시
+                detailOwnedText.text = myCount.ToString();
+            }
+            // ▲▲▲ 추가 완료 ▲▲▲
 
-            // ▼▼▼ [삭제됨] 수량 텍스트 갱신 코드 삭제 ▼▼▼
-            // if (detailQuantityText != null) detailQuantityText.text = myCount.ToString();
 
-
-            // ▼▼▼ [수정] 잠긴 아이템("???")인지 확인 ▼▼▼
+            // 1. 잠긴 아이템
             if (item.itemName == "???")
             {
-                if (detailPriceText != null)
-                {
-                    detailPriceText.gameObject.SetActive(true);
-                    detailPriceText.text = "???"; // 가격 물음표
-                }
+                SetQuantityControlsActive(false);
+                if (detailTotalPriceText != null) detailTotalPriceText.text = "???";
 
-                if (openBuyPopupButton != null)
+                if (buyButton != null)
                 {
-                    openBuyPopupButton.interactable = false;
+                    buyButton.interactable = false;
                     if (buyButtonText != null) buyButtonText.text = "해금 필요";
                 }
             }
-            // ▼▼▼ 기존 로직 (도구/일반 아이템 구분) ▼▼▼
+            // 2. 도구 (Tool)
             else if (item.itemCategory == "Tool")
             {
-                bool isOwnedTool = (myCount > 0); // 보유 여부 확인
+                SetQuantityControlsActive(false);
 
-                if (isOwnedTool)
+                if (detailTotalPriceText != null) detailTotalPriceText.text = item.price.ToString();
+
+                if (myCount > 0)
                 {
-                    // 보유 중이면 가격 숨기기
-                    if (detailPriceText != null) detailPriceText.gameObject.SetActive(false);
-
-                    if (openBuyPopupButton != null)
+                    if (buyButton != null)
                     {
-                        openBuyPopupButton.interactable = false;
+                        buyButton.interactable = false;
                         if (buyButtonText != null) buyButtonText.text = "보유 중";
                     }
                 }
                 else
                 {
-                    if (detailPriceText != null)
+                    if (buyButton != null)
                     {
-                        detailPriceText.gameObject.SetActive(true);
-                        detailPriceText.text = item.price.ToString();
-                    }
-                    if (openBuyPopupButton != null)
-                    {
-                        openBuyPopupButton.interactable = isUnlocked;
-                        if (buyButtonText != null) buyButtonText.text = "결제";
+                        buyButton.interactable = isUnlocked;
+                        if (buyButtonText != null) buyButtonText.text = "구매하기";
                     }
                 }
             }
+            // 3. 일반 아이템
             else
             {
-                // [일반 아이템]
-                if (detailPriceText != null)
-                {
-                    detailPriceText.gameObject.SetActive(true);
-                    detailPriceText.text = item.price.ToString();
-                }
+                SetQuantityControlsActive(true);
+                UpdateQuantityUI(); // 가격 계산 갱신
 
-                if (openBuyPopupButton != null)
+                if (buyButton != null)
                 {
-                    openBuyPopupButton.interactable = isUnlocked;
-                    if (buyButtonText != null) buyButtonText.text = "결제";
+                    buyButton.interactable = isUnlocked;
                 }
             }
         }
     }
 
-    public void ClearSelection()
+    private void SetQuantityControlsActive(bool isActive)
     {
-        if (selectedSlot != null) selectedSlot.SetSelected(false);
-        selectedItem = null;
-        selectedSlot = null;
-        if (detailPanelObject != null) detailPanelObject.SetActive(false);
-        if (openBuyPopupButton != null) openBuyPopupButton.gameObject.SetActive(false);
+        if (decreaseButton != null) decreaseButton.gameObject.SetActive(isActive);
+        if (increaseButton != null) increaseButton.gameObject.SetActive(isActive);
+        if (quantityText != null) quantityText.gameObject.SetActive(isActive);
     }
 
-    public void OnOpenBuyPopupClick()
+    public void OnDecreaseQuantity()
+    {
+        if (currentBuyQuantity > 1)
+        {
+            currentBuyQuantity--;
+            UpdateQuantityUI();
+        }
+    }
+
+    public void OnIncreaseQuantity()
     {
         if (selectedItem == null) return;
 
         int myPoing = PoingManager.Instance.GetPoing();
-        int price = selectedItem.price;
+        int price = selectedItem.price > 0 ? selectedItem.price : 999999;
+        int maxAffordable = myPoing / price;
 
-        if (price <= 0) return;
+        if (maxAffordable == 0) maxAffordable = 1;
 
-        int maxCanBuy = myPoing / price;
-
-        if (maxCanBuy <= 0)
+        if (currentBuyQuantity < 99)
         {
-            UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
-            return;
+            currentBuyQuantity++;
+            UpdateQuantityUI();
         }
-
-        buyPopupObject.SetActive(true);
-        if (popupItemIcon != null) popupItemIcon.sprite = selectedItem.itemIcon;
-        if (popupNameText != null) popupNameText.text = selectedItem.itemName;
-
-        if (popupSlider != null)
+        else
         {
-            popupSlider.minValue = 1;
-            popupSlider.maxValue = maxCanBuy;
-            popupSlider.value = 1;
-            currentBuyQuantity = 1;
+            UIManager.Instance.ShowAlertPopup("최대 수량입니다.");
         }
-
-        UpdatePopupTexts();
-        SoundManager.Instance.PlaySFX("PopupOpen");
     }
 
-    public void OnSliderValueChanged(float value)
+    private void UpdateQuantityUI()
     {
-        currentBuyQuantity = (int)value;
-        UpdatePopupTexts();
-    }
+        if (selectedItem == null) return;
 
-    private void UpdatePopupTexts()
-    {
-        if (popupCountText != null)
-            popupCountText.text = currentBuyQuantity.ToString();
+        // 1. 가운데 구매 수량 (< 1 >)
+        if (quantityText != null)
+            quantityText.text = currentBuyQuantity.ToString();
 
-        if (selectedItem != null && popupTotalCostText != null)
-        {
-            int total = selectedItem.price * currentBuyQuantity;
-            popupTotalCostText.text = total.ToString() + " 포잉";
-        }
+        // 2. 총 가격 (코인 아이콘 옆)
+        int totalCost = selectedItem.price * currentBuyQuantity;
+        if (detailTotalPriceText != null)
+            detailTotalPriceText.text = totalCost.ToString();
+
+        // 3. 버튼 텍스트
+        if (buyButtonText != null)
+            buyButtonText.text = $"{currentBuyQuantity}개 구매";
     }
 
     public void OnRealPurchaseClick()
@@ -308,21 +284,12 @@ public class StoreUI : MonoBehaviour
             PoingManager.Instance.DecreasePoing(totalCost);
             InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
 
-            // 퀘스트 진행도 알림
             NotifyPurchaseToQuest(selectedItem, currentBuyQuantity);
 
-            // ▼▼▼▼▼ [여기 수정] 아이템 획득 팝업 -> 다시 '단순 알림창'으로 변경 ▼▼▼▼▼
-
-            // (지운 코드) UIManager.Instance.ShowItemAcquiredPopup(selectedItem);
-
-            // [새로 넣을 코드] 그냥 글자만 뜨게 하기
             UIManager.Instance.ShowAlertPopup($"{selectedItem.itemName} {currentBuyQuantity}개 구매 완료!");
+            SoundManager.Instance.PlaySFX("Money");
 
-            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-
-            CloseBuyPopup();
-
-            // 패널 갱신
+            // ▼▼▼ [중요] 구매 후 보유량이 늘었으니 UI를 갱신해줌! ▼▼▼
             UpdateDetailPanel(selectedItem, true);
         }
         else
@@ -331,40 +298,25 @@ public class StoreUI : MonoBehaviour
         }
     }
 
-    public void CloseBuyPopup()
+    public void ClearSelection()
     {
-        if (buyPopupObject != null) buyPopupObject.SetActive(false);
-        SoundManager.Instance.PlaySFX("Button");
+        if (selectedSlot != null) selectedSlot.SetSelected(false);
+        selectedItem = null;
+        selectedSlot = null;
+        if (detailPanelObject != null) detailPanelObject.SetActive(false);
+        if (buyButton != null) buyButton.gameObject.SetActive(false);
     }
 
-    // 퀘스트 진행도 : 구매 종류 구별 함수 
     private void NotifyPurchaseToQuest(ItemData item, int quantity)
     {
         if (QuestManager.Instance == null || item == null) return;
 
         switch (item.itemCategory)
         {
-            case "Seed":
-                QuestManager.Instance.NotifyAction(QuestConditionType.BuySeed, item, quantity);
-                break;
-
-            case "Potion":
-                QuestManager.Instance.NotifyAction(QuestConditionType.BuyPotion, item, quantity);
-                break;
-
-            case "Tool":
-                QuestManager.Instance.NotifyAction(QuestConditionType.BuyTool, item, quantity);
-                break;
-
-            case "Theme":
-                QuestManager.Instance.NotifyAction(QuestConditionType.BuyTheme, item, quantity);
-                break;
-
-            default:
-                break;
+            case "Seed": QuestManager.Instance.NotifyAction(QuestConditionType.BuySeed, item, quantity); break;
+            case "Potion": QuestManager.Instance.NotifyAction(QuestConditionType.BuyPotion, item, quantity); break;
+            case "Tool": QuestManager.Instance.NotifyAction(QuestConditionType.BuyTool, item, quantity); break;
+            case "Theme": QuestManager.Instance.NotifyAction(QuestConditionType.BuyTheme, item, quantity); break;
         }
     }
-
-
-
 }
