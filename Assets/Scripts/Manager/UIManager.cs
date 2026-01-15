@@ -349,6 +349,32 @@ public class UIManager : MonoBehaviour
         // 다시 켜기
         poingBarRect.gameObject.SetActive(true);
     }
+
+    // ▼▼▼ [추가] 연구실에서 도감으로 바로 이동할 때 사용하는 함수 ▼▼▼
+    public void OpenCollectionPanel(ItemData targetItem = null)
+    {
+        // 1. 모든 팝업 닫기
+        CloseAllPopups();
+
+        // 2. 연구실 창 확실히 끄기 (변수명 수정됨: researchLabPanel -> researchLabPopup)
+        if (researchLabPopup != null)
+        {
+            researchLabPopup.SetActive(false);
+        }
+
+        // 3. 도감 창 켜기
+        if (collectionPopup != null)
+        {
+            collectionPopup.SetActive(true);
+        }
+
+
+        if (targetItem != null)
+        {
+            CollectionUI.Instance.ShowItem(targetItem);
+        }
+    }
+
     void Update()
     {
         // ▼▼▼ [핵심] 자동 감지 로직 추가 (이것만 넣으면 끝!) ▼▼▼
@@ -388,4 +414,5 @@ public class UIManager : MonoBehaviour
             }
         }
     }
+
 }
