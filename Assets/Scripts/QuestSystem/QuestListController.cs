@@ -7,7 +7,7 @@ public class QuestListController : MonoBehaviour
     // 스크롤뷰 확장에 필요 
     [Header("슬롯이 붙을 부모")]
     [SerializeField] private Transform slotParent;
-
+    
     [Header("타입별 슬롯 프리팹")]
     [SerializeField] private GameObject mainSlotPrefab;
     [SerializeField] private GameObject subSlotPrefab;
@@ -233,8 +233,14 @@ public class QuestListController : MonoBehaviour
             }
             else
             {
-                questDetailUI.Show(data);
+                bool isClosedView = showClosedMains || (data != null && data.state == QuestState.Closed);
+
+                if (isClosedView)
+                    questDetailUI.ShowClosed(data);   
+                else
+                    questDetailUI.Show(data);
             }
+
         }
     }
 
@@ -291,4 +297,5 @@ public class QuestListController : MonoBehaviour
         }
         return result;
     }
+
 }

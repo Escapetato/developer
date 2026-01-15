@@ -423,6 +423,31 @@ public class QuestManager : MonoBehaviour
         return true;
     }
 
+    public int ClaimRewardsDailyBatch(IList<QuestData> dailyQuests)
+    {
+        if (dailyQuests == null) return 0;
+
+        int claimed = 0;
+
+        for (int i = 0; i < dailyQuests.Count; i++)
+        {
+            var q = dailyQuests[i];
+            if (q == null) continue;
+
+            // "활성화된 보상 아이콘" 조건 = 완료 + 미수령 + Daily + Closed 아님
+            if (q.type != QuestType.Daily) continue;
+            if (q.rewardClaimed) continue;
+            if (q.state == QuestState.Closed) continue;
+            if (!IsCompletedByCounts(q)) continue;
+
+            if (ClaimRewardDaily(q)) // 기존 로직 재사용
+                claimed++;
+        }
+
+        return claimed;
+    }
+
+
     // [유틸] 퀘스트 조건 배열(Types/Items/Counts)의 null/길이 불일치 방지.
     // targetCounts 길이를 기준으로 currentCounts/conditionTypes/conditionItems/countByAmount를 자동 보정한다.
     private void EnsureConditionArrays(QuestData q)
