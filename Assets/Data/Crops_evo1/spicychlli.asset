@@ -28,4 +28,6 @@ MonoBehaviour:
   toolTier: 0
   growthReductionPercent: 0.25
   isDefaultUnlocked: 0
-  itemDescription: 
+  itemDescription: "\uB05D\uD310\uC655 \uB9E4\uC6B4\uB9DB\uC744 \uC790\uB791\uD558\uB294
+    \uC804\uC124\uC758 \uACE0\uCD94. \uB18D\uBD80\uC870\uCC28 \uB9E8\uC190\uC73C\uB85C\uB294
+    \uB2E4\uB8E8\uAE30 \uC5B4\uB835\uB2E4."

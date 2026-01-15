@@ -239,7 +239,7 @@ public class CollectionUI : MonoBehaviour
 
         if (resultCropImage != null) resultCropImage.sprite = recipe.resultItem.itemIcon;
         if (resultName != null) resultName.text = recipe.resultItem.itemName;
-        if (potionUsedText != null) potionUsedText.text = "생명의 물방울: " + recipe.potion.itemName;
+        if (potionUsedText != null) potionUsedText.text = recipe.potion.itemName;
         if (potionUsedImage != null) potionUsedImage.sprite = recipe.potion.itemIcon;
         if (descriptionText != null) descriptionText.text = recipe.resultItem.itemDescription;
     }
