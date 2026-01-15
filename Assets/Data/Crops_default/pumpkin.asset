@@ -23,8 +23,8 @@ MonoBehaviour:
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
-  growTimeDisplay: "1\uBD84"
-  harvestToolName: "\uD638\uBBF8"
+  growTimeDisplay: "2\uC2DC\uAC04"
+  harvestToolName: "\uB0AB"
   toolTier: 0
   growthReductionPercent: 0.25
   isDefaultUnlocked: 0

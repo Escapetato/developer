@@ -23,7 +23,7 @@ MonoBehaviour:
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
-  growTimeDisplay: "1\uBD84"
+  growTimeDisplay: "3\uBD84"
   harvestToolName: "\uD638\uBBF8"
   toolTier: 0
   growthReductionPercent: 0.25

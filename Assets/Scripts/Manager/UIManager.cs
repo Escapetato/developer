@@ -48,7 +48,7 @@ public class UIManager : MonoBehaviour
     public GameObject fertilizerPopup;
 
     private Field currentField; // [추가] 씨앗을 심을 밭
-    private Field lastField = null;   // 마지막으로 클릭한 밭
+    // private Field lastField = null;   // 마지막으로 클릭한 밭 (경고 때문에 잠깐 주석 처리!)
     private bool isSeedPopupOpen = false; // 시드 팝업 열림 여부
 
     void Awake()
@@ -345,6 +345,9 @@ public class UIManager : MonoBehaviour
         poingBarRect.pivot = new Vector2(0, 1);
         poingBarRect.anchoredPosition = new Vector2(50, -50);
         poingBarRect.localScale = Vector3.one;
+
+        // 다시 켜기
+        poingBarRect.gameObject.SetActive(true);
     }
     void Update()
     {

@@ -25,6 +25,12 @@ public class QuestManager : MonoBehaviour
     // 한 플레이 세션에서 한 번만 초기화 
     private bool initialized = false;
 
+    // 변수 추가
+    private string lastSavedDate = "";
+
+    // DB에서 불러오기가 끝났는지 확인하는 변수
+    private bool isLoaded = false;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -32,12 +38,13 @@ public class QuestManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
-        DontDestroyOnLoad(transform.root.gameObject); // 씬이 바뀌어도 유지 
+        transform.SetParent(null); // 부모(@Managers)에서 탈출
+        DontDestroyOnLoad(gameObject); // 파괴 방지
 
         InitializeIfNeeded();
     }
-
     private void InitializeIfNeeded()
     {
         if (initialized) return;
@@ -182,15 +189,61 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    // 초기 퀘스트 슬롯 오픈 
+    // [QuestManager.cs] OpenInitialSlots 함수 수정
+    // QuestManager.cs -> OpenInitialSlots 함수 (이걸로 교체!)
     private void OpenInitialSlots()
     {
         MainQuestSlot();
         SubQuestSlot(2);
 
-        // 일일 퀘스트는 별도 로직(DailyQuestSelector)에서 3개(A/B/C) 생성
-        DailyQuestSelector.ConfigureDailyQuests(dailyQuests, 3);
-        Debug.Log("[QuestManager] 일일 퀘스트 생성 완료 (DailyQuestSelector)");
+        string today = System.DateTime.Today.ToString("yyyy-MM-dd");
+        bool needSave = false;
+
+        // [상황 A] 같은 날짜 접속 (유지해야 함)
+        if (!string.IsNullOrEmpty(lastSavedDate) && lastSavedDate == today)
+        {
+            Debug.Log($"[QuestManager] 같은 날({today}) 접속. 일일 퀘스트 유지.");
+
+            // ★ [핵심] 불러온 일일 퀘스트의 '목표 수치'가 0으로 날아갔다면 복구해줘야 함!
+            foreach (var q in dailyQuests)
+            {
+                if (q.state == QuestState.Active || q.state == QuestState.Completed)
+                {
+                    // 목표가 없거나 0이면 -> 기본값으로 복구
+                    if (q.targetCounts == null || q.targetCounts.Length == 0 || q.targetCounts[0] == 0)
+                    {
+                        int fallbackTarget = 3; // 기본 목표 3회
+                        if (q.dailyTargets != null) fallbackTarget = q.dailyTargets.lowTarget; // 설정된 Low 값 있으면 그걸로
+
+                        q.targetCounts = new int[] { fallbackTarget };
+                        if (q.currentCounts == null || q.currentCounts.Length == 0) q.currentCounts = new int[] { 0 };
+
+                        Debug.Log($"[복구] 일일 퀘스트({q.title}) 목표 수치 복구 완료: {fallbackTarget}");
+                    }
+                }
+            }
+
+            // 만약 활성화된 게 하나도 없다면(오류 등) 새로 생성
+            if (CountActive(dailyQuests) == 0)
+            {
+                DailyQuestSelector.ConfigureDailyQuests(dailyQuests, 3);
+                needSave = true;
+            }
+        }
+        // [상황 B] 날짜가 변경됨 or 첫 시작 (리셋)
+        else
+        {
+            Debug.Log($"[QuestManager] 새로운 날({today}) 접속. 일일 퀘스트 리셋!");
+            foreach (var q in dailyQuests) q.state = QuestState.Locked;
+            DailyQuestSelector.ConfigureDailyQuests(dailyQuests, 3);
+            needSave = true;
+        }
+
+        // ★★★ [중요] 새로 만들었으면 즉시 저장해야, 껐다 켜도 안 바뀜!
+        if (needSave)
+        {
+            SaveToDB();
+        }
     }
 
     // 메인 퀘스트 슬롯 관리
@@ -214,6 +267,9 @@ public class QuestManager : MonoBehaviour
                 q.state = QuestState.Active;
                 q.isNewlyOpened = true;
                 Debug.Log($"[QuestManager] 메인 퀘스트 새로 오픈: key={q.key}, title={q.title}");
+
+                // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+                SaveToDB();
                 return;
             }
         }
@@ -244,6 +300,8 @@ public class QuestManager : MonoBehaviour
                 q.isNewlyOpened = true;
                 openCount++;
                 Debug.Log($"[QuestManager] 서브 퀘스트 오픈: key={q.key}, title={q.title}");
+                // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+                SaveToDB();
             }
         }
 
@@ -267,30 +325,95 @@ public class QuestManager : MonoBehaviour
         return cnt;
     }
 
-    // [추가] DB에 저장
-    public void LoadQuestData(List<QuestSaveData> savedQuests)
+    // 수정
+    public void LoadQuestData(List<QuestSaveData> savedQuests, string dateStr)
     {
-        // 퀘스트 리스트가 아직 초기화 안 됐으면 초기화 먼저
+        Debug.Log($"[QuestManager] LoadQuestData 호출됨. 저장된 퀘스트 수: {(savedQuests != null ? savedQuests.Count : 0)}");
+
+        lastSavedDate = dateStr;
+
+        // 1. 초기화 (일일 퀘스트 내용/목표 설정됨)
         InitializeIfNeeded();
 
+        // [CASE 1] 저장된 데이터가 없는 경우 (신규 유저 / DB 초기화)
+        if (savedQuests == null || savedQuests.Count == 0)
+        {
+            Debug.Log("[QuestManager] 저장된 퀘스트 데이터가 없습니다. (신규 시작)");
+
+            if (string.IsNullOrEmpty(lastSavedDate))
+                lastSavedDate = System.DateTime.Today.ToString("yyyy-MM-dd");
+
+            isLoaded = true; // 로딩 완료 도장
+            OpenInitialSlots(); // 초기 슬롯 오픈 + 저장
+            return;
+        }
+
+        // [CASE 2] 저장된 데이터가 있는 경우 (기존 유저)
+
+        // 상태 리셋
+        foreach (var q in allQuestList)
+        {
+            q.state = QuestState.Locked;
+            q.currentCount = 0;
+            q.rewardClaimed = false;
+            q.isNewlyOpened = false;
+            if (q.currentCounts != null)
+                for (int i = 0; i < q.currentCounts.Length; i++) q.currentCounts[i] = 0;
+        }
+
+        // 데이터 덮어쓰기
         foreach (var savedQ in savedQuests)
         {
-            // Key값으로 내 퀘스트 리스트에서 해당 퀘스트 찾기
-            QuestData myQuest = allQuestList.Find(q => q.key == savedQ.key);
+            if (savedQ == null) continue;
 
+            QuestData myQuest = allQuestList.Find(q => q.key == savedQ.key);
             if (myQuest != null)
             {
-                myQuest.state = (QuestState)savedQ.state; // int -> Enum 변환
+                // 저장된 상태 복구
+                myQuest.state = (QuestState)savedQ.state;
                 myQuest.currentCount = savedQ.currentCount;
                 myQuest.rewardClaimed = savedQ.rewardClaimed;
+
+                EnsureConditionArrays(myQuest);
+
+                // 배열에도 값 동기화
+                if (myQuest.currentCounts != null && myQuest.currentCounts.Length > 0)
+                {
+                    myQuest.currentCounts[0] = savedQ.currentCount;
+                }
+
+                // ▼▼▼ [여기 추가됨!] 일일 퀘스트 완료 체크 보정 ▼▼▼
+                // 불러온 카운트가 목표치 이상이면, 상태를 'Completed(완료)'로 강제 변경
+                if (myQuest.type == QuestType.Daily && myQuest.state == QuestState.Active)
+                {
+                    if (myQuest.targetCounts != null && myQuest.targetCounts.Length > 0)
+                    {
+                        int target = myQuest.targetCounts[0];
+                        int current = myQuest.currentCounts[0];
+
+                        // 목표 달성했으면 완료 상태로!
+                        if (target > 0 && current >= target)
+                        {
+                            myQuest.state = QuestState.Completed;
+                            Debug.Log($"[Load] 일일 퀘스트({myQuest.title}) 완료 상태로 보정됨 ({current}/{target})");
+                        }
+                    }
+                }
+                // ▲▲▲ [추가 끝] ▲▲▲
             }
         }
 
-        // 상태가 변경되었으니 슬롯 갱신 시도
+        // 로딩 완료 도장 찍기 (먼저 찍어야 OpenInitialSlots에서 저장됨)
+        isLoaded = true;
+
+        // 슬롯 갱신
         OpenInitialSlots();
         RebuildActiveConditionIndex();
-        Debug.Log("퀘스트 상태 복구 완료");
+
+        Debug.Log($"[QuestManager] 퀘스트 복구 최종 완료! 메인 진행중: {CountActive(mainQuests)}개");
     }
+
+
     public event Action OnQuestChanged;
 
     private bool IsCompletedByCounts(QuestData q)
@@ -352,6 +475,10 @@ public class QuestManager : MonoBehaviour
             SubQuestSlot(2);     // 서브 2개 유지
 
         OnQuestChanged?.Invoke();
+
+        // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+        SaveToDB();
+
         return true;
     }
     
@@ -420,6 +547,10 @@ public class QuestManager : MonoBehaviour
 
 
         OnQuestChanged?.Invoke();
+
+        // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+        SaveToDB();
+
         return true;
     }
 
@@ -541,6 +672,9 @@ public class QuestManager : MonoBehaviour
 
         if (changedAny)
             OnQuestChanged?.Invoke();
+
+        // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+        SaveToDB();
     }
 
     // 진화 결과 추적용 함수 (연속 횟수)
@@ -611,6 +745,21 @@ public class QuestManager : MonoBehaviour
                 if (changed) OnQuestChanged?.Invoke();
             }
         }
+
+        // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
+        SaveToDB();
     }
 
+    // 추가
+    private void SaveToDB()
+    {
+        // ★ 아직 DB에서 로딩이 안 끝났으면 저장 x (초기화 덮어쓰기 방지)
+        if (!isLoaded) return;
+
+        if (Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null && DBManager.Instance != null)
+        {
+            string myId = Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+            DBManager.Instance.SaveAllData(myId);
+        }
+    }
 }
