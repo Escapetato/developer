@@ -57,7 +57,6 @@ public class QuestDetailUI : MonoBehaviour
     [SerializeField] private Sprite[] potionIcons = new Sprite[8];
     [SerializeField] private Sprite[] potionIconsOff = new Sprite[8];
 
-
     private static readonly string[] PotionNames =
 {
     "불", "소리", "번개", "바람", "물", "별", "꽃", "무지개" 
@@ -66,6 +65,9 @@ public class QuestDetailUI : MonoBehaviour
     [Header("아이템 아이콘 fallback")]
     [SerializeField] private Sprite defaultItemSprite;
     [SerializeField] private Sprite defaultItemSpriteOff;
+
+    [Header("보상 수령 체크 오버레이 (빨간 체크)")]
+    [SerializeField] private GameObject[] rewardClaimCheckOn; // Slot0~2에 대응
 
     private QuestData currentQuest;
     private List<QuestData> currentDailyQuests;
@@ -630,9 +632,17 @@ public class QuestDetailUI : MonoBehaviour
     private void HideAllRewardSlots()
     {
         if (rewardSlotRoots == null) return;
+
         for (int i = 0; i < rewardSlotRoots.Length; i++)
             if (rewardSlotRoots[i] != null) rewardSlotRoots[i].SetActive(false);
+
+        if (rewardClaimCheckOn != null)
+        {
+            for (int i = 0; i < rewardClaimCheckOn.Length; i++)
+                if (rewardClaimCheckOn[i] != null) rewardClaimCheckOn[i].SetActive(false);
+        }
     }
+
 
     private void SetRewardSlot(int idx, Sprite icon, string textOrEmpty)
     {
@@ -699,6 +709,18 @@ public class QuestDetailUI : MonoBehaviour
 
         return (target > 0) && (cur >= target);
     }
+
+    private bool IsDailyCompleted(QuestData q)
+    {
+        if (q == null) return false;
+        if (q.state == QuestState.Closed) return false;
+
+        int cur = (q.currentCounts != null && q.currentCounts.Length > 0) ? q.currentCounts[0] : q.currentCount;
+        int target = (q.targetCounts != null && q.targetCounts.Length > 0) ? q.targetCounts[0] : 0;
+
+        return (target > 0) && (cur >= target);
+    }
+
 
     private Sprite TryGetItemIconOff(object item)
     {
@@ -790,41 +812,64 @@ public class QuestDetailUI : MonoBehaviour
         // A: 포잉
         if (qPoing != null)
         {
-            bool onA = IsDailyClaimable(qPoing);
-            anyOn |= onA;
-            Sprite iconA = onA ? iconPoing : (iconPoingOff != null ? iconPoingOff : iconPoing);
+            bool completedA = IsDailyCompleted(qPoing);
+            bool claimableA = completedA && !qPoing.rewardClaimed && qPoing.state != QuestState.Closed;
+            anyOn |= claimableA;
+
+            // 완료면 항상 on 아이콘 유지
+            Sprite iconA = completedA ? iconPoing : (iconPoingOff != null ? iconPoingOff : iconPoing);
+
             SetRewardSlot(0, iconA, $"{qPoing.rewardAmount}");
+            SetRewardClaimCheck(0, qPoing.rewardClaimed);
         }
 
         // B: 비료
         if (qFert != null)
         {
-            bool onB = IsDailyClaimable(qFert);
-            anyOn |= onB;
-            Sprite iconB = onB ? iconFertilizer : (iconFertilizerOff != null ? iconFertilizerOff : iconFertilizer);
+            bool completedB = IsDailyCompleted(qFert);
+            bool claimableB = completedB && !qFert.rewardClaimed && qFert.state != QuestState.Closed;
+            anyOn |= claimableB;
+
+            // 완료면 항상 on 아이콘 유지
+            Sprite iconB = completedB ? iconFertilizer : (iconFertilizerOff != null ? iconFertilizerOff : iconFertilizer);
+
             SetRewardSlot(1, iconB, $"{qFert.rewardAmount}");
+            SetRewardClaimCheck(1, qFert.rewardClaimed); 
         }
 
         // C: 물약
         if (qPotion != null)
         {
-            bool onC = IsDailyClaimable(qPotion);
-            anyOn |= onC;
+            bool completedC = IsDailyCompleted(qPotion);
+            bool claimableC = completedC && !qPotion.rewardClaimed && qPotion.state != QuestState.Closed;
+            anyOn |= claimableC;
 
-            int idx = qPotion.rewardKey - 100; // 100~107
-            string name = (idx >= 0 && idx < PotionNames.Length) ? PotionNames[idx] : "물약";
-
+            int idx = qPotion.rewardKey - 100;
             Sprite onIcon = (idx >= 0 && idx < potionIcons.Length) ? potionIcons[idx] : defaultItemSprite;
             Sprite offIcon =
                 (potionIconsOff != null && idx >= 0 && idx < potionIconsOff.Length && potionIconsOff[idx] != null)
                 ? potionIconsOff[idx]
                 : (defaultItemSpriteOff != null ? defaultItemSpriteOff : onIcon);
 
-            SetRewardSlot(2, onC ? onIcon : offIcon, $"{qPotion.rewardAmount}");
+            // 완료면 항상 on 아이콘 유지
+            SetRewardSlot(2, completedC ? onIcon : offIcon, $"{qPotion.rewardAmount}");
+            SetRewardClaimCheck(2, qPotion.rewardClaimed); 
         }
 
         if (rewardButton != null)
-            rewardButton.interactable = anyOn;
+            rewardButton.interactable = anyOn; // 수령 가능한 게 있을 때만 true
+
     }
+
+    // 일퀘 보상 수령 후 체크표시 
+    private void SetRewardClaimCheck(int idx, bool on)
+    {
+        if (rewardClaimCheckOn == null) return;
+        if (idx < 0 || idx >= rewardClaimCheckOn.Length) return;
+        if (rewardClaimCheckOn[idx] == null) return;
+
+        rewardClaimCheckOn[idx].SetActive(on);
+    }
+
 
 }
