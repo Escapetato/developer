@@ -14,23 +14,23 @@ public class InventoryUI : MonoBehaviour
     public ItemData selectedItem { get; private set; }
     public ItemSlot selectedSlot { get; private set; }
 
-    [Header("Details Panel UI")]
+    [Header("Details Panel")]
     public GameObject detailPanelObject;
     public Image detailImage;
     public TextMeshProUGUI detailNameText;
 
-    // ▼▼▼ [NEW] 그룹 오브젝트 변수 추가 ▼▼▼
-    [Header("Info Groups (For Layout)")]
-    public GameObject priceGroupObject; // 코인 아이콘 + 가격 텍스트가 묶인 그룹
-    public GameObject ownedGroupObject; // 박스 아이콘 + 보유 텍스트가 묶인 그룹 (혹시 몰라 선언)
-
+    // ▼ [NEW] 판매 시 받을 '총 금액' 표시 텍스트
     public TextMeshProUGUI detailTotalPriceText;
+
+    // ▼ [NEW] 현재 보유 수량 표시 (상세창 내)
     public TextMeshProUGUI detailOwnedCountText;
 
-    public Button decreaseButton;
-    public Button increaseButton;
-    public TextMeshProUGUI quantityText;
+    // ▼ [NEW] 수량 조절 버튼
+    public Button decreaseButton;      // (<)
+    public Button increaseButton;      // (>)
+    public TextMeshProUGUI quantityText; // 판매할 수량 (1)
 
+    // ▼ [CHANGED] 판매 버튼
     public Button sellButton;
     public TextMeshProUGUI sellButtonText;
 
@@ -51,6 +51,7 @@ public class InventoryUI : MonoBehaviour
 
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
 
+        // 버튼 리스너 연결
         if (decreaseButton != null)
         {
             decreaseButton.onClick.RemoveAllListeners();
@@ -79,6 +80,7 @@ public class InventoryUI : MonoBehaviour
             currentCategory = "Seed";
             RedrawInventory();
         }
+
         ClearSelection();
     }
 
@@ -106,13 +108,15 @@ public class InventoryUI : MonoBehaviour
             selectedItem = slot.item;
             selectedSlot = slot;
             selectedSlot.SetSelected(true);
+
+            // 선택 시 판매 수량 1로 초기화
             currentSellQuantity = 1;
             UpdateDetailPanel(slot.item);
         }
         else ClearSelection();
     }
 
-    // ▼▼▼ 수정된 UpdateDetailPanel ▼▼▼
+    // ▼▼▼ 여기가 핵심 수정 부분입니다 ▼▼▼
     private void UpdateDetailPanel(ItemData item)
     {
         if (item != null)
@@ -122,7 +126,7 @@ public class InventoryUI : MonoBehaviour
             if (detailImage != null) detailImage.sprite = item.itemIcon;
             if (detailNameText != null) detailNameText.text = item.itemName;
 
-            // 보유 수량 갱신 (항상 표시)
+            // 1. 현재 보유 수량 가져오기 및 표시 (이건 항상 보여줌)
             int myCount = 0;
             if (InventoryManager.Instance.items.ContainsKey(item))
                 myCount = InventoryManager.Instance.items[item];
@@ -130,61 +134,51 @@ public class InventoryUI : MonoBehaviour
             if (detailOwnedCountText != null)
                 detailOwnedCountText.text = myCount.ToString();
 
-            // 판매 버튼 항상 켜두기 (나중에 interactable로 조절)
-            if (sellButton != null) sellButton.gameObject.SetActive(true);
-
-            // ---------------------------------------------------------
-            // 작물(Crop) 여부에 따른 UI 배치 변경
-            // ---------------------------------------------------------
+            // 2. 카테고리에 따라 UI 분기 처리
             if (item.itemCategory == "Crop")
             {
-                // [작물일 때]
+                // [작물일 때] -> 판매 UI 모두 켜기
 
-                // 1. 가격 그룹(코인 등) 보이기 -> Layout Group이 자동으로 양옆 정렬함
-                if (priceGroupObject != null) priceGroupObject.SetActive(true);
-
-                // 2. 수량 조절 버튼 활성화
+                // 수량 조절 버튼들 활성화 (< 1 >)
                 SetQuantityControlsActive(true);
-                UpdateQuantityUI();
 
-                // 3. 판매 버튼 활성화 (개수 있으면)
+                // 판매 버튼 활성화 (개수가 있어야 활성화)
                 if (sellButton != null)
                 {
+                    sellButton.gameObject.SetActive(true); // 버튼 자체를 보이게 함
                     sellButton.interactable = (myCount > 0);
                     if (sellButtonText != null) sellButtonText.text = $"{currentSellQuantity}개 판매";
                 }
+
+                // 가격 및 텍스트 갱신
+                UpdateQuantityUI();
             }
             else
             {
-                // [작물이 아닐 때]
+                // [작물이 아닐 때] -> 판매 UI 모두 끄기
 
-                // 1. 가격 그룹(코인 등) 숨기기 -> Layout Group이 남은 '보유그룹'을 중앙 정렬함
-                if (priceGroupObject != null) priceGroupObject.SetActive(false);
-
-                // 2. 수량 조절 버튼 숨기기
+                // 수량 조절 버튼들 숨김
                 SetQuantityControlsActive(false);
 
-                // 3. 판매 버튼 비활성화 + 텍스트 변경
+                // 판매 버튼 자체를 아예 숨김 (요청하신 부분)
                 if (sellButton != null)
                 {
-                    sellButton.interactable = false;
-                    if (sellButtonText != null) sellButtonText.text = "판매 불가";
+                    sellButton.gameObject.SetActive(false);
                 }
             }
         }
     }
 
+    // 수량 조절 버튼 및 가격 텍스트 표시 여부 제어
     private void SetQuantityControlsActive(bool isActive)
     {
         if (decreaseButton != null) decreaseButton.gameObject.SetActive(isActive);
         if (increaseButton != null) increaseButton.gameObject.SetActive(isActive);
         if (quantityText != null) quantityText.gameObject.SetActive(isActive);
-        // detailTotalPriceText는 priceGroupObject 안에 포함되어 있다면 굳이 여기서 안 꺼도 됨
-        // 하지만 혹시 모르니 남겨둠
+
+        // 총 가격 텍스트도 안 쓸 거면 숨김
         if (detailTotalPriceText != null) detailTotalPriceText.gameObject.SetActive(isActive);
     }
-
-    // ... (나머지 OnDecreaseQuantity, OnIncreaseQuantity, OnRealSellClick 등은 기존과 동일) ...
 
     public void OnDecreaseQuantity()
     {
@@ -198,7 +192,9 @@ public class InventoryUI : MonoBehaviour
     public void OnIncreaseQuantity()
     {
         if (selectedItem == null) return;
+
         int myCount = InventoryManager.Instance.GetItemCount(selectedItem);
+
         if (currentSellQuantity < myCount)
         {
             currentSellQuantity++;
@@ -209,12 +205,21 @@ public class InventoryUI : MonoBehaviour
     private void UpdateQuantityUI()
     {
         if (selectedItem == null) return;
-        if (quantityText != null) quantityText.text = currentSellQuantity.ToString();
 
+        // 1. 수량 텍스트
+        if (quantityText != null)
+            quantityText.text = currentSellQuantity.ToString();
+
+        // 2. 총 판매 가격 계산
         int totalEarnings = selectedItem.price * currentSellQuantity;
-        if (detailTotalPriceText != null) detailTotalPriceText.text = totalEarnings.ToString();
 
-        if (sellButtonText != null) sellButtonText.text = $"{currentSellQuantity}개 판매";
+        // 3. 가격 텍스트 갱신
+        if (detailTotalPriceText != null)
+            detailTotalPriceText.text = totalEarnings.ToString();
+
+        // 4. 판매 버튼 텍스트
+        if (sellButtonText != null)
+            sellButtonText.text = $"{currentSellQuantity}개 판매";
     }
 
     public void OnRealSellClick()
@@ -223,6 +228,7 @@ public class InventoryUI : MonoBehaviour
         if (selectedItem.itemCategory != "Crop") return;
 
         int totalEarnings = selectedItem.price * currentSellQuantity;
+
         InventoryManager.Instance.RemoveItem(selectedItem, currentSellQuantity);
         PoingManager.Instance.IncreasePoing(totalEarnings);
 
@@ -247,6 +253,7 @@ public class InventoryUI : MonoBehaviour
     {
         Dictionary<ItemData, int> allItems = InventoryManager.Instance.items;
         int i = 0;
+
         foreach (KeyValuePair<ItemData, int> itemPair in allItems)
         {
             if (itemPair.Key.itemCategory == currentCategory)
@@ -255,16 +262,22 @@ public class InventoryUI : MonoBehaviour
                 {
                     slots[i].gameObject.SetActive(true);
                     slots[i].SetSlot(itemPair.Key, itemPair.Value);
-                    if (selectedSlot == slots[i]) selectedSlot.SetSelected(true);
+
+                    if (selectedSlot == slots[i])
+                    {
+                        selectedSlot.SetSelected(true);
+                    }
                     i++;
                 }
             }
         }
+
         for (int j = i; j < slots.Count; j++)
         {
             slots[j].ClearSlot();
             slots[j].gameObject.SetActive(false);
         }
+
         if (i == 0) ClearSelection();
     }
 
