@@ -981,6 +981,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5b1de8934242f6b43b72dbbbe2c7018a, type: 2}
   - {fileID: 11400000, guid: 6deaf2a4e67777d4c9119edc844bebd3, type: 2}
   - {fileID: 11400000, guid: 60ac3b5c96f1f8049ac28a767ca6ff7f, type: 2}
+  - {fileID: 11400000, guid: 937a18249d2f73e47b9332aa4e592597, type: 2}
   - {fileID: 11400000, guid: fc160dc35553f0b4f91068d055162ab8, type: 2}
   - {fileID: 11400000, guid: 1f64bd9698d9c5440afbed9a4950fc52, type: 2}
 --- !u!1 &374979958
@@ -5687,6 +5688,14 @@ PrefabInstance:
     - target: {fileID: 4978352096589980354, guid: 0e808062ef84ce14db9063fa0967f568, type: 3}
       propertyPath: m_Name
       value: QuestSlotItem_day
+      objectReference: {fileID: 0}
+    - target: {fileID: 6191070129096102502, guid: 0e808062ef84ce14db9063fa0967f568, type: 3}
+      propertyPath: borderImage
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9002464839369892319, guid: 0e808062ef84ce14db9063fa0967f568, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
