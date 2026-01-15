@@ -30,6 +30,12 @@ public class QuestListController : MonoBehaviour
     // 현재 선택된 슬롯 
     private QuestSlotUI currentSelectedSlot;
 
+    // 마지막으로 유저가 선택한 슬롯이 '일일'이었는지
+    private bool lastSelectedWasDaily = false;
+
+    // QuestChanged로 리프레시할 때, 첫 슬롯 자동선택을 잠깐 막기
+    private bool suppressAutoSelectOnce = false;
+
     // 추후 세이브 로드, 진행도 반영 이벤트 연결 필요 
     private void Start()
     {
@@ -47,9 +53,67 @@ public class QuestListController : MonoBehaviour
 
     private void HandleQuestChanged()
     {
-        currentSelectedSlot = null; // 기존 슬롯 오브젝트가 Destroy되므로 초기화
+        bool wantKeepDaily = lastSelectedWasDaily && !showClosedMains;
+
+        // 직전 선택이 일일 슬롯이면: 왼쪽 리스트를 Refresh 하지 않는다.
+        // -> daily_lineO(선택 테두리) 그대로 유지
+        if (wantKeepDaily && currentSelectedSlot != null && currentSelectedSlot.IsDailySlot())
+        {
+            // 오른쪽 패널만 최신 데이터로 갱신
+            if (questDetailUI != null)
+                questDetailUI.ShowDailyQuests(GetDailyQuestsForUI());
+
+            // 빨간 점만 최신화(필요 시)
+            currentSelectedSlot.RefreshNewDot();
+
+            // 혹시라도 선택이 풀렸을 가능성 대비
+            currentSelectedSlot.SetSelected(true);
+            return;
+        }
+
+        // ====== 기존 로직(일일이 아니면 전체 리프레시) ======
+        suppressAutoSelectOnce = true;
+
         if (showClosedMains) RefreshClosedMainSlots();
         else RefreshSlots();
+
+        if (wantKeepDaily)
+        {
+            var dailySlot = FindDailySlotInChildren();
+            if (dailySlot != null) SelectSlot(dailySlot, false);
+        }
+        else
+        {
+            var first = FindFirstSlotInChildren();
+            if (first != null) SelectSlot(first, false);
+        }
+
+        suppressAutoSelectOnce = false;
+    }
+
+
+    private QuestSlotUI FindDailySlotInChildren()
+    {
+        if (slotParent == null) return null;
+
+        for (int i = 0; i < slotParent.childCount; i++)
+        {
+            var ui = slotParent.GetChild(i).GetComponent<QuestSlotUI>();
+            if (ui == null) continue;
+
+            var q = ui.GetQuest();
+            bool isDaily = ui.IsDailySlot() || (q != null && q.type == QuestType.Daily);
+
+            if (isDaily) return ui;
+        }
+        return null;
+    }
+
+
+    private QuestSlotUI FindFirstSlotInChildren()
+    {
+        if (slotParent == null || slotParent.childCount == 0) return null;
+        return slotParent.GetChild(0).GetComponent<QuestSlotUI>();
     }
 
 
@@ -160,11 +224,12 @@ public class QuestListController : MonoBehaviour
 
             ui.SetSelected(false);
 
-            // 첫 슬롯 자동 선택 
-            if (currentSelectedSlot == null)
+            // 첫 슬롯 자동 선택 (일일 제외)
+            if (currentSelectedSlot == null && !suppressAutoSelectOnce)
             {
-                SelectSlot(ui, false); // ✅ 자동 선택(유저 클릭 아님) → 점 안 꺼짐
+                SelectSlot(ui, false);
             }
+
 
         }
     }
@@ -214,9 +279,11 @@ public class QuestListController : MonoBehaviour
 
         // 2) 새 슬롯을 선택 상태로
         currentSelectedSlot = clickedSlot;
-        currentSelectedSlot.SetSelected(true);
+        // 현재 선택이 일일인지 기억
+        lastSelectedWasDaily = currentSelectedSlot.IsDailySlot() || (currentSelectedSlot.GetQuest() != null && currentSelectedSlot.GetQuest().type == QuestType.Daily);
+        
 
-        // ✅ 유저가 눌렀을 때만 "새로 열림" 해제
+        // 유저가 눌렀을 때만 "새로 열림" 해제
         if (isUserClick)
             MarkQuestAsSeen(clickedSlot);
 
@@ -242,6 +309,8 @@ public class QuestListController : MonoBehaviour
             }
 
         }
+
+        currentSelectedSlot.SetSelected(true);
     }
 
 

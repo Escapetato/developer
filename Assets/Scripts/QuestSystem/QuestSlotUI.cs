@@ -1,3 +1,4 @@
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,10 @@ public class QuestSlotUI : MonoBehaviour
     [SerializeField] private Sprite selectedSprite;
 
     [Header("새로 열린 퀘스트 (빨간 점)")]
-    [SerializeField] private GameObject newDotObject; 
+    [SerializeField] private GameObject newDotObject;
+
+    [Header("일일퀘스트 선택 상태 계속 유지(보상 완료 버튼 후에도)")]
+    [SerializeField] private Image borderImage; // 실제 테두리(라인) Image
 
     private QuestData boundQuest;
     private bool isDailySlot = false;
@@ -29,6 +33,8 @@ public class QuestSlotUI : MonoBehaviour
         if (button != null)
         {
             button.onClick.AddListener(OnClickSlot);
+            button.transition = Selectable.Transition.None;
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
         }
 
         SetSelected(false);
@@ -53,7 +59,7 @@ public class QuestSlotUI : MonoBehaviour
         }
 
         // 새로운 데이터 바인딩 시 초기화 
-        SetSelected(false);
+        //SetSelected(false);
         RefreshNewDot(); 
 
     }
