@@ -23,6 +23,12 @@ public class QuestDetailUI : MonoBehaviour
     private Vector2 conditionContainerNormalPos;
     private bool isConditionPosCached = false;
 
+    [Header("일일퀘스트 미션 줄간격(일일 모드에서만)")]
+    [SerializeField] private float dailyRowExtraSpacing = 20f; // Inspector에서 조절
+
+    private Vector3[] conditionRowNormalPos;
+    private bool isRowPosCached = false;
+
     [Header("보상 버튼")]
     //[SerializeField] private Button[] rewardButtons;
     [SerializeField] private Button rewardButton;
@@ -78,6 +84,8 @@ public class QuestDetailUI : MonoBehaviour
 
     public void Show(QuestData data)
     {
+        SetDetailVisible(true);
+
         currentQuest = data;
         isDailyQuestView = false;
         if (descText != null) descText.gameObject.SetActive(true);
@@ -155,6 +163,8 @@ public class QuestDetailUI : MonoBehaviour
 
     public void ShowDailyQuests(List<QuestData> dailyQuests)
     {
+        SetDetailVisible(true);
+
         isDailyQuestView = true;
         ApplyDailyLayout(true);
 
@@ -328,6 +338,9 @@ public class QuestDetailUI : MonoBehaviour
         {
             conditionContainer.anchoredPosition = conditionContainerNormalPos;
         }
+
+        CacheRowPositionsIfNeeded();
+        ApplyDailyRowSpacing(isDaily);
     }
 
     public void RefreshConditions()
@@ -575,6 +588,8 @@ public class QuestDetailUI : MonoBehaviour
     // 지난 메인 퀘스트 UI 
     public void ShowClosed(QuestData data)
     {
+        SetDetailVisible(true);
+
         currentQuest = data;
         isDailyQuestView = false;
         ApplyDailyLayout(false);
@@ -760,11 +775,11 @@ public class QuestDetailUI : MonoBehaviour
 
         switch (q.key)
         {
-            case 1: SetRewardSlot(1, land, "1단계"); break;
+            case 1: SetRewardSlot(1, land, ""); break;
             case 2: SetRewardSlot(1, nat, ""); break;
-            case 3: SetRewardSlot(1, land, "2단계"); break;
+            case 3: SetRewardSlot(1, land, ""); break;
             case 4: SetRewardSlot(1, sap, ""); break;
-            case 5: SetRewardSlot(1, land, "3단계"); break;
+            case 5: SetRewardSlot(1, land, ""); break;
             case 6: SetRewardSlot(1, gawi, ""); break;
             default: SetRewardSlot(1, land, ""); break;
         }
@@ -898,6 +913,80 @@ public class QuestDetailUI : MonoBehaviour
         if (rewardClaimCheckOn[idx] == null) return;
 
         rewardClaimCheckOn[idx].SetActive(on);
+    }
+
+    // 일일퀘스트 화면에서만 미션 줄 간격 조정 
+    private void CacheRowPositionsIfNeeded()
+    {
+        if (isRowPosCached) return;
+
+        conditionRowNormalPos = new Vector3[conditionRows.Length];
+
+        for (int i = 0; i < conditionRows.Length; i++)
+        {
+            if (conditionRows[i] == null) continue;
+
+            // RectTransform이 있으면 UI 방식, 없으면 Transform 방식
+            var rt = conditionRows[i].GetComponent<RectTransform>();
+            if (rt != null) conditionRowNormalPos[i] = rt.anchoredPosition;
+            else conditionRowNormalPos[i] = conditionRows[i].transform.localPosition;
+        }
+
+        isRowPosCached = true;
+    }
+
+
+    private void ApplyDailyRowSpacing(bool isDaily)
+    {
+        if (conditionRowNormalPos == null) return;
+
+        // row가 아래로 내려갈수록 y가 줄어드는 구조면 dir = -1
+        float dir = -1f;
+
+        if (conditionRows.Length >= 2 && conditionRows[0] != null && conditionRows[1] != null)
+        {
+            Vector3 p0 = conditionRowNormalPos[0];
+            Vector3 p1 = conditionRowNormalPos[1];
+            dir = (p1.y < p0.y) ? -1f : 1f;
+        }
+
+        for (int i = 0; i < conditionRows.Length; i++)
+        {
+            if (conditionRows[i] == null) continue;
+
+            Vector3 basePos = conditionRowNormalPos[i];
+            Vector3 targetPos = basePos;
+
+            if (isDaily)
+            {
+                // i가 커질수록 더 벌어지게 (Row0 0, Row1 1배, Row2 2배)
+                targetPos += new Vector3(0f, dir * dailyRowExtraSpacing * i, 0f);
+            }
+
+            var rt = conditionRows[i].GetComponent<RectTransform>();
+            if (rt != null) rt.anchoredPosition = targetPos;
+            else conditionRows[i].transform.localPosition = targetPos;
+        }
+    }
+
+    // closed 된 메인 퀘스트가 0개 일 때, 지난 퀘스트 화면을 누르면, 
+    public void SetDetailVisible(bool visible)
+    {
+        if (titleText != null) titleText.gameObject.SetActive(visible);
+
+        if (descText != null) descText.gameObject.SetActive(visible);
+
+        if (conditionContainer != null) conditionContainer.gameObject.SetActive(visible);
+
+        if (rewardButton != null) rewardButton.gameObject.SetActive(visible);
+        if (rewardBoxRoot != null) rewardBoxRoot.SetActive(visible);
+    }
+
+    // 지난퀘스트(Closed) 리스트가 비었을 때 전용
+    public void ShowEmptyRightPanel()
+    {
+        Clear();                // 텍스트/행들 정리
+        SetDetailVisible(false); // "아예 안 보이게"
     }
 
 

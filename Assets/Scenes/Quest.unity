@@ -1628,7 +1628,7 @@ Transform:
   m_GameObject: {fileID: 608162225}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -13.0807495, y: 10.800509, z: 3423.8943}
+  m_LocalPosition: {x: -13.0807495, y: 14, z: 3423.8943}
   m_LocalScale: {x: 108.13793, y: 108.13793, z: 108.13793}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1976,7 +1976,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3.4861324, y: 0.37}
+  m_AnchoredPosition: {x: -3.72, y: -0.27}
   m_SizeDelta: {x: 1920.0001, y: 1078.8052}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &784534990
@@ -2590,7 +2590,8 @@ MonoBehaviour:
   - {fileID: 1930883932}
   - {fileID: 2105054710}
   conditionContainer: {fileID: 784534989}
-  dailyContainerOffsetY: 3.2
+  dailyContainerOffsetY: 2.6
+  dailyRowExtraSpacing: 67
   rewardButton: {fileID: 2120062133}
   rewardBoxRoot: {fileID: 1738673341}
   rewardSlotRoots:
@@ -2794,8 +2795,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5, y: -2.1}
-  m_SizeDelta: {x: 950, y: 1000}
+  m_AnchoredPosition: {x: 0.57, y: -1.34}
+  m_SizeDelta: {x: 900, y: 700}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1208130148
 MonoBehaviour:
@@ -4133,7 +4134,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 10, y: -45}
-  m_SizeDelta: {x: 65, y: 5}
+  m_SizeDelta: {x: 70, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1735256193
 MonoBehaviour:
@@ -4155,7 +4156,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 5
+  m_text: ' '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4428,7 +4429,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 40.02821, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -4690,6 +4691,7 @@ MonoBehaviour:
   conditionCheckOn: []
   conditionContainer: {fileID: 0}
   dailyContainerOffsetY: 2
+  dailyRowExtraSpacing: 20
   rewardButton: {fileID: 0}
   rewardBoxRoot: {fileID: 0}
   rewardSlotRoots: []

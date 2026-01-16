@@ -163,11 +163,19 @@ public class QuestListController : MonoBehaviour
             }
         }
 
-        if (closedMainSlotPrefab == null)
+        // closed 0개면 오른쪽 패널 완전 숨김
+        if (closedList.Count == 0)
         {
-            Debug.LogWarning("[QuestListController] closedMainSlotPrefab 이 비어 있습니다.");
+            if (questDetailUI != null)
+                questDetailUI.ShowEmptyRightPanel();
             return;
         }
+
+        //if (closedMainSlotPrefab == null)
+        //{
+        //    Debug.LogWarning("[QuestListController] closedMainSlotPrefab 이 비어 있습니다.");
+        //    return;
+        //}
 
         foreach (var q in closedList)
         {
