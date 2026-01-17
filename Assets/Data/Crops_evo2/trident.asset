@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uC0BC\uC9C0\uCC3D"
   description: 
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 21300000, guid: 7eaa6a853af10504384b7b6daa98027f, type: 3}
   itemCategory: Crop
   collectionCategory: 
   price: 2100
