@@ -13,10 +13,10 @@ public class CameraController : MonoBehaviour
     public float maxZoom = 20f;
 
     [Header("배경화면 경계 (Sprite의 실제 끝 좌표)")]
-    public float mapMinX = -25f;
-    public float mapMaxX = 25f;
-    public float mapMinY = -25f;
-    public float mapMaxY = 25f;
+    public float mapMinX = -19.2f;
+    public float mapMaxX = 19.2f;
+    public float mapMinY = -10.8f;
+    public float mapMaxY = 10.8f;
 
     private Vector3 lastMousePos;
 
