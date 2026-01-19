@@ -17844,7 +17844,6 @@ GameObject:
   - component: {fileID: 806649007}
   - component: {fileID: 806649005}
   - component: {fileID: 806649006}
-  - component: {fileID: 806649008}
   - component: {fileID: 806649009}
   m_Layer: 0
   m_Name: Main Camera
@@ -17927,26 +17926,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &806649008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 806649004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d726ae7fd15ed47b5912be77619feefc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  panSpeed: 0.5
-  zoomSpeed: 0.01
-  minZoom: 7
-  maxZoom: 15
-  minX: -10
-  maxX: 10
-  minY: -10
-  maxY: 10
 --- !u!114 &806649009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32780,7 +32759,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 142242547}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99992853
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -50757,7 +50736,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.0005702356, y: -0.000002592574}
+  m_AnchoredPosition: {x: -0.0005702356, y: 0.000008120942}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2056541280
