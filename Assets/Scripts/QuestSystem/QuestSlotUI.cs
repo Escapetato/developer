@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class QuestSlotUI : MonoBehaviour
 {
     [Header("UI")]
@@ -37,7 +38,7 @@ public class QuestSlotUI : MonoBehaviour
             button.navigation = new Navigation { mode = Navigation.Mode.None };
         }
 
-        SetSelected(false);
+        //SetSelected(false);
     }
 
     // QuestManager에서 데이터 넘겨줄 때 호출
@@ -59,7 +60,7 @@ public class QuestSlotUI : MonoBehaviour
         }
 
         // 새로운 데이터 바인딩 시 초기화 
-        //SetSelected(false);
+        SetSelected(false);
         RefreshNewDot(); 
 
     }
@@ -74,18 +75,36 @@ public class QuestSlotUI : MonoBehaviour
     {
         isSelected = selected;
 
+        // 1) 테두리(라인)용 이미지가 지정되어 있으면 그걸 최우선으로 사용
+        if (borderImage != null)
+        {
+            if (selected)
+            {
+                if (selectedSprite != null) borderImage.sprite = selectedSprite;
+            }
+            else
+            {
+                if (normalSprite != null) borderImage.sprite = normalSprite;
+            }
+            return;
+        }
+
+        // 2) fallback: 슬롯 자신에 Image가 있으면 그걸 사용
         var img = GetComponent<Image>();
-        if (img == null) return;
+        if (img == null)
+        {
+            Debug.LogWarning($"[QuestSlotUI] No Image / borderImage on {name}. " +
+                             $"Please assign 'borderImage' in prefab or add Image component.");
+            return;
+        }
 
         if (selected)
         {
-            if (selectedSprite != null)
-                img.sprite = selectedSprite;   
+            if (selectedSprite != null) img.sprite = selectedSprite;
         }
         else
         {
-            if (normalSprite != null)
-                img.sprite = normalSprite;     
+            if (normalSprite != null) img.sprite = normalSprite;
         }
     }
 

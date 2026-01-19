@@ -75,6 +75,13 @@ public class QuestDetailUI : MonoBehaviour
     [Header("보상 수령 체크 오버레이 (빨간 체크)")]
     [SerializeField] private GameObject[] rewardClaimCheckOn; // Slot0~2에 대응
 
+    [Header("스크롤 제어(Scrollbar UI는 유니티에서 숨김)")]
+    [SerializeField] private ScrollRect scrollRect;
+
+    [Tooltip("Closed 메인 슬롯이 이 개수 이상일 때만 휠 스크롤 ON")]
+    [SerializeField] private int closedScrollThreshold = 5;
+
+
     private QuestData currentQuest;
     private List<QuestData> currentDailyQuests;
 

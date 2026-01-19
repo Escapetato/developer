@@ -24,6 +24,12 @@ public class QuestListController : MonoBehaviour
     [Header("퀘스트 상세 패널")]
     [SerializeField] private QuestDetailUI questDetailUI;
 
+    [Header("스크롤 제어(Scrollbar UI는 유니티에서 숨김)")]
+    [SerializeField] private ScrollRect scrollRect;
+
+    [Tooltip("Closed 메인 슬롯이 이 개수 이상일 때만 휠 스크롤 ON")]
+    [SerializeField] private int closedScrollThreshold = 5;
+
     // 현재 모드 (평소 퀘스트 데이터) 
     private bool showClosedMains = false;
 
@@ -36,10 +42,14 @@ public class QuestListController : MonoBehaviour
     // QuestChanged로 리프레시할 때, 첫 슬롯 자동선택을 잠깐 막기
     private bool suppressAutoSelectOnce = false;
 
+    private bool allowAutoSelectOnCreate = true;
+
     // 추후 세이브 로드, 진행도 반영 이벤트 연결 필요 
     private void Start()
     {
         RefreshSlots();
+
+        allowAutoSelectOnCreate = false;
 
         if (QuestManager.Instance != null)
             QuestManager.Instance.OnQuestChanged += HandleQuestChanged;
@@ -77,6 +87,9 @@ public class QuestListController : MonoBehaviour
         if (showClosedMains) RefreshClosedMainSlots();
         else RefreshSlots();
 
+        // 리프레시 끝나면 자동선택/선택 로직 허용
+        suppressAutoSelectOnce = false;
+
         if (wantKeepDaily)
         {
             var dailySlot = FindDailySlotInChildren();
@@ -84,11 +97,18 @@ public class QuestListController : MonoBehaviour
         }
         else
         {
-            var first = FindFirstSlotInChildren();
-            if (first != null) SelectSlot(first, false);
+            Debug.Log($"[QuestListController] After refresh: childCount={slotParent.childCount}");
+            RequestAutoSelectTopNextFrame();
         }
 
-        suppressAutoSelectOnce = false;
+        //else
+        //{
+        //    var first = FindFirstSlotInChildren();
+        //    Debug.Log($"[QuestListController] After refresh: childCount={slotParent.childCount}, first={(first ? first.name : "null")}");
+        //    if (first != null) SelectSlot(first, false);
+
+        //}
+
     }
 
 
@@ -145,6 +165,8 @@ public class QuestListController : MonoBehaviour
             CreateSlot(dailySlotPrefab, dailyRep);
         }
 
+        ApplyScrollForCurrent();
+
     }
 
     // 박스 선택 시 Closed 된 메인 퀘스트만 
@@ -168,19 +190,19 @@ public class QuestListController : MonoBehaviour
         {
             if (questDetailUI != null)
                 questDetailUI.ShowEmptyRightPanel();
+
+            ApplyScrollForClosed(0);
+
             return;
         }
-
-        //if (closedMainSlotPrefab == null)
-        //{
-        //    Debug.LogWarning("[QuestListController] closedMainSlotPrefab 이 비어 있습니다.");
-        //    return;
-        //}
 
         foreach (var q in closedList)
         {
             CreateSlot(closedMainSlotPrefab, q); 
         }
+
+        ApplyScrollForClosed(closedList.Count);
+
     }
 
 
@@ -233,11 +255,10 @@ public class QuestListController : MonoBehaviour
             ui.SetSelected(false);
 
             // 첫 슬롯 자동 선택 (일일 제외)
-            if (currentSelectedSlot == null && !suppressAutoSelectOnce)
+            if (allowAutoSelectOnCreate && currentSelectedSlot == null && !suppressAutoSelectOnce)
             {
                 SelectSlot(ui, false);
             }
-
 
         }
     }
@@ -266,6 +287,9 @@ public class QuestListController : MonoBehaviour
             RefreshClosedMainSlots();
         else
             RefreshSlots();
+
+        RequestAutoSelectTopNextFrame();
+
     }
 
     public void OnSlotClicked(QuestSlotUI clickedSlot)
@@ -350,6 +374,28 @@ public class QuestListController : MonoBehaviour
         clickedSlot.RefreshNewDot();
     }
 
+    private void ApplyScrollForCurrent()
+    {
+        if (scrollRect == null) return;
+
+        // 현재 목록: 스크롤 기능 완전 OFF
+        scrollRect.vertical = false;
+        scrollRect.horizontal = false;
+        scrollRect.velocity = Vector2.zero;
+    }
+
+    private void ApplyScrollForClosed(int closedCount)
+    {
+        if (scrollRect == null) return;
+
+        // 과거(Closed): 5개 이상일 때만 휠 스크롤 ON
+        bool canScroll = closedCount >= closedScrollThreshold;
+
+        scrollRect.vertical = canScroll;
+        scrollRect.horizontal = false;
+        scrollRect.velocity = Vector2.zero;
+    }
+
     // 자식 모두 삭제
     private void ClearChildren(Transform parent)
     {
@@ -373,6 +419,28 @@ public class QuestListController : MonoBehaviour
                 result.Add(q);
         }
         return result;
+    }
+
+    private Coroutine pendingAutoSelect;
+
+    private void RequestAutoSelectTopNextFrame()
+    {
+        if (pendingAutoSelect != null)
+            StopCoroutine(pendingAutoSelect);
+
+        pendingAutoSelect = StartCoroutine(CoAutoSelectTopNextFrame());
+    }
+
+    private System.Collections.IEnumerator CoAutoSelectTopNextFrame()
+    {
+        // 1프레임 기다려서 Setup()/레이아웃 초기화(SetSelected(false))가 다 끝나게 함
+        yield return null;
+
+        var first = FindFirstSlotInChildren();
+        if (first != null)
+            SelectSlot(first, false);
+
+        pendingAutoSelect = null;
     }
 
 }
