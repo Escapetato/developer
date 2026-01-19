@@ -317,7 +317,7 @@ MonoBehaviour:
     - "7\uC77C \uC5F0\uC18D \uC811\uC18D\uD558\uAE30"
     targetCounts: 07000000
     currentCounts: 00000000
-    conditionTypes: 00000000
+    conditionTypes: 0d000000
     conditionItems:
     - {fileID: 0}
     countByAmount: 00
