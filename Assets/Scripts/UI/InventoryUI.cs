@@ -226,35 +226,49 @@ public class InventoryUI : MonoBehaviour
 
     public void OnRealSellClick()
     {
+        // 1. 안전장치
         if (selectedItem == null) return;
 
-        int totalPrice = selectedItem.price * currentSellQuantity;
+        // 2. 판매 로직 실행 전, 데이터를 백업해둠 (혹시 모를 null 방지)
+        ItemData itemToSell = selectedItem;
+        int qtyToSell = currentSellQuantity;
+        int totalPrice = itemToSell.price * qtyToSell;
 
-        InventoryManager.Instance.RemoveItem(selectedItem, currentSellQuantity);
+        // 3. 인벤토리에서 삭제 & 돈 증가
+        InventoryManager.Instance.RemoveItem(itemToSell, qtyToSell);
         PoingManager.Instance.IncreasePoing(totalPrice);
 
-        // 퀘스트 진행도 : 판매 
-        if (QuestManager.Instance != null && selectedItem != null)
+        // 4. 퀘스트 진행도 알림 (백업해둔 itemToSell 사용)
+        if (QuestManager.Instance != null)
         {
-            // 작물만 카운트
-            if (selectedItem.itemCategory == "Crop")
+            if (itemToSell.itemCategory == "Crop")
             {
-                QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, selectedItem, currentSellQuantity);
+                QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, itemToSell, qtyToSell);
             }
         }
 
+        // 5. 알림창 띄우기
         UIManager.Instance.ShowAlertPopup($"판매 완료! (+{totalPrice} 포잉)");
         SoundManager.Instance.PlaySFX("button");
 
+        // 6. 팝업 닫고 UI 다시 그리기
         CloseSellPopup();
         RedrawInventory();
+        // 주의: 여기서 아이템이 0개가 되면 RedrawInventory 안에서 selectedItem이 null로 바뀔 수 있음!
 
-        if (InventoryManager.Instance.items.ContainsKey(selectedItem))
+        // ▼▼▼ [수정된 부분] 순서와 조건을 안전하게 변경 ▼▼▼
+
+        // selectedItem이 살아있고(null이 아니고), 인벤토리에도 남아있다면 -> 정보창 갱신
+        if (selectedItem != null && InventoryManager.Instance.items.ContainsKey(selectedItem))
+        {
             UpdateDetailPanel(selectedItem);
+        }
         else
+        {
+            // 아이템을 다 팔아서 없어졌거나 null이 됐다면 -> 선택 해제
             ClearSelection();
+        }
     }
-
     public void CloseSellPopup()
     {
         if (sellPopupObject != null) sellPopupObject.SetActive(false);

@@ -57,10 +57,15 @@ public class InventoryManager : MonoBehaviour
         OnInventoryChanged?.Invoke();
         Debug.Log(item.itemName + " " + amount + "개 추가됨.");
 
-        // ▼▼▼ [추가] 아이템 먹었으니 저장! ▼▼▼
+        // ▼▼▼ [추가] 아이템을 먹었으면 도감 매니저에게 알려줘야 함
+        if (GameProgressionManager.Instance != null)
+        {
+            GameProgressionManager.Instance.UnlockItem(item);
+        }
+        // ▲▲▲ 추가 끝 ▲▲▲
+
         SaveToDB();
     }
-
     public void RemoveItem(ItemData item, int amount)
     {
         if (items.ContainsKey(item))

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: QuestDatabase
   m_EditorClassIdentifier: 
   quests:
-  - key: 1
+  - key: 101
     title: "\uB3C4\uB9DD\uAC04 \uAC10\uC790 "
     type: 0
     questDesc: "\uC774\uC6C3\uC9D1 \uB18D\uBD80\uAC00 \uB2E4\uAE09\uD558\uAC8C \uB6F0\uC5B4\uC654\uB2E4.\n\"\uC81C\uAC00
@@ -40,13 +40,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 0
     rewardPoing: 0
-    nextKey: 2
+    nextKey: 102
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 2
+  - key: 102
     title: "\uC6B8\uD241\uBD88\uD241 \uBA4B\uC9C4 \uBAB8\uB9E4\uC5D0"
     type: 0
     questDesc: "\uC6B8\uD241\uBD88\uD241 \uBA4B\uC9C4 \uBAB8\uB9E4\uC5D0 \uBE68\uAC04
@@ -73,13 +73,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 1
     rewardPoing: 0
-    nextKey: 3
+    nextKey: 103
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 3
+  - key: 103
     title: "\uB108\uB9C8\uB298 \uC0AC\uB791\uD55C\uB2E4 \uD588\uC796\uC544 "
     type: 0
     questDesc: "\uCE5C\uD558\uAC8C \uC9C0\uB0B4\uB358 \uCE5C\uAD6C\uAC00 \uC5C9\uC5C9
@@ -107,13 +107,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 0
     rewardPoing: 0
-    nextKey: 4
+    nextKey: 104
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 4
+  - key: 104
     title: "\uC62C \uB54C \uBA54\uB85C\uB098 "
     type: 0
     questDesc: "\uC678\uCD9C \uC900\uBE44\uB97C \uD558\uACE0 \uC788\uB294 \uB2F9\uC2E0\uC5D0\uAC8C
@@ -138,13 +138,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 1
     rewardPoing: 0
-    nextKey: 5
+    nextKey: 105
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 5
+  - key: 105
     title: "\uC7AD\uC758 \uB4F1\uBD88 "
     type: 0
     questDesc: "\uC61B\uB0A0, \uB9C8\uC744\uC5D0\uB294 \uC545\uB9C8\uAE4C\uC9C0 \uC18D\uC600\uB2E4\uB294
@@ -173,13 +173,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 0
     rewardPoing: 0
-    nextKey: 6
+    nextKey: 106
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 6
+  - key: 106
     title: "\uC18C\uC6D0\uC744 \uB4E4\uC5B4\uC8FC\uB294 \uBCC4\uB2D8"
     type: 0
     questDesc: "\uB18D\uC7A5 \uB9C8\uC744\uC5D4 '\uBCC4\uB2D8\uC5D0\uAC8C \uC18C\uC6D0\uC744
@@ -213,7 +213,7 @@ MonoBehaviour:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 1
+  - key: 201
     title: "\uD1A0\uB9C8\uD1A0 \uC528\uC557 \uD574\uAE08"
     type: 1
     questDesc: "\uC2F1\uADF8\uB7FD\uACE0 \uBD89\uC740 \uD1A0\uB9C8\uD1A0\uB97C \uB9CC\uB098\uB824\uBA74
@@ -237,13 +237,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 1
     rewardPoing: 100
-    nextKey: 2
+    nextKey: 202
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 2
+  - key: 202
     title: "\uB9C8\uB298 \uC528\uC557 \uD574\uAE08"
     type: 1
     questDesc: "\uAC15\uD55C \uD5A5\uC744 \uC9C0\uB2CC \uB9C8\uB298\uC744 \uC7AC\uBC30\uD558\uB824\uBA74
@@ -266,13 +266,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 1
     rewardPoing: 100
-    nextKey: 3
+    nextKey: 203
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 3
+  - key: 203
     title: "\uBA5C\uB860 \uC528\uC557 \uD574\uAE08"
     type: 1
     questDesc: "\uB2EC\uCF64\uD55C \uBA5C\uB860\uC744 \uB4E4\uC5EC\uC624\uB824\uBA74
@@ -296,13 +296,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 1
     rewardPoing: 200
-    nextKey: 4
+    nextKey: 204
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 4
+  - key: 204
     title: "\uD638\uBC15 \uC528\uC557 \uD574\uAE08"
     type: 1
     questDesc: "\uB4E0\uB4E0\uD55C \uD638\uBC15\uC740 \uC131\uC2E4\uD55C \uB18D\uBD80\uC5D0\uAC8C\uB9CC
@@ -325,13 +325,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 1
     rewardPoing: 200
-    nextKey: 5
+    nextKey: 205
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 5
+  - key: 205
     title: "\uACE0\uCD94 \uC528\uC557 \uD574\uAE08 "
     type: 1
     questDesc: "\uB728\uAC70\uC6B4 \uC131\uACA9\uC758 \uACE0\uCD94\uB294 \uBA4B\uC9C4
@@ -354,13 +354,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 1
     rewardPoing: 400
-    nextKey: 6
+    nextKey: 206
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 6
+  - key: 206
     title: "\uC0AC\uD0D5\uC218\uC218 \uC528\uC557 \uD574\uAE08"
     type: 1
     questDesc: "\uB2EC\uCF64\uD55C \uC0AC\uD0D5\uC218\uC218\uB97C \uB9CC\uB098\uB824\uBA74,
@@ -383,13 +383,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 1
     rewardPoing: 400
-    nextKey: 7
+    nextKey: 207
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 7
+  - key: 207
     title: "\uC544\uC2A4\uD30C\uB77C\uAC70\uC2A4 \uC528\uC557 \uD574\uAE08"
     type: 1
     questDesc: "\uBC14\uB78C\uC5D0 \uB178\uB798\uB97C \uC2E3\uB294 \uC544\uC2A4\uD30C\uB77C\uAC70\uC2A4\uB294
@@ -412,13 +412,13 @@ MonoBehaviour:
     rewardKey: 0
     rewardAmount: 1
     rewardPoing: 650
-    nextKey: 8
+    nextKey: 208
     dailyDifficulty: 0
     dailyTargets:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 8
+  - key: 208
     title: "\uC6A9\uACFC \uC528\uC557 \uD574\uAE08 "
     type: 1
     questDesc: "\uBC24\uD558\uB298\uCC98\uB7FC \uC2E0\uBE44\uB85C\uC6B4 \uC6A9\uACFC\uB294
@@ -448,7 +448,7 @@ MonoBehaviour:
       lowTarget: 1
       mediumTarget: 1
       highTarget: 1
-  - key: 1
+  - key: 301
     title: "\uC791\uBB3C \uC2EC\uAE30"
     type: 2
     questDesc: 
@@ -473,7 +473,7 @@ MonoBehaviour:
       lowTarget: 10
       mediumTarget: 15
       highTarget: 20
-  - key: 2
+  - key: 302
     title: "\uC791\uBB3C \uC218\uD655\uD558\uAE30"
     type: 2
     questDesc: 
@@ -498,7 +498,7 @@ MonoBehaviour:
       lowTarget: 5
       mediumTarget: 10
       highTarget: 15
-  - key: 3
+  - key: 303
     title: "\uC791\uBB3C \uD310\uB9E4\uD558\uAE30"
     type: 2
     questDesc: 
@@ -523,7 +523,7 @@ MonoBehaviour:
       lowTarget: 1
       mediumTarget: 3
       highTarget: 5
-  - key: 4
+  - key: 304
     title: "\uC791\uBB3C \uC9C4\uD654 \uC131\uACF5\uD558\uAE30"
     type: 2
     questDesc: 
@@ -548,7 +548,7 @@ MonoBehaviour:
       lowTarget: 1
       mediumTarget: 3
       highTarget: 5
-  - key: 5
+  - key: 305
     title: "\uC791\uBB3C \uC9C4\uD654 \uC2E4\uD328\uD558\uAE30"
     type: 2
     questDesc: 
@@ -573,7 +573,7 @@ MonoBehaviour:
       lowTarget: 1
       mediumTarget: 3
       highTarget: 5
-  - key: 6
+  - key: 306
     title: "\uBE44\uB8CC \uC8FC\uC785\uD558\uAE30"
     type: 2
     questDesc: 
@@ -598,7 +598,7 @@ MonoBehaviour:
       lowTarget: 1
       mediumTarget: 3
       highTarget: 5
-  - key: 7
+  - key: 307
     title: "\uC791\uBB3C \uC528\uC557 \uAD6C\uB9E4\uD558\uAE30"
     type: 2
     questDesc: 
@@ -623,7 +623,7 @@ MonoBehaviour:
       lowTarget: 10
       mediumTarget: 15
       highTarget: 20
-  - key: 8
+  - key: 308
     title: "\uBB3C\uC57D \uAD6C\uB9E4\uD558\uAE30"
     type: 2
     questDesc: 

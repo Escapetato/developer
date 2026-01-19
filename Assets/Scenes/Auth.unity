@@ -205,54 +205,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding: {x: -8, y: -5, z: -8, w: -5}
   m_Softness: {x: 0, y: 0}
---- !u!1 &249668343
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 249668344}
-  - component: {fileID: 249668345}
-  m_Layer: 0
-  m_Name: InventoryManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &249668344
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 249668343}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1460846529}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &249668345
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 249668343}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad97c9de2bdb2234da2b85a552769d8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  testItem: {fileID: 11400000, guid: eaa77d76b2039774c9230adfceb61aca, type: 2}
-  testPotion: {fileID: 11400000, guid: a9f2d6e5448e4da4ea36a85ad9d00154, type: 2}
-  SeedItem: {fileID: 11400000, guid: c81eda962970b497cb2d43d1ac3b0ffd, type: 2}
-  FertilizerItem: {fileID: 0}
 --- !u!1 &340147658
 GameObject:
   m_ObjectHideFlags: 0
@@ -1632,51 +1584,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 885109084}
   m_CullTransparentMesh: 1
---- !u!1 &941929402
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 941929403}
-  - component: {fileID: 941929404}
-  m_Layer: 0
-  m_Name: PoingManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &941929403
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 941929402}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1460846529}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &941929404
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 941929402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bc1431e60e861d4a9935a0f0b616f34, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentPoing: 500
 --- !u!1 &944126232
 GameObject:
   m_ObjectHideFlags: 0
@@ -2518,56 +2425,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1206257470}
   m_CullTransparentMesh: 1
---- !u!1 &1228410593
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1228410594}
-  - component: {fileID: 1228410595}
-  m_Layer: 0
-  m_Name: GameProgressionManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1228410594
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1228410593}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1460846529}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1228410595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1228410593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4156c2c151d0e4248aa8a2ec4a696bb0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isShopUnlocked: 0
-  startingItems:
-  - {fileID: 11400000, guid: c750a806cdddfa54db1a5ac00afb8b69, type: 2}
-  - {fileID: 11400000, guid: c1edb44d15c8f3a4199d472ece42d97c, type: 2}
-  - {fileID: 11400000, guid: eaa77d76b2039774c9230adfceb61aca, type: 2}
-  - {fileID: 11400000, guid: a9f2d6e5448e4da4ea36a85ad9d00154, type: 2}
 --- !u!1 &1245391352
 GameObject:
   m_ObjectHideFlags: 0
@@ -2990,6 +2847,7 @@ MonoBehaviour:
   itemAcquiredConfirmButton: {fileID: 0}
   poingBarRect: {fileID: 0}
   poingBarOriginalParent: {fileID: 0}
+  mainToolUI: {fileID: 0}
   seedPopup: {fileID: 0}
   fertilizerPopup: {fileID: 0}
 --- !u!4 &1460846529
@@ -3005,9 +2863,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 941929403}
-  - {fileID: 249668344}
-  - {fileID: 1228410594}
   - {fileID: 340147662}
   - {fileID: 944126233}
   - {fileID: 467896408}
