@@ -25,6 +25,11 @@ public class QuestManager : MonoBehaviour
     // 한 플레이 세션에서 한 번만 초기화 
     private bool initialized = false;
 
+    // ===== [Login Streak] =====
+    private const int LOGIN_META_KEY = -999999;  // 세이브에 묻혀 저장할 "메타 퀘스트" key (절대 겹치지 않는 값)
+    private bool _loginStreakAppliedThisSession = false;
+    private int _loginStreak = 0;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -47,7 +52,8 @@ public class QuestManager : MonoBehaviour
         BuildQuestLists();
         InitializeQuestStates();
         OpenInitialSlots();
-        RebuildActiveConditionIndex(); 
+        RebuildActiveConditionIndex();
+        TryApplyLoginStreakAfterLoad();
 
 
         Debug.Log($"[QuestManager] 초기 슬롯 오픈 완료 - " +
@@ -118,7 +124,38 @@ public class QuestManager : MonoBehaviour
             allQuestList.Add(CloneQuest(q)); // DB 원본 건드리지 않고 클론해서 사용
         }
 
+        EnsureLoginMetaQuest();
         Debug.Log($"[QuestManager] QuestDatabase에서 {allQuestList.Count}개 퀘스트 로드.");
+    }
+
+    // 데이터 로그 이벤트 인식
+    private void EnsureLoginMetaQuest()
+    {
+        if (allQuestList.Exists(q => q != null && q.key == LOGIN_META_KEY)) return;
+
+        var meta = new QuestData();
+        meta.key = LOGIN_META_KEY;
+
+        // BuildQuestLists()에서 Main/Sub/Daily만 분류하니까
+        // enum에 없는 값(-1)을 넣으면 어떤 리스트에도 안 들어가서 UI에 절대 안 뜸.
+        meta.type = (QuestType)(-1);
+
+        // Active로 되면 바인딩 인덱스에 걸릴 수 있으니 Closed로 고정
+        meta.state = QuestState.Closed;
+
+        meta.title = "[META] LoginStreak";
+        meta.questDesc = "Do not show";
+        meta.currentCount = 0;       // 여기 하나에 날짜+streak를 인코딩해서 저장
+        meta.rewardClaimed = false;
+
+        meta.conditionTexts = null;
+        meta.targetCounts = null;
+        meta.currentCounts = null;
+        meta.conditionTypes = null;
+        meta.conditionItems = null;
+        meta.countByAmount = null;
+
+        allQuestList.Add(meta);
     }
 
     // 퀘스트 타입 분류 + KEY 기준 오름차순 정렬  
@@ -160,6 +197,7 @@ public class QuestManager : MonoBehaviour
         foreach (var q in allQuestList)
         {
             if (q == null) continue;
+            if (q.key == LOGIN_META_KEY) continue; // 메타는 초기화(0으로 리셋)하면 안 됨
 
             if (q.state == QuestState.Closed)
             {
@@ -289,6 +327,7 @@ public class QuestManager : MonoBehaviour
         // 상태가 변경되었으니 슬롯 갱신 시도
         OpenInitialSlots();
         RebuildActiveConditionIndex();
+        TryApplyLoginStreakAfterLoad();
         Debug.Log("퀘스트 상태 복구 완료");
     }
     public event Action OnQuestChanged;
@@ -637,5 +676,120 @@ public class QuestManager : MonoBehaviour
             }
         }
     }
+
+    private void TryApplyLoginStreakAfterLoad()
+    {
+        Debug.Log("[LoginStreak] TryApplyLoginStreakAfterLoad CALLED");
+
+        if (_loginStreakAppliedThisSession) return;
+        _loginStreakAppliedThisSession = true;
+
+        // 메타 퀘스트에서 저장값 읽기
+        var meta = allQuestList.Find(q => q != null && q.key == LOGIN_META_KEY);
+        if (meta == null)
+        {
+            Debug.LogWarning("[LoginStreak] meta quest missing");
+            return;
+        }
+
+        // packed = yyyymmdd * 100 + streak (streak 0~99)
+        int packed = meta.currentCount;
+
+        int lastYmd = packed / 100;
+        int streak = packed % 100;
+
+        int todayYmd = int.Parse(DateTime.Now.ToString("yyyyMMdd"));
+
+        if (lastYmd == todayYmd)
+        {
+            _loginStreak = streak;
+            ApplyLoginStreakToQuests(_loginStreak);
+            return;
+        }
+
+        DateTime today = DateTime.Now.Date;
+        DateTime lastDate = ParseYmd(lastYmd);
+
+        int diff = (today - lastDate).Days;
+
+        if (diff == 1) streak = Mathf.Min(99, streak + 1);
+        else streak = 1;
+
+        _loginStreak = streak;
+
+        // 메타 갱신(= 다음 로그인 비교 기준)
+        meta.currentCount = todayYmd * 100 + _loginStreak;
+
+        // 퀘스트 반영
+        ApplyLoginStreakToQuests(_loginStreak);
+
+        // DBManager.Instance 접근 방식은 프로젝트에 맞게 조정 필요
+        // Singleton이면 Instance, 아니면 FindObjectOfType
+        var db = FindObjectOfType<DBManager>();
+        var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+        if (db != null && auth != null && auth.CurrentUser != null)
+        {
+            db.SaveAllData(auth.CurrentUser.UserId);
+            Debug.Log($"[LoginStreak] saved. ymd={todayYmd} streak={_loginStreak}");
+        }
+        else
+        {
+            Debug.LogWarning("[LoginStreak] Save skipped (db/auth/user missing)");
+        }
+    }
+
+    private DateTime ParseYmd(int ymd)
+    {
+        if (ymd <= 0) return DateTime.MinValue.Date;
+
+        int y = ymd / 10000;
+        int m = (ymd / 100) % 100;
+        int d = ymd % 100;
+
+        try { return new DateTime(y, m, d).Date; }
+        catch { return DateTime.MinValue.Date; }
+    }
+
+    // 로그인 진행도 반영 함수 
+    private void ApplyLoginStreakToQuests(int streak)
+    {
+        if (_activeBindings.TryGetValue(QuestConditionType.LoginStreak, out var list) == false
+            || list == null || list.Count == 0)
+        {
+            Debug.Log($"[LoginStreak] no active binding. streak={streak}");
+            return;
+        }
+
+        bool changed = false;
+
+        foreach (var b in list)
+        {
+            var q = b.quest;
+            int i = b.index;
+            if (q == null || q.state != QuestState.Active) continue;
+
+            EnsureConditionArrays(q);
+
+            int target = q.targetCounts[i];
+            int newValue = Mathf.Clamp(streak, 0, target);
+
+            if (q.currentCounts[i] != newValue)
+            {
+                q.currentCounts[i] = newValue;
+                if (q.targetCounts.Length == 1) q.currentCount = q.currentCounts[0];
+                changed = true;
+            }
+
+            if (IsCompletedByCounts(q) && q.state == QuestState.Active)
+            {
+                q.state = QuestState.Completed;
+                changed = true;
+            }
+        }
+
+        if (changed)
+            OnQuestChanged?.Invoke();
+    }
+
 
 }
