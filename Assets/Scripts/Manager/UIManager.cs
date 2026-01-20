@@ -136,6 +136,8 @@ public class UIManager : MonoBehaviour
             SoundManager.Instance.PlaySFX("button"); // 
         }
 
+        isSeedPopupOpen = false;
+
         // 3. [기능] 실제로 팝업들 끄기
         if (fertilizerPopup != null) fertilizerPopup.SetActive(false);
         if (inventoryPopup != null) inventoryPopup.SetActive(false);
