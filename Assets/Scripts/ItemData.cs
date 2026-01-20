@@ -28,6 +28,7 @@ public class ItemData : ScriptableObject
     public float growTime;         // 실제 로직용 시간 (초)
     public ItemData harvestItem;   // 수확물
     public int requiredToolTier = 1;
+    public Sprite readyFieldSprite;
 
     [Header("도감 표시용 정보 (UI)")]
     public string growTimeDisplay = "1분";    // 예: "10분", "30초"

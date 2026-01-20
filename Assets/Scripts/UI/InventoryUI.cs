@@ -14,27 +14,25 @@ public class InventoryUI : MonoBehaviour
     public ItemData selectedItem { get; private set; }
     public ItemSlot selectedSlot { get; private set; }
 
-    [Header("Details Panel")]
+    [Header("Details Panel UI")]
     public GameObject detailPanelObject;
     public Image detailImage;
     public TextMeshProUGUI detailNameText;
-    public TextMeshProUGUI detailPriceText;
 
-    // ▼▼▼ [추가 1] 수량 텍스트를 연결할 변수 추가 ▼▼▼
-    public TextMeshProUGUI detailQuantityText;
+    // ▼ 가격 대신 '판매 불가' 텍스트를 띄울 곳
+    public TextMeshProUGUI detailTotalPriceText;
 
-    public Button openSellPopupButton;
+    // ▼ 현재 보유 수량 표시
+    public TextMeshProUGUI detailOwnedCountText;
+
+    // ▼ 수량 조절 버튼들
+    public Button decreaseButton;
+    public Button increaseButton;
+    public TextMeshProUGUI quantityText;
+
+    // ▼ 판매 버튼
+    public Button sellButton;
     public TextMeshProUGUI sellButtonText;
-
-    [Header("Sell Popup Settings")]
-    public GameObject sellPopupObject;
-    public Image popupItemIcon;
-    public TextMeshProUGUI popupNameText;
-    public Slider popupSlider;
-    public TextMeshProUGUI popupCountText;
-    public TextMeshProUGUI popupPriceText;
-    public Button popupConfirmButton;
-    public Button popupCancelButton;
 
     [Header("Category Buttons")]
     public List<CategoryButton> categoryButtons;
@@ -52,30 +50,22 @@ public class InventoryUI : MonoBehaviour
         slotParent.GetComponentsInChildren<ItemSlot>(slots);
 
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
-        if (sellPopupObject != null) sellPopupObject.SetActive(false);
 
-        if (openSellPopupButton != null)
+        // 버튼 리스너 연결
+        if (decreaseButton != null)
         {
-            openSellPopupButton.onClick.RemoveAllListeners();
-            openSellPopupButton.onClick.AddListener(OnOpenSellPopupClick);
+            decreaseButton.onClick.RemoveAllListeners();
+            decreaseButton.onClick.AddListener(OnDecreaseQuantity);
         }
-
-        if (popupSlider != null)
+        if (increaseButton != null)
         {
-            popupSlider.onValueChanged.RemoveAllListeners();
-            popupSlider.onValueChanged.AddListener(OnSliderValueChanged);
+            increaseButton.onClick.RemoveAllListeners();
+            increaseButton.onClick.AddListener(OnIncreaseQuantity);
         }
-
-        if (popupConfirmButton != null)
+        if (sellButton != null)
         {
-            popupConfirmButton.onClick.RemoveAllListeners();
-            popupConfirmButton.onClick.AddListener(OnRealSellClick);
-        }
-
-        if (popupCancelButton != null)
-        {
-            popupCancelButton.onClick.RemoveAllListeners();
-            popupCancelButton.onClick.AddListener(CloseSellPopup);
+            sellButton.onClick.RemoveAllListeners();
+            sellButton.onClick.AddListener(OnRealSellClick);
         }
     }
 
@@ -90,7 +80,6 @@ public class InventoryUI : MonoBehaviour
             currentCategory = "Seed";
             RedrawInventory();
         }
-
         ClearSelection();
     }
 
@@ -118,168 +107,159 @@ public class InventoryUI : MonoBehaviour
             selectedItem = slot.item;
             selectedSlot = slot;
             selectedSlot.SetSelected(true);
+
+            currentSellQuantity = 1;
             UpdateDetailPanel(slot.item);
         }
         else ClearSelection();
     }
 
+    // ▼▼▼ [수정됨] UI 갱신 로직 ▼▼▼
     private void UpdateDetailPanel(ItemData item)
     {
         if (item != null)
         {
             detailPanelObject.SetActive(true);
 
-            if (openSellPopupButton != null)
-                openSellPopupButton.gameObject.SetActive(true);
-
+            // 기본 정보 표시 (아이콘, 이름)
             if (detailImage != null) detailImage.sprite = item.itemIcon;
             if (detailNameText != null) detailNameText.text = item.itemName;
 
-            // ▼▼▼ [추가 2] 현재 보유 개수 가져와서 텍스트 갱신 ▼▼▼
+            // 보유 수량 표시 (항상 표시)
             int myCount = 0;
             if (InventoryManager.Instance.items.ContainsKey(item))
-            {
                 myCount = InventoryManager.Instance.items[item];
-            }
 
-            if (detailQuantityText != null)
+            if (detailOwnedCountText != null)
+                detailOwnedCountText.text = myCount.ToString();
+
+            // 판매 버튼 일단 켜두기 (위치 잡기용)
+            if (sellButton != null) sellButton.gameObject.SetActive(true);
+
+            // ------------------------------------------------
+            // [분기점] 작물(Crop) vs 그 외
+            // ------------------------------------------------
+            if (item.itemCategory == "Crop")
             {
-                // 예: "5" 또는 "보유 수량: 5" 등 원하는 대로 수정 가능
-                detailQuantityText.text = myCount.ToString();
-            }
-            // ▲▲▲ 추가 완료 ▲▲▲
+                // 1. 수량 조절 버튼 활성화
+                SetQuantityControlsActive(true);
 
+                // 2. 가격 및 수량 텍스트 정상 갱신
+                UpdateQuantityUI();
 
-            // 1. 도구(Tool)인지 확인
-            if (item.itemCategory == "Tool")
-            {
-                if (detailPriceText != null)
-                    detailPriceText.gameObject.SetActive(false);
-
-                if (openSellPopupButton != null)
+                // 3. 판매 버튼 활성화 (보유량이 있을 때만 클릭 가능)
+                if (sellButton != null)
                 {
-                    openSellPopupButton.interactable = false;
-                    if (sellButtonText != null) sellButtonText.text = "보유 중";
+                    sellButton.interactable = (myCount > 0);
+                    if (sellButtonText != null) sellButtonText.text = $"{currentSellQuantity}개 판매";
                 }
             }
             else
             {
-                if (detailPriceText != null)
+                // [작물이 아님 -> 판매 불가]
+
+                // 1. 수량 조절 버튼(<, >)과 숫자 숨기기
+                if (decreaseButton != null) decreaseButton.gameObject.SetActive(false);
+                if (increaseButton != null) increaseButton.gameObject.SetActive(false);
+                if (quantityText != null) quantityText.gameObject.SetActive(false);
+
+                // 2. [요청사항] 포잉(가격) 텍스트에 "판매 불가" 띄우기
+                if (detailTotalPriceText != null)
                 {
-                    detailPriceText.gameObject.SetActive(true);
-                    detailPriceText.text = item.price.ToString();
+                    detailTotalPriceText.gameObject.SetActive(true); // 텍스트는 켜고
+                    detailTotalPriceText.text = "판매 불가";         // 내용을 변경
                 }
 
-                if (openSellPopupButton != null)
+                // 3. [요청사항] 판매 버튼은 보이지만 "판매 불가"로 변경
+                if (sellButton != null)
                 {
-                    openSellPopupButton.interactable = (myCount > 0);
-                    if (sellButtonText != null) sellButtonText.text = "판매";
+                    sellButton.interactable = false; // 클릭 금지
+                    if (sellButtonText != null) sellButtonText.text = "판매 불가";
                 }
             }
         }
     }
 
-    public void OnOpenSellPopupClick()
+    // 수량 조절 버튼 활성/비활성 헬퍼 함수
+    private void SetQuantityControlsActive(bool isActive)
+    {
+        if (decreaseButton != null) decreaseButton.gameObject.SetActive(isActive);
+        if (increaseButton != null) increaseButton.gameObject.SetActive(isActive);
+        if (quantityText != null) quantityText.gameObject.SetActive(isActive);
+
+        // 가격 텍스트는 위에서 따로 제어하므로 여기서는 켜줍니다.
+        if (detailTotalPriceText != null) detailTotalPriceText.gameObject.SetActive(true);
+    }
+
+    public void OnDecreaseQuantity()
+    {
+        if (currentSellQuantity > 1)
+        {
+            currentSellQuantity--;
+            UpdateQuantityUI();
+        }
+    }
+
+    public void OnIncreaseQuantity()
     {
         if (selectedItem == null) return;
-        if (selectedItem.itemCategory == "Tool") return;
+        int myCount = InventoryManager.Instance.GetItemCount(selectedItem);
 
-        int ownedCount = 0;
-        if (InventoryManager.Instance.items.ContainsKey(selectedItem))
-            ownedCount = InventoryManager.Instance.items[selectedItem];
-
-        if (ownedCount <= 0) return;
-
-        sellPopupObject.SetActive(true);
-
-        if (popupItemIcon != null) popupItemIcon.sprite = selectedItem.itemIcon;
-        if (popupNameText != null) popupNameText.text = selectedItem.itemName;
-
-        if (popupSlider != null)
+        if (currentSellQuantity < myCount)
         {
-            popupSlider.minValue = 1;
-            popupSlider.maxValue = ownedCount;
-            popupSlider.value = 1;
-            currentSellQuantity = 1;
+            currentSellQuantity++;
+            UpdateQuantityUI();
         }
-
-        UpdatePopupTexts();
     }
 
-    public void OnSliderValueChanged(float value)
+    private void UpdateQuantityUI()
     {
-        currentSellQuantity = (int)value;
-        UpdatePopupTexts();
-    }
+        if (selectedItem == null) return;
 
-    private void UpdatePopupTexts()
-    {
-        if (popupCountText != null)
-            popupCountText.text = currentSellQuantity.ToString();
+        // 수량 텍스트
+        if (quantityText != null) quantityText.text = currentSellQuantity.ToString();
 
-        if (selectedItem != null && popupPriceText != null)
-        {
-            int total = selectedItem.price * currentSellQuantity;
-            popupPriceText.text = total.ToString() + " 포잉";
-        }
+        // 가격 계산
+        int totalEarnings = selectedItem.price * currentSellQuantity;
+
+        // 가격 텍스트
+        if (detailTotalPriceText != null) detailTotalPriceText.text = totalEarnings.ToString();
+
+        // 버튼 텍스트
+        if (sellButtonText != null) sellButtonText.text = $"{currentSellQuantity}개 판매";
     }
 
     public void OnRealSellClick()
     {
-        // 1. 안전장치
         if (selectedItem == null) return;
+        if (selectedItem.itemCategory != "Crop") return;
 
-        // 2. 판매 로직 실행 전, 데이터를 백업해둠 (혹시 모를 null 방지)
-        ItemData itemToSell = selectedItem;
-        int qtyToSell = currentSellQuantity;
-        int totalPrice = itemToSell.price * qtyToSell;
+        int totalEarnings = selectedItem.price * currentSellQuantity;
 
-        // 3. 인벤토리에서 삭제 & 돈 증가
-        InventoryManager.Instance.RemoveItem(itemToSell, qtyToSell);
-        PoingManager.Instance.IncreasePoing(totalPrice);
+        InventoryManager.Instance.RemoveItem(selectedItem, currentSellQuantity);
+        PoingManager.Instance.IncreasePoing(totalEarnings);
 
-        // 4. 퀘스트 진행도 알림 (백업해둔 itemToSell 사용)
         if (QuestManager.Instance != null)
+            QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, selectedItem, currentSellQuantity);
+
+        UIManager.Instance.ShowAlertPopup($"판매 완료! (+{totalEarnings} 포잉)");
+        SoundManager.Instance.PlaySFX("Money");
+
+        if (InventoryManager.Instance.GetItemCount(selectedItem) > 0)
         {
-            if (itemToSell.itemCategory == "Crop")
-            {
-                QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, itemToSell, qtyToSell);
-            }
-        }
-
-        // 5. 알림창 띄우기
-        UIManager.Instance.ShowAlertPopup($"판매 완료! (+{totalPrice} 포잉)");
-        SoundManager.Instance.PlaySFX("button");
-
-        // 6. 팝업 닫고 UI 다시 그리기
-        CloseSellPopup();
-        RedrawInventory();
-        // 주의: 여기서 아이템이 0개가 되면 RedrawInventory 안에서 selectedItem이 null로 바뀔 수 있음!
-
-        // ▼▼▼ [수정된 부분] 순서와 조건을 안전하게 변경 ▼▼▼
-
-        // selectedItem이 살아있고(null이 아니고), 인벤토리에도 남아있다면 -> 정보창 갱신
-        if (selectedItem != null && InventoryManager.Instance.items.ContainsKey(selectedItem))
-        {
+            currentSellQuantity = 1;
             UpdateDetailPanel(selectedItem);
         }
         else
         {
-            // 아이템을 다 팔아서 없어졌거나 null이 됐다면 -> 선택 해제
             ClearSelection();
         }
-    }
-    public void CloseSellPopup()
-    {
-        if (sellPopupObject != null) sellPopupObject.SetActive(false);
-        SoundManager.Instance.PlaySFX("button");
     }
 
     private void RedrawInventory()
     {
         Dictionary<ItemData, int> allItems = InventoryManager.Instance.items;
         int i = 0;
-
         foreach (KeyValuePair<ItemData, int> itemPair in allItems)
         {
             if (itemPair.Key.itemCategory == currentCategory)
@@ -288,22 +268,16 @@ public class InventoryUI : MonoBehaviour
                 {
                     slots[i].gameObject.SetActive(true);
                     slots[i].SetSlot(itemPair.Key, itemPair.Value);
-
-                    if (selectedSlot == slots[i])
-                    {
-                        selectedSlot.SetSelected(true);
-                    }
+                    if (selectedSlot == slots[i]) selectedSlot.SetSelected(true);
                     i++;
                 }
             }
         }
-
         for (int j = i; j < slots.Count; j++)
         {
             slots[j].ClearSlot();
             slots[j].gameObject.SetActive(false);
         }
-
         if (i == 0) ClearSelection();
     }
 
@@ -313,6 +287,6 @@ public class InventoryUI : MonoBehaviour
         selectedItem = null;
         selectedSlot = null;
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
-        if (openSellPopupButton != null) openSellPopupButton.gameObject.SetActive(false);
+        if (sellButton != null) sellButton.gameObject.SetActive(false);
     }
 }
