@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // [필수] TextMeshPro 사용을 위해 네임스페이스 추가
+using TMPro;
+using UnityEngine.EventSystems;
 
 // 게임 내 모든 UI 팝업과 알림창을 중앙에서 관리하는 매니저 클래스
 public class UIManager : MonoBehaviour
@@ -67,7 +68,7 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        CloseAllPopups(); 
+        CloseAllPopups();
 
         // 안전장치: 알림창들이 켜져 있다면 강제로 끔
         if (alertPopup != null) alertPopup.SetActive(false);
@@ -166,7 +167,8 @@ public class UIManager : MonoBehaviour
         alertCloseButton.onClick.RemoveAllListeners();
 
         // '확인' 버튼 누르면 팝업 꺼지도록 설정
-        alertCloseButton.onClick.AddListener(() => {
+        alertCloseButton.onClick.AddListener(() =>
+        {
             alertPopup.SetActive(false);
         });
 
@@ -285,14 +287,14 @@ public class UIManager : MonoBehaviour
             seedPopup.SetActive(true);
             seedPopup.GetComponent<SeedPopupUI>()?.RefreshButtons(field);
         }
-        
+
         isSeedPopupOpen = true;
     }
     public void OpenFertilizerPopup(Field field)
     {
         CloseAllPopups(); // 다른 모든 팝업 닫기
         currentField = field;
-        
+
         if (fertilizerPopup != null)
         {
             fertilizerPopup.SetActive(true);
@@ -349,43 +351,91 @@ public class UIManager : MonoBehaviour
         // 다시 켜기
         poingBarRect.gameObject.SetActive(true);
     }
+
+    // ▼▼▼ [추가] 연구실에서 도감으로 바로 이동할 때 사용하는 함수 ▼▼▼
+    public void OpenCollectionPanel(ItemData targetItem = null)
+    {
+        // 1. 모든 팝업 닫기
+        CloseAllPopups();
+
+        // 2. 연구실 창 확실히 끄기 (변수명 수정됨: researchLabPanel -> researchLabPopup)
+        if (researchLabPopup != null)
+        {
+            researchLabPopup.SetActive(false);
+        }
+
+        // 3. 도감 창 켜기
+        if (collectionPopup != null)
+        {
+            collectionPopup.SetActive(true);
+        }
+
+
+        if (targetItem != null)
+        {
+            CollectionUI.Instance.ShowItem(targetItem);
+        }
+    }
+
     void Update()
     {
-        // ▼▼▼ [핵심] 자동 감지 로직 추가 (이것만 넣으면 끝!) ▼▼▼
+        // 1. [툴 UI 자동 감지 로직]
         if (mainToolUI != null)
         {
-            // 1. 메인 팝업 중 하나라도 켜져 있는지 검사
-            bool isAnyPopupOpen = 
+            bool isAnyPopupOpen =
                 (inventoryPopup != null && inventoryPopup.activeSelf) ||
                 (researchLabPopup != null && researchLabPopup.activeSelf) ||
                 (storePopup != null && storePopup.activeSelf) ||
                 (collectionPopup != null && collectionPopup.activeSelf) ||
-                (questPopup != null && questPopup.activeSelf);
+                (questPopup != null && questPopup.activeSelf) ||
+                (seedPopup != null && seedPopup.activeSelf);
 
-            // 2. 팝업이 열려있으면 툴 UI 끄기 / 없으면 켜기 (반대로 설정)
-            // (이미 상태가 맞다면 굳이 SetActive를 또 호출하지 않게 최적화)
             if (mainToolUI.activeSelf == isAnyPopupOpen)
             {
                 mainToolUI.SetActive(!isAnyPopupOpen);
             }
         }
-        // ▲▲▲ 자동 감지 끝 ▲▲▲
 
-
-        // 기존 밭 클릭 로직 (그대로 유지)
-        if (isSeedPopupOpen && Input.GetMouseButtonDown(0)) 
+        // 2. [씨앗 팝업 닫기 로직] - 2D 전용
+        if (isSeedPopupOpen)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
+            // [추가] 마우스 휠(줌) 조작 시 즉시 닫기
+            if (Input.GetAxis("Mouse ScrollWheel") != 0)
             {
-                Field clickedField = hit.collider.GetComponent<Field>();
-                if (clickedField == null)
+                CloseAllPopups();
+                return;
+            }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                // UI(버튼 등)를 눌렀다면 팝업을 닫지 않음
+                if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 {
-                    CloseAllPopups(); 
+                    return;
+                }
+
+                // [2D 핵심] 마우스 클릭 지점의 월드 좌표를 가져옴
+                Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                // 해당 지점에 있는 2D 콜라이더 검사
+                Collider2D hitCollider = Physics2D.OverlapPoint(mousePos);
+
+                if (hitCollider != null)
+                {
+                    Field clickedField = hitCollider.GetComponent<Field>();
+
+                    // 클릭한 대상이 밭(Field)이 아니면 팝업 닫기
+                    if (clickedField == null)
+                    {
+                        CloseAllPopups();
+                    }
+                }
+                else
+                {
+                    // 아무것도 없는 허공을 클릭했을 때도 팝업 닫기
+                    CloseAllPopups();
                 }
             }
         }
     }
+
 }
