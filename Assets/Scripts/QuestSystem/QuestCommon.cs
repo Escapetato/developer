@@ -90,5 +90,8 @@ public enum QuestConditionType
     EvolveSuccessStreak,  // 5연속 성공
 
     // (포잉)
-    SpendPoing       // 골드 소비(금액 누적)
+    SpendPoing,      // 골드 소비(금액 누적)
+
+    // 연속 7일 접속 
+    LoginStreak
 }
