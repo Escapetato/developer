@@ -30500,7 +30500,7 @@ MonoBehaviour:
   - soundName: ev_fail
     clip: {fileID: 8300000, guid: da80d16aef67e435fb048be348440f72, type: 3}
   - soundName: button
-    clip: {fileID: 8300000, guid: b71fe3a17a9b68b4db102b93c8ee3fc4, type: 3}
+    clip: {fileID: 8300000, guid: a0a62882d928645239fea7aff9616ba7, type: 3}
   - soundName: paper
     clip: {fileID: 8300000, guid: 7a756448cc7cd491a978c5489d8a29f4, type: 3}
   - soundName: quest_reward
@@ -33790,7 +33790,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 142242547}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99526477
+  m_Size: 0.9999422
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -52011,7 +52011,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.0005702356, y: 0.00006379571}
+  m_AnchoredPosition: {x: -0.0005702356, y: 0.00043266834}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2056541280
