@@ -135,6 +135,8 @@ public class Field : MonoBehaviour
 
     public void Plant(ItemData seed)
     {
+        SoundManager.Instance.PlaySFX("plant"); // 효과음 추가
+
         plantedSeed = seed;
         remainingTime = seed.growTime;
         fertilizerCount = 0;
@@ -161,12 +163,18 @@ public class Field : MonoBehaviour
     public void Harvest()
     {
         if (currentState != FieldState.Ready) return;
+
         if (HarvestToolManager.Instance.currentToolTier == plantedSeed.requiredToolTier)
         {
+            SoundManager.Instance.PlaySFX("harvest"); // 효과음 추가
             InventoryManager.Instance.AddItem(plantedSeed.harvestItem, 1);
             if (plantInstance != null) Destroy(plantInstance);
             plantedSeed = null;
             SetState(FieldState.Empty);
+        }
+        else
+        {
+            SoundManager.Instance.PlaySFX("harvest_fail"); // 수확 실패시 효과음
         }
     }
 }
