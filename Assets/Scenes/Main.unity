@@ -746,23 +746,19 @@ MonoBehaviour:
   detailPanelObject: {fileID: 1300975826}
   detailImage: {fileID: 105410449}
   detailNameText: {fileID: 119179039}
-  detailPriceText: {fileID: 1661324670}
-  openBuyPopupButton: {fileID: 96921595}
+  detailTotalPriceText: {fileID: 0}
+  detailOwnedText: {fileID: 0}
+  decreaseButton: {fileID: 0}
+  increaseButton: {fileID: 0}
+  quantityText: {fileID: 0}
+  buyButton: {fileID: 0}
+  buyButtonText: {fileID: 1744542016}
   categoryButtons:
   - {fileID: 1949440314}
   - {fileID: 1511574787}
   - {fileID: 1936277092}
   - {fileID: 151754391}
   defaultCategoryButton: {fileID: 1949440314}
-  buyPopupObject: {fileID: 1012030146}
-  popupItemIcon: {fileID: 1891595207}
-  popupNameText: {fileID: 1228821232}
-  popupSlider: {fileID: 714338299}
-  popupCountText: {fileID: 1834150220}
-  popupTotalCostText: {fileID: 1962296543}
-  popupConfirmButton: {fileID: 1936651366}
-  popupCancelButton: {fileID: 153520765}
-  buyButtonText: {fileID: 1744542016}
 --- !u!114 &51677702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2885,10 +2881,47 @@ MonoBehaviour:
   - {fileID: 883518493}
   conditionContainer: {fileID: 1454882242}
   dailyContainerOffsetY: 3.2
-  rewardButtons:
-  - {fileID: 1107564270}
-  - {fileID: 1576614125}
-  - {fileID: 1822279856}
+  dailyRowExtraSpacing: 20
+  rewardButton: {fileID: 0}
+  rewardBoxRoot: {fileID: 0}
+  rewardSlotRoots: []
+  rewardSlotIcons: []
+  rewardSlotTexts: []
+  iconLand: {fileID: 0}
+  iconNat: {fileID: 0}
+  iconSap: {fileID: 0}
+  iconGawi: {fileID: 0}
+  iconLandOff: {fileID: 0}
+  iconNatOff: {fileID: 0}
+  iconSapOff: {fileID: 0}
+  iconGawiOff: {fileID: 0}
+  iconPoing: {fileID: 0}
+  iconFertilizer: {fileID: 0}
+  iconPoingOff: {fileID: 0}
+  iconFertilizerOff: {fileID: 0}
+  potionIcons:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  potionIconsOff:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  defaultItemSprite: {fileID: 0}
+  defaultItemSpriteOff: {fileID: 0}
+  rewardClaimCheckOn: []
+  scrollRect: {fileID: 0}
+  closedScrollThreshold: 5
 --- !u!1 &129340664
 GameObject:
   m_ObjectHideFlags: 0
@@ -5716,8 +5749,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptySprite: {fileID: 21300000, guid: 404bae2896de14736ad381078eda1a87, type: 3}
-  plantedSprite: {fileID: 21300000, guid: 94991a5c528604f1b8668f01172116cc, type: 3}
-  growingSprite: {fileID: 21300000, guid: ff865a5c56eff48649ef27a4c2615414, type: 3}
+  seedSprite: {fileID: 0}
+  youthSprite: {fileID: 0}
+  adultSprite: {fileID: 0}
   readySprite: {fileID: 21300000, guid: e1d78976b670e4972918961055a23ff8, type: 3}
   fieldImage: {fileID: 232139129}
   plantAnchor: {fileID: 1060000464}
@@ -8306,8 +8340,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptySprite: {fileID: 21300000, guid: 404bae2896de14736ad381078eda1a87, type: 3}
-  plantedSprite: {fileID: 21300000, guid: 94991a5c528604f1b8668f01172116cc, type: 3}
-  growingSprite: {fileID: 21300000, guid: ff865a5c56eff48649ef27a4c2615414, type: 3}
+  seedSprite: {fileID: 0}
+  youthSprite: {fileID: 0}
+  adultSprite: {fileID: 0}
   readySprite: {fileID: 21300000, guid: e1d78976b670e4972918961055a23ff8, type: 3}
   fieldImage: {fileID: 333326892}
   plantAnchor: {fileID: 1780616682}
@@ -8459,18 +8494,13 @@ MonoBehaviour:
   detailPanelObject: {fileID: 1528188731}
   detailImage: {fileID: 960825489}
   detailNameText: {fileID: 1352304508}
-  detailPriceText: {fileID: 1982362017}
-  detailQuantityText: {fileID: 1032738178}
-  openSellPopupButton: {fileID: 2128785384}
+  detailTotalPriceText: {fileID: 0}
+  detailOwnedCountText: {fileID: 0}
+  decreaseButton: {fileID: 0}
+  increaseButton: {fileID: 0}
+  quantityText: {fileID: 0}
+  sellButton: {fileID: 0}
   sellButtonText: {fileID: 2003543550}
-  sellPopupObject: {fileID: 965912321}
-  popupItemIcon: {fileID: 1215662340}
-  popupNameText: {fileID: 700532545}
-  popupSlider: {fileID: 757567276}
-  popupCountText: {fileID: 1767668589}
-  popupPriceText: {fileID: 1032323752}
-  popupConfirmButton: {fileID: 359402645}
-  popupCancelButton: {fileID: 859110703}
   categoryButtons:
   - {fileID: 1440637639}
   - {fileID: 581994965}
@@ -10416,8 +10446,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptySprite: {fileID: 21300000, guid: 404bae2896de14736ad381078eda1a87, type: 3}
-  plantedSprite: {fileID: 21300000, guid: 94991a5c528604f1b8668f01172116cc, type: 3}
-  growingSprite: {fileID: 21300000, guid: ff865a5c56eff48649ef27a4c2615414, type: 3}
+  seedSprite: {fileID: 0}
+  youthSprite: {fileID: 0}
+  adultSprite: {fileID: 0}
   readySprite: {fileID: 21300000, guid: e1d78976b670e4972918961055a23ff8, type: 3}
   fieldImage: {fileID: 411979852}
   plantAnchor: {fileID: 565366609}
@@ -10489,6 +10520,8 @@ MonoBehaviour:
   successItemIcon: {fileID: 1076783751}
   successNameText: {fileID: 820259337}
   successMessageText: {fileID: 185591703}
+  successConfirmButton: {fileID: 0}
+  successCollectionButton: {fileID: 0}
   categoryTabs:
   - categoryName: Potion
     buttonObj: {fileID: 1384650006}
@@ -10502,6 +10535,8 @@ MonoBehaviour:
   tabNormalSprite: {fileID: 21300000, guid: 939c5987bca38de4dbe176818fb9cb3e, type: 3}
   tabSelectedColor: {r: 0.41960785, g: 0.24705882, b: 0, a: 1}
   tabNormalColor: {r: 0.98039216, g: 0.9529412, b: 0.90588236, a: 1}
+  loadingPopupObject: {fileID: 0}
+  evolutionDelay: 2
 --- !u!114 &417696661
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12907,8 +12942,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptySprite: {fileID: 21300000, guid: 404bae2896de14736ad381078eda1a87, type: 3}
-  plantedSprite: {fileID: 21300000, guid: 94991a5c528604f1b8668f01172116cc, type: 3}
-  growingSprite: {fileID: 21300000, guid: ff865a5c56eff48649ef27a4c2615414, type: 3}
+  seedSprite: {fileID: 0}
+  youthSprite: {fileID: 0}
+  adultSprite: {fileID: 0}
   readySprite: {fileID: 21300000, guid: e1d78976b670e4972918961055a23ff8, type: 3}
   fieldImage: {fileID: 514249383}
   plantAnchor: {fileID: 2076954781}
@@ -28954,6 +28990,8 @@ MonoBehaviour:
   boxOffSprite: {fileID: 21300000, guid: 12f4883c98aaf4dbc9bcc5ef3a200d7c, type: 3}
   boxOnSprite: {fileID: 21300000, guid: f22de2085f12d8c498420558637023fd, type: 3}
   questDetailUI: {fileID: 128918576}
+  scrollRect: {fileID: 0}
+  closedScrollThreshold: 5
 --- !u!224 &1225753965
 RectTransform:
   m_ObjectHideFlags: 0
@@ -30437,28 +30475,36 @@ MonoBehaviour:
   bgmSource: {fileID: 1246507288}
   fadeDuration: 0.3
   sfxList:
+  - soundName: open
+    clip: {fileID: 8300000, guid: 51b94b26f6fc348de88f4edd4bda3ef5, type: 3}
+  - soundName: close
+    clip: {fileID: 8300000, guid: 0ac2718ebd75d4d668f462f4cc208277, type: 3}
+  - soundName: enter
+    clip: {fileID: 8300000, guid: 707a14b7b5dd04c58a94dd5e10960e6c, type: 3}
   - soundName: back
-    clip: {fileID: 8300000, guid: 42ea5841e6f72fa46b0578acbe345df9, type: 3}
+    clip: {fileID: 8300000, guid: 93364cbe64339466590f1e1da7e8b062, type: 3}
+  - soundName: fertilizer
+    clip: {fileID: 8300000, guid: 8610938ad6bf244ecb65c10896540324, type: 3}
+  - soundName: plant
+    clip: {fileID: 8300000, guid: eab53b0586d9a47d082b23d9b432f716, type: 3}
+  - soundName: tool_change
+    clip: {fileID: 8300000, guid: 1275de334e8fe4a868a50e35e8c1eec2, type: 3}
+  - soundName: harvest
+    clip: {fileID: 8300000, guid: 9583602453a2146cfb83e35053285043, type: 3}
+  - soundName: harvest_fail
+    clip: {fileID: 8300000, guid: fc9991340d7184dfeae5c1ff4af614c6, type: 3}
+  - soundName: ev_ing
+    clip: {fileID: 8300000, guid: 1181d937459a54d13be6573e519d7d9f, type: 3}
+  - soundName: ev_success
+    clip: {fileID: 8300000, guid: 7dbccd26e1a404bc1bf5ce947ea44dc4, type: 3}
+  - soundName: ev_fail
+    clip: {fileID: 8300000, guid: da80d16aef67e435fb048be348440f72, type: 3}
   - soundName: button
     clip: {fileID: 8300000, guid: b71fe3a17a9b68b4db102b93c8ee3fc4, type: 3}
-  - soundName: close
-    clip: {fileID: 8300000, guid: 7ffd2a7b1bb5c8248af1d74b21a1f4b4, type: 3}
-  - soundName: enter
-    clip: {fileID: 8300000, guid: 9853f996145aea24bbc2e5a74c3ac3e5, type: 3}
-  - soundName: ev_fail
-    clip: {fileID: 8300000, guid: ec193bdd421dccc4ea04fd59b0fa90d6, type: 3}
-  - soundName: ev_success
-    clip: {fileID: 8300000, guid: f09458791360e3e4e84c54c1ac0ce684, type: 3}
-  - soundName: harvest
-    clip: {fileID: 8300000, guid: 00eee2b6b530a6641b274e0368036b9b, type: 3}
-  - soundName: open
-    clip: {fileID: 8300000, guid: 336958ddc43b6374b9440c7535522d19, type: 3}
   - soundName: paper
-    clip: {fileID: 8300000, guid: 401406ad0f6c768418cc1db8c9133374, type: 3}
-  - soundName: plant
-    clip: {fileID: 8300000, guid: 2b77d68b4833c1740860943c3a26591f, type: 3}
-  - soundName: tool_change
-    clip: {fileID: 8300000, guid: e3bed8c8a1172a14c8b87d9724c42102, type: 3}
+    clip: {fileID: 8300000, guid: 7a756448cc7cd491a978c5489d8a29f4, type: 3}
+  - soundName: quest_reward
+    clip: {fileID: 8300000, guid: 53e771bf6934942b8ad8ce2e8ffa82db, type: 3}
   bgmList:
   - soundName: candy
     clip: {fileID: 8300000, guid: 25cc2225e435897429edc1d2d07361fe, type: 3}
@@ -33744,7 +33790,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 142242547}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9999459
+  m_Size: 0.99526477
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -34227,8 +34273,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptySprite: {fileID: 21300000, guid: 404bae2896de14736ad381078eda1a87, type: 3}
-  plantedSprite: {fileID: 21300000, guid: 94991a5c528604f1b8668f01172116cc, type: 3}
-  growingSprite: {fileID: 21300000, guid: ff865a5c56eff48649ef27a4c2615414, type: 3}
+  seedSprite: {fileID: 0}
+  youthSprite: {fileID: 0}
+  adultSprite: {fileID: 0}
   readySprite: {fileID: 21300000, guid: e1d78976b670e4972918961055a23ff8, type: 3}
   fieldImage: {fileID: 1383624716}
   plantAnchor: {fileID: 2129635079}
@@ -47434,8 +47481,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptySprite: {fileID: 21300000, guid: 404bae2896de14736ad381078eda1a87, type: 3}
-  plantedSprite: {fileID: 21300000, guid: 94991a5c528604f1b8668f01172116cc, type: 3}
-  growingSprite: {fileID: 21300000, guid: ff865a5c56eff48649ef27a4c2615414, type: 3}
+  seedSprite: {fileID: 0}
+  youthSprite: {fileID: 0}
+  adultSprite: {fileID: 0}
   readySprite: {fileID: 21300000, guid: e1d78976b670e4972918961055a23ff8, type: 3}
   fieldImage: {fileID: 1888009908}
   plantAnchor: {fileID: 496228366}
@@ -51712,8 +51760,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptySprite: {fileID: 21300000, guid: 404bae2896de14736ad381078eda1a87, type: 3}
-  plantedSprite: {fileID: 21300000, guid: 94991a5c528604f1b8668f01172116cc, type: 3}
-  growingSprite: {fileID: 21300000, guid: ff865a5c56eff48649ef27a4c2615414, type: 3}
+  seedSprite: {fileID: 0}
+  youthSprite: {fileID: 0}
+  adultSprite: {fileID: 0}
   readySprite: {fileID: 21300000, guid: e1d78976b670e4972918961055a23ff8, type: 3}
   fieldImage: {fileID: 2053352982}
   plantAnchor: {fileID: 1527104459}
@@ -51962,7 +52011,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.0005702356, y: 0.0009667665}
+  m_AnchoredPosition: {x: -0.0005702356, y: 0.00006379571}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2056541280
