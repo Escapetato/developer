@@ -3914,10 +3914,47 @@ MonoBehaviour:
   - {fileID: 883518493}
   conditionContainer: {fileID: 1454882242}
   dailyContainerOffsetY: 3.2
-  rewardButtons:
-  - {fileID: 1107564270}
-  - {fileID: 1576614125}
-  - {fileID: 1822279856}
+  dailyRowExtraSpacing: 20
+  rewardButton: {fileID: 0}
+  rewardBoxRoot: {fileID: 0}
+  rewardSlotRoots: []
+  rewardSlotIcons: []
+  rewardSlotTexts: []
+  iconLand: {fileID: 0}
+  iconNat: {fileID: 0}
+  iconSap: {fileID: 0}
+  iconGawi: {fileID: 0}
+  iconLandOff: {fileID: 0}
+  iconNatOff: {fileID: 0}
+  iconSapOff: {fileID: 0}
+  iconGawiOff: {fileID: 0}
+  iconPoing: {fileID: 0}
+  iconFertilizer: {fileID: 0}
+  iconPoingOff: {fileID: 0}
+  iconFertilizerOff: {fileID: 0}
+  potionIcons:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  potionIconsOff:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  defaultItemSprite: {fileID: 0}
+  defaultItemSpriteOff: {fileID: 0}
+  rewardClaimCheckOn: []
+  scrollRect: {fileID: 0}
+  closedScrollThreshold: 5
 --- !u!1 &129340664
 GameObject:
   m_ObjectHideFlags: 0
@@ -43907,6 +43944,8 @@ MonoBehaviour:
   boxOffSprite: {fileID: 21300000, guid: 12f4883c98aaf4dbc9bcc5ef3a200d7c, type: 3}
   boxOnSprite: {fileID: 21300000, guid: f22de2085f12d8c498420558637023fd, type: 3}
   questDetailUI: {fileID: 128918576}
+  scrollRect: {fileID: 0}
+  closedScrollThreshold: 5
 --- !u!224 &1225753965
 RectTransform:
   m_ObjectHideFlags: 0
@@ -45296,28 +45335,36 @@ MonoBehaviour:
   bgmSource: {fileID: 1246507288}
   fadeDuration: 0.3
   sfxList:
-  - soundName: back
-    clip: {fileID: 8300000, guid: 42ea5841e6f72fa46b0578acbe345df9, type: 3}
-  - soundName: button
-    clip: {fileID: 8300000, guid: b71fe3a17a9b68b4db102b93c8ee3fc4, type: 3}
-  - soundName: close
-    clip: {fileID: 8300000, guid: 7ffd2a7b1bb5c8248af1d74b21a1f4b4, type: 3}
-  - soundName: enter
-    clip: {fileID: 8300000, guid: 9853f996145aea24bbc2e5a74c3ac3e5, type: 3}
-  - soundName: ev_fail
-    clip: {fileID: 8300000, guid: ec193bdd421dccc4ea04fd59b0fa90d6, type: 3}
-  - soundName: ev_success
-    clip: {fileID: 8300000, guid: f09458791360e3e4e84c54c1ac0ce684, type: 3}
-  - soundName: harvest
-    clip: {fileID: 8300000, guid: 00eee2b6b530a6641b274e0368036b9b, type: 3}
   - soundName: open
-    clip: {fileID: 8300000, guid: 336958ddc43b6374b9440c7535522d19, type: 3}
-  - soundName: paper
-    clip: {fileID: 8300000, guid: 401406ad0f6c768418cc1db8c9133374, type: 3}
+    clip: {fileID: 8300000, guid: 51b94b26f6fc348de88f4edd4bda3ef5, type: 3}
+  - soundName: close
+    clip: {fileID: 8300000, guid: 0ac2718ebd75d4d668f462f4cc208277, type: 3}
+  - soundName: enter
+    clip: {fileID: 8300000, guid: 707a14b7b5dd04c58a94dd5e10960e6c, type: 3}
+  - soundName: back
+    clip: {fileID: 8300000, guid: 93364cbe64339466590f1e1da7e8b062, type: 3}
+  - soundName: fertilizer
+    clip: {fileID: 8300000, guid: 8610938ad6bf244ecb65c10896540324, type: 3}
+  - soundName: harvest
+    clip: {fileID: 8300000, guid: 9583602453a2146cfb83e35053285043, type: 3}
+  - soundName: harvest_fail
+    clip: {fileID: 8300000, guid: fc9991340d7184dfeae5c1ff4af614c6, type: 3}
   - soundName: plant
-    clip: {fileID: 8300000, guid: 2b77d68b4833c1740860943c3a26591f, type: 3}
+    clip: {fileID: 8300000, guid: eab53b0586d9a47d082b23d9b432f716, type: 3}
   - soundName: tool_change
-    clip: {fileID: 8300000, guid: e3bed8c8a1172a14c8b87d9724c42102, type: 3}
+    clip: {fileID: 8300000, guid: 1275de334e8fe4a868a50e35e8c1eec2, type: 3}
+  - soundName: ev_ing
+    clip: {fileID: 8300000, guid: 1181d937459a54d13be6573e519d7d9f, type: 3}
+  - soundName: ev_success
+    clip: {fileID: 8300000, guid: 7dbccd26e1a404bc1bf5ce947ea44dc4, type: 3}
+  - soundName: ev_fail
+    clip: {fileID: 8300000, guid: da80d16aef67e435fb048be348440f72, type: 3}
+  - soundName: paper
+    clip: {fileID: 8300000, guid: 7a756448cc7cd491a978c5489d8a29f4, type: 3}
+  - soundName: quest_reward
+    clip: {fileID: 8300000, guid: 53e771bf6934942b8ad8ce2e8ffa82db, type: 3}
+  - soundName: button
+    clip: {fileID: 8300000, guid: a0a62882d928645239fea7aff9616ba7, type: 3}
   bgmList:
   - soundName: candy
     clip: {fileID: 8300000, guid: 25cc2225e435897429edc1d2d07361fe, type: 3}
