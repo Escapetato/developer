@@ -78,8 +78,8 @@ public class QuestDetailUI : MonoBehaviour
     [Header("스크롤 제어(Scrollbar UI는 유니티에서 숨김)")]
     [SerializeField] private ScrollRect scrollRect;
 
-    [Tooltip("Closed 메인 슬롯이 이 개수 이상일 때만 휠 스크롤 ON")]
-    [SerializeField] private int closedScrollThreshold = 5;
+    //[Tooltip("Closed 메인 슬롯이 이 개수 이상일 때만 휠 스크롤 ON")]
+    //[SerializeField] private int closedScrollThreshold = 5;
 
 
     private QuestData currentQuest;
