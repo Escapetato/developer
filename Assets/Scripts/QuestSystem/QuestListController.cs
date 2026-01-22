@@ -51,15 +51,38 @@ public class QuestListController : MonoBehaviour
 
         allowAutoSelectOnCreate = false;
 
+        //if (QuestManager.Instance != null)
+        //    QuestManager.Instance.OnQuestChanged += HandleQuestChanged;
+    }
+
+    //private void OnDestroy()
+    //{
+    //    if (QuestManager.Instance != null)
+    //        QuestManager.Instance.OnQuestChanged -= HandleQuestChanged;
+    //}
+
+    // 비활성화 상태에서도 도는 코루틴 에러 
+    private void OnEnable()
+    {
+        // 패널이 켜졌을 때만 퀘스트 변경 이벤트를 받는다
         if (QuestManager.Instance != null)
             QuestManager.Instance.OnQuestChanged += HandleQuestChanged;
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
+        // 패널이 꺼지면 이벤트 끊어서(상점 등) 갱신이 들어와도 코루틴이 안 돌게 함
         if (QuestManager.Instance != null)
             QuestManager.Instance.OnQuestChanged -= HandleQuestChanged;
+
+        // 돌고 있던 자동선택 코루틴도 정리
+        if (pendingAutoSelect != null)
+        {
+            StopCoroutine(pendingAutoSelect);
+            pendingAutoSelect = null;
+        }
     }
+
 
     private void HandleQuestChanged()
     {
@@ -425,6 +448,9 @@ public class QuestListController : MonoBehaviour
 
     private void RequestAutoSelectTopNextFrame()
     {
+        // 패널이 꺼져있으면 코루틴 실행 안 함
+        if (!isActiveAndEnabled || !gameObject.activeInHierarchy) return;
+
         if (pendingAutoSelect != null)
             StopCoroutine(pendingAutoSelect);
 
@@ -435,6 +461,13 @@ public class QuestListController : MonoBehaviour
     {
         // 1프레임 기다려서 Setup()/레이아웃 초기화(SetSelected(false))가 다 끝나게 함
         yield return null;
+
+        // 기다리는 동안 패널이 꺼졌다면 중단
+        if (!isActiveAndEnabled || !gameObject.activeInHierarchy)
+        {
+            pendingAutoSelect = null;
+            yield break;
+        }
 
         var first = FindFirstSlotInChildren();
         if (first != null)
