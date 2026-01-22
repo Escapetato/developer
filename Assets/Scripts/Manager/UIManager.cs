@@ -83,6 +83,12 @@ public class UIManager : MonoBehaviour
         if (confirmPopup != null) confirmPopup.SetActive(false);
 
         SoundManager.Instance.PlayBGM("mainfarm");
+
+        // ▼▼▼ [여기 추가!] 씬이 켜지자마자 저장된 밭 데이터를 복구 ▼▼▼
+        if (DBManager.Instance != null)
+        {
+            DBManager.Instance.ApplyFieldDataToScene();
+        }
     }
 
     public void ShowConfirmPopup(string message, Action onConfirm)

@@ -35,8 +35,8 @@ public class CollectionUI : MonoBehaviour
     public TextMeshProUGUI descriptionText;
 
     [Header("--- Navigation ---")]
-    public Button prevButton;
-    public Button nextButton;
+    public Button prevButton; // 이전 버튼 (첫 장이면 숨김)
+    public Button nextButton; // 다음 버튼 (마지막 장이면 숨김)
 
     private List<ItemData> currentCategoryList;
     private int currentIndex = 0;
@@ -86,43 +86,72 @@ public class CollectionUI : MonoBehaviour
 
         currentIndex = 0;
         UpdateLeftPage();
+
+        // 카테고리 바꿀 때 버튼 상태 갱신
+        UpdateNavigationButtons();
     }
 
     public void OnPrevBtnClick()
     {
         if (currentCategoryList == null || currentCategoryList.Count == 0) return;
-        currentIndex--;
-        if (currentIndex < 0) currentIndex = currentCategoryList.Count - 1;
-        UpdateLeftPage();
+
+        // 0보다 클 때만 감소
+        if (currentIndex > 0)
+        {
+            currentIndex--;
+            UpdateLeftPage();
+            UpdateNavigationButtons(); // 버튼 상태 갱신
+        }
     }
 
     public void OnNextBtnClick()
     {
         if (currentCategoryList == null || currentCategoryList.Count == 0) return;
-        currentIndex++;
-        if (currentIndex >= currentCategoryList.Count) currentIndex = 0;
-        UpdateLeftPage();
+
+        // 끝보다 작을 때만 증가
+        if (currentIndex < currentCategoryList.Count - 1)
+        {
+            currentIndex++;
+            UpdateLeftPage();
+            UpdateNavigationButtons(); // 버튼 상태 갱신
+        }
     }
 
-    // ▼▼▼ [핵심] 외부에서 특정 아이템을 보여달라고 할 때 쓰는 함수 ▼▼▼
+    // ▼▼▼ [수정] 버튼 숨김 처리 함수 ▼▼▼
+    private void UpdateNavigationButtons()
+    {
+        int totalCount = (currentCategoryList != null) ? currentCategoryList.Count : 0;
+
+        // 1. 이전(Prev) 버튼: 첫 페이지(0)면 아예 안 보이게
+        if (prevButton != null)
+        {
+            prevButton.gameObject.SetActive(currentIndex > 0);
+        }
+
+        // 2. 다음(Next) 버튼: 마지막 페이지면 아예 안 보이게
+        if (nextButton != null)
+        {
+            nextButton.gameObject.SetActive(currentIndex < totalCount - 1);
+        }
+    }
+    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
     public void ShowItem(ItemData itemToShow)
     {
         if (itemToShow == null) return;
 
-        // 1. 이 아이템이 진화 결과물인지 확인하고, 베이스 작물(어미) 찾기
         EvolutionRecipe targetRecipe = allRecipes.Find(r => r.resultItem == itemToShow);
         ItemData baseItem = null;
 
         if (targetRecipe != null)
         {
-            baseItem = targetRecipe.material; // 진화 재료(베이스 작물)를 찾음
+            baseItem = targetRecipe.material;
         }
         else
         {
-            baseItem = itemToShow; // 진화 결과물이 아니면 그 자체가 베이스라고 가정
+            baseItem = itemToShow;
         }
 
-        // 2. 해당 카테고리 탭으로 이동 (버튼 색상도 같이 갱신)
         if (categoryButtons != null)
         {
             foreach (var btn in categoryButtons)
@@ -139,21 +168,19 @@ public class CollectionUI : MonoBehaviour
             SetCategory(baseItem.collectionCategory);
         }
 
-        // 3. 리스트에서 해당 작물 페이지 찾기
         int targetIndex = currentCategoryList.FindIndex(x => x == baseItem);
         if (targetIndex != -1)
         {
             currentIndex = targetIndex;
-            UpdateLeftPage(); // 왼쪽 페이지 갱신
+            UpdateLeftPage();
+            UpdateNavigationButtons(); // 여기서도 버튼 상태 갱신
         }
 
-        // 4. 진화 결과물이라면 오른쪽 상세페이지도 즉시 보여주기
         if (targetRecipe != null)
         {
             ShowRightPage(targetRecipe);
         }
     }
-    // ▲▲▲ 추가 완료 ▲▲▲
 
     private void UpdateLeftPage()
     {
@@ -166,7 +193,6 @@ public class CollectionUI : MonoBehaviour
         ItemData currentBaseItem = currentCategoryList[currentIndex];
         bool isBaseUnlocked = GameProgressionManager.Instance.IsItemUnlocked(currentBaseItem);
 
-        // 왼쪽 페이지 표시
         if (isBaseUnlocked)
         {
             if (baseCropImage != null) baseCropImage.sprite = currentBaseItem.itemIcon;
@@ -182,7 +208,6 @@ public class CollectionUI : MonoBehaviour
             if (toolText != null) toolText.text = "수확 도구: ???";
         }
 
-        // 하단 진화 슬롯 설정
         List<EvolutionRecipe> myRecipes = new List<EvolutionRecipe>();
         foreach (var recipe in allRecipes)
         {
@@ -192,7 +217,6 @@ public class CollectionUI : MonoBehaviour
             }
         }
 
-        // 슬롯 1
         if (myRecipes.Count > 0)
         {
             bool isResultUnlocked = GameProgressionManager.Instance.IsItemUnlocked(myRecipes[0].resultItem);
@@ -204,7 +228,6 @@ public class CollectionUI : MonoBehaviour
             evoSlot1.Setup(null, false);
         }
 
-        // 슬롯 2
         if (myRecipes.Count > 1)
         {
             bool isResultUnlocked = GameProgressionManager.Instance.IsItemUnlocked(myRecipes[1].resultItem);
