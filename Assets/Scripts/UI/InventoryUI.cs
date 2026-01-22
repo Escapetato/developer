@@ -30,17 +30,16 @@ public class InventoryUI : MonoBehaviour
     public Button increaseButton;
     public TextMeshProUGUI quantityText;
 
-    // ▼▼▼ [수정] Image 변수는 삭제하고, 그림(Sprite) 변수만 남김 ▼▼▼
-    private Image decreaseBtnImage; // 코드에서 자동으로 찾음
-    private Image increaseBtnImage; // 코드에서 자동으로 찾음
+    // 버튼 이미지 제어 변수
+    private Image decreaseBtnImage;
+    private Image increaseBtnImage;
 
     [Space(10)]
     [Header("Button Sprites (드래그해서 채워주세요)")]
-    public Sprite arrowLeftOn;          // 켜짐 (<) - 원래 색
-    public Sprite arrowLeftOff;         // 꺼짐 (<) - 회색
-    public Sprite arrowRightOn;         // 켜짐 (>) - 원래 색
-    public Sprite arrowRightOff;        // 꺼짐 (>) - 회색
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+    public Sprite arrowLeftOn;          // 켜짐 (<) - ui_amount_pre
+    public Sprite arrowLeftOff;         // 꺼짐 (<) - ui_amount_pre_off
+    public Sprite arrowRightOn;         // 켜짐 (>) - ui_amount_next
+    public Sprite arrowRightOff;        // 꺼짐 (>) - ui_amount_next_off
 
     // 판매 버튼
     public Button sellButton;
@@ -64,7 +63,7 @@ public class InventoryUI : MonoBehaviour
 
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
 
-        // ▼▼▼ [핵심] 버튼 오브젝트에서 바로 Image 컴포넌트를 가져옴 ▼▼▼
+        // 버튼 이미지 자동 찾기
         if (decreaseButton != null)
         {
             decreaseButton.onClick.RemoveAllListeners();
@@ -77,7 +76,6 @@ public class InventoryUI : MonoBehaviour
             increaseButton.onClick.AddListener(OnIncreaseQuantity);
             increaseBtnImage = increaseButton.GetComponent<Image>();
         }
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
         if (sellButton != null)
         {
@@ -153,7 +151,7 @@ public class InventoryUI : MonoBehaviour
             if (item.itemCategory == "Crop")
             {
                 SetQuantityControlsActive(true);
-                UpdateQuantityUI(); // 여기서 버튼 이미지 갱신됨
+                UpdateQuantityUI(); // 버튼 이미지 갱신
 
                 if (sellButton != null)
                 {
@@ -197,7 +195,6 @@ public class InventoryUI : MonoBehaviour
         {
             currentSellQuantity--;
             UpdateQuantityUI();
-            SoundManager.Instance.PlaySFX("button");
         }
     }
 
@@ -210,7 +207,6 @@ public class InventoryUI : MonoBehaviour
         {
             currentSellQuantity++;
             UpdateQuantityUI();
-            SoundManager.Instance.PlaySFX("button");
         }
     }
 
@@ -232,38 +228,43 @@ public class InventoryUI : MonoBehaviour
         UpdateArrowButtons();
     }
 
-    // ▼▼▼ [추가] 버튼 상태 및 이미지 갱신 함수 ▼▼▼
     private void UpdateArrowButtons()
     {
         if (selectedItem == null) return;
         int maxCount = InventoryManager.Instance.GetItemCount(selectedItem);
 
         // 1. 감소 버튼 (최소 1개)
-        if (currentSellQuantity <= 1)
+        if (decreaseButton != null && decreaseBtnImage != null)
         {
-            if (decreaseButton != null) decreaseButton.interactable = false;
-            if (decreaseBtnImage != null && arrowLeftOff != null) decreaseBtnImage.sprite = arrowLeftOff;
-        }
-        else
-        {
-            if (decreaseButton != null) decreaseButton.interactable = true;
-            if (decreaseBtnImage != null && arrowLeftOn != null) decreaseBtnImage.sprite = arrowLeftOn;
+            if (currentSellQuantity <= 1)
+            {
+                decreaseButton.interactable = false;
+                if (arrowLeftOff != null) decreaseBtnImage.sprite = arrowLeftOff;
+            }
+            else
+            {
+                decreaseButton.interactable = true;
+                if (arrowLeftOn != null) decreaseBtnImage.sprite = arrowLeftOn;
+            }
         }
 
         // 2. 증가 버튼 (최대 보유량)
-        if (currentSellQuantity >= maxCount)
+        if (increaseButton != null && increaseBtnImage != null)
         {
-            if (increaseButton != null) increaseButton.interactable = false;
-            if (increaseBtnImage != null && arrowRightOff != null) increaseBtnImage.sprite = arrowRightOff;
-        }
-        else
-        {
-            if (increaseButton != null) increaseButton.interactable = true;
-            if (increaseBtnImage != null && arrowRightOn != null) increaseBtnImage.sprite = arrowRightOn;
+            if (currentSellQuantity >= maxCount)
+            {
+                increaseButton.interactable = false;
+                if (arrowRightOff != null) increaseBtnImage.sprite = arrowRightOff;
+            }
+            else
+            {
+                increaseButton.interactable = true;
+                if (arrowRightOn != null) increaseBtnImage.sprite = arrowRightOn;
+            }
         }
     }
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
+    // ▼▼▼ [핵심] 판매 확인 팝업 추가됨 ▼▼▼
     public void OnRealSellClick()
     {
         if (selectedItem == null) return;
@@ -271,24 +272,32 @@ public class InventoryUI : MonoBehaviour
 
         int totalEarnings = selectedItem.price * currentSellQuantity;
 
-        InventoryManager.Instance.RemoveItem(selectedItem, currentSellQuantity);
-        PoingManager.Instance.IncreasePoing(totalEarnings);
+        // 팝업 띄우기
+        UIManager.Instance.ShowConfirmPopup(
+            $"{totalEarnings} 포잉에 판매하시겠습니까?",
+            () =>
+            {
+                // [진짜 판매 로직 - 네 눌렀을 때]
+                InventoryManager.Instance.RemoveItem(selectedItem, currentSellQuantity);
+                PoingManager.Instance.IncreasePoing(totalEarnings);
 
-        if (QuestManager.Instance != null)
-            QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, selectedItem, currentSellQuantity);
+                if (QuestManager.Instance != null)
+                    QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, selectedItem, currentSellQuantity);
 
-        UIManager.Instance.ShowAlertPopup($"판매 완료! (+{totalEarnings} 포잉)");
-        SoundManager.Instance.PlaySFX("Money");
+                UIManager.Instance.ShowAlertPopup($"판매 완료! (+{totalEarnings} 포잉)");
 
-        if (InventoryManager.Instance.GetItemCount(selectedItem) > 0)
-        {
-            currentSellQuantity = 1;
-            UpdateDetailPanel(selectedItem);
-        }
-        else
-        {
-            ClearSelection();
-        }
+                // 판매 후 수량이나 선택 상태 갱신
+                if (InventoryManager.Instance.GetItemCount(selectedItem) > 0)
+                {
+                    currentSellQuantity = 1;
+                    UpdateDetailPanel(selectedItem);
+                }
+                else
+                {
+                    ClearSelection();
+                }
+            }
+        );
     }
 
     private void RedrawInventory()

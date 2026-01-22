@@ -31,18 +31,16 @@ public class StoreUI : MonoBehaviour
     public Button increaseButton;
     public TextMeshProUGUI quantityText;
 
-    // ▼▼▼ [수정] 버튼 자체의 이미지를 바꿀 변수들 ▼▼▼
-    private Image decreaseBtnImage; // 버튼에 붙은 Image 컴포넌트 (코드에서 찾음)
-    private Image increaseBtnImage; // 버튼에 붙은 Image 컴포넌트 (코드에서 찾음)
+    // 버튼 이미지 제어 변수
+    private Image decreaseBtnImage;
+    private Image increaseBtnImage;
 
     [Space(10)]
-    [Header("Button Sprites (이미지 파일 연결)")]
-    // 여기에 유니티 프로젝트 창에 있는 PNG 파일들을 드래그해서 넣으세요
+    [Header("Button Sprites (드래그해서 채워주세요)")]
     public Sprite leftBtnOn;   // ui_amount_pre (갈색)
     public Sprite leftBtnOff;  // ui_amount_pre_off (회색)
     public Sprite rightBtnOn;  // ui_amount_next (갈색)
     public Sprite rightBtnOff; // ui_amount_next_off (회색)
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
     public Button buyButton;
     public TextMeshProUGUI buyButtonText;
@@ -60,25 +58,25 @@ public class StoreUI : MonoBehaviour
         else Destroy(gameObject);
 
         slots = new List<ItemSlot>();
-        slotParent.GetComponentsInChildren<ItemSlot>(slots);
+        if (slotParent != null)
+            slotParent.GetComponentsInChildren<ItemSlot>(slots);
 
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
 
-        // ▼▼▼ [핵심] 버튼 오브젝트에서 바로 Image 컴포넌트를 가져옴 ▼▼▼
+        // 버튼 이미지 자동 찾기
         if (decreaseButton != null)
         {
             decreaseButton.onClick.RemoveAllListeners();
             decreaseButton.onClick.AddListener(OnDecreaseQuantity);
-            decreaseBtnImage = decreaseButton.GetComponent<Image>(); // 이거 가져와서 이미지 교체함
+            decreaseBtnImage = decreaseButton.GetComponent<Image>();
         }
 
         if (increaseButton != null)
         {
             increaseButton.onClick.RemoveAllListeners();
             increaseButton.onClick.AddListener(OnIncreaseQuantity);
-            increaseBtnImage = increaseButton.GetComponent<Image>(); // 이거 가져와서 이미지 교체함
+            increaseBtnImage = increaseButton.GetComponent<Image>();
         }
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
         if (buyButton != null)
         {
@@ -218,7 +216,7 @@ public class StoreUI : MonoBehaviour
             else
             {
                 SetQuantityControlsActive(true);
-                UpdateQuantityUI(); // 여기서 버튼 이미지를 갱신함
+                UpdateQuantityUI();
 
                 if (buyButton != null)
                 {
@@ -270,7 +268,6 @@ public class StoreUI : MonoBehaviour
     {
         if (selectedItem == null) return;
 
-        // 텍스트 갱신
         if (quantityText != null)
             quantityText.text = currentBuyQuantity.ToString();
 
@@ -281,48 +278,40 @@ public class StoreUI : MonoBehaviour
         if (buyButtonText != null)
             buyButtonText.text = $"{currentBuyQuantity}개 구매";
 
-        // ▼▼▼ [핵심] 버튼 이미지 교체 로직 ▼▼▼
         UpdateButtonSprites();
     }
 
     private void UpdateButtonSprites()
     {
-        // 최대 구매 가능 개수 계산
         int myPoing = PoingManager.Instance.GetPoing();
         int price = selectedItem.price > 0 ? selectedItem.price : 999999;
         int maxAffordable = myPoing / price;
         if (maxAffordable == 0) maxAffordable = 1;
         int finalMax = Mathf.Min(maxAffordable, 99);
 
-        // 1. 왼쪽(-) 버튼 처리
         if (decreaseButton != null && decreaseBtnImage != null)
         {
             if (currentBuyQuantity <= 1)
             {
-                // 최소값이면 비활성화 + 회색 이미지
                 decreaseButton.interactable = false;
                 if (leftBtnOff != null) decreaseBtnImage.sprite = leftBtnOff;
             }
             else
             {
-                // 아니면 활성화 + 원래 이미지
                 decreaseButton.interactable = true;
                 if (leftBtnOn != null) decreaseBtnImage.sprite = leftBtnOn;
             }
         }
 
-        // 2. 오른쪽(+) 버튼 처리
         if (increaseButton != null && increaseBtnImage != null)
         {
             if (currentBuyQuantity >= finalMax)
             {
-                // 최대값이면 비활성화 + 회색 이미지
                 increaseButton.interactable = false;
                 if (rightBtnOff != null) increaseBtnImage.sprite = rightBtnOff;
             }
             else
             {
-                // 아니면 활성화 + 원래 이미지
                 increaseButton.interactable = true;
                 if (rightBtnOn != null) increaseBtnImage.sprite = rightBtnOn;
             }
@@ -335,22 +324,29 @@ public class StoreUI : MonoBehaviour
 
         int totalCost = selectedItem.price * currentBuyQuantity;
 
-        if (PoingManager.Instance.HasEnoughPoing(totalCost))
-        {
-            PoingManager.Instance.DecreasePoing(totalCost);
-            InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
-
-            NotifyPurchaseToQuest(selectedItem, currentBuyQuantity);
-
-            UIManager.Instance.ShowAlertPopup($"{selectedItem.itemName} {currentBuyQuantity}개 구매 완료!");
-            SoundManager.Instance.PlaySFX("Money");
-
-            UpdateDetailPanel(selectedItem, true);
-        }
-        else
+        if (!PoingManager.Instance.HasEnoughPoing(totalCost))
         {
             UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
+            return;
         }
+
+        // 여기서 질문 팝업을 띄웁니다!
+        UIManager.Instance.ShowConfirmPopup(
+            $"{totalCost} 포잉으로 구매하시겠습니까?",
+            () =>
+            {
+                // [진짜 구매 로직 - 사용자가 '네'를 누르면 실행됨]
+                PoingManager.Instance.DecreasePoing(totalCost);
+                InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
+
+                NotifyPurchaseToQuest(selectedItem, currentBuyQuantity);
+
+                UIManager.Instance.ShowAlertPopup("구매 완료!");
+
+                // 구매 후 UI 갱신
+                UpdateDetailPanel(selectedItem, true);
+            }
+        );
     }
 
     public void ClearSelection()
