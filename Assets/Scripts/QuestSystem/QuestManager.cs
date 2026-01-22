@@ -22,6 +22,16 @@ public class QuestManager : MonoBehaviour
     [SerializeField] private ItemData dailyFertilizerItem;   // 비료 ItemData (1개)
     [SerializeField] private ItemData[] dailyPotionItems;    // 포션 ItemData 8개 (불~무지개 순서)
 
+    [Header("밭 확장 보상")]
+    [SerializeField] private GameObject firstFields;
+    [SerializeField] private GameObject lockFirstFields;
+
+    [SerializeField] private GameObject secondFields;
+    [SerializeField] private GameObject lockSecondFields;
+
+    [SerializeField] private GameObject thirdFields;
+    [SerializeField] private GameObject lockThirdFields;
+
     // 한 플레이 세션에서 한 번만 초기화 
     private bool initialized = false;
 
@@ -401,6 +411,9 @@ public class QuestManager : MonoBehaviour
         RebuildActiveConditionIndex();
         ApplyLoginStreakOnLogin(lastSavedDate);
 
+        // 메인퀘스트 상태 기반으로 밭 확장 복구
+        ApplyFarmExpansionByQuestState();
+
         Debug.Log($"[QuestManager] 퀘스트 복구 완료! 메인 진행중: {CountActive(mainQuests)}개");
     }
 
@@ -437,7 +450,35 @@ public class QuestManager : MonoBehaviour
         // 완료 안 됐으면 종료 (테스트로 counts 조작하면 통과 가능)
         if (!IsCompletedByCounts(quest)) return false;
 
-        // 땅 확장 구현 필요 
+        // 땅 확장 
+        if (quest.type == QuestType.Main)
+        {
+            int stage = -1;
+
+            switch (quest.key)
+            {
+                case 101: stage = 1; break;
+                case 103: stage = 2; break;
+                case 105: stage = 3; break;
+            }
+
+            if (stage != -1)
+            {
+                ApplyFarmExpansion(stage);
+
+                quest.rewardClaimed = true;
+                quest.state = QuestState.Closed;
+                RebuildActiveConditionIndex();
+
+                MainQuestSlot(); 
+                OnQuestChanged?.Invoke();
+                SaveToDB();
+
+                return true;
+            }
+        }
+
+        // 땅 확장 제외 보상 
         if (quest.rewardItem == null) return false;
 
         int amount = Mathf.Max(1, quest.rewardAmount);
@@ -908,5 +949,48 @@ public class QuestManager : MonoBehaviour
             SaveToDB();
         }
     }
+
+    // 밭 확장 보상 (메인퀘스트 0, 2, 4)
+    private void ApplyFarmExpansion(int stage)
+    {
+        if (stage >= 1)
+        {
+            if (lockFirstFields != null) lockFirstFields.SetActive(false);
+            if (firstFields != null) firstFields.SetActive(true);
+        }
+
+        if (stage >= 2)
+        {
+            if (lockSecondFields != null) lockSecondFields.SetActive(false);
+            if (secondFields != null) secondFields.SetActive(true);
+        }
+
+        if (stage >= 3)
+        {
+            if (lockThirdFields != null) lockThirdFields.SetActive(false);
+            if (thirdFields != null) thirdFields.SetActive(true);
+        }
+    }
+
+    // 메인 퀘스트 상태 따라 밭 상태 복구 
+    private void ApplyFarmExpansionByQuestState()
+    {
+        int stage = 0;
+
+        // 메인퀘스트 key 기준 (Closed 여부로 판단)
+        if (mainQuests.Exists(q => q.key == 101 && q.state == QuestState.Closed))
+            stage = 1;
+        if (mainQuests.Exists(q => q.key == 103 && q.state == QuestState.Closed))
+            stage = 2;
+        if (mainQuests.Exists(q => q.key == 105 && q.state == QuestState.Closed))
+            stage = 3;
+
+        if (stage > 0)
+        {
+            ApplyFarmExpansion(stage);
+            Debug.Log($"[FarmExpansion] 복구 적용: stage={stage}");
+        }
+    }
+
 
 }
