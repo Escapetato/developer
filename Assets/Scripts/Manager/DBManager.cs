@@ -17,6 +17,10 @@ public class UserData
     public List<InventorySaveData> inventory = new List<InventorySaveData>();
     public List<QuestSaveData> quests = new List<QuestSaveData>();
 
+    // ▼▼▼ [추가됨] 밭 저장 데이터 리스트 ▼▼▼
+    public List<FieldSaveData> fields = new List<FieldSaveData>();
+    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
     // 해금된 레시피 이름들
     public List<string> unlockedRecipeNames = new List<string>();
 
@@ -44,6 +48,16 @@ public class QuestSaveData
     public bool rewardClaimed;
 }
 
+[Serializable]
+public class FieldSaveData
+{
+    public int fieldId;
+    public string plantedSeedName;
+    public float remainingTime;
+    public int fertilizerCount;
+    public int state;
+}
+
 public class DBManager : MonoBehaviour
 {
     public static DBManager Instance;
@@ -56,6 +70,9 @@ public class DBManager : MonoBehaviour
     public List<EvolutionRecipe> allGameRecipes = new List<EvolutionRecipe>();
 
     DatabaseReference reference;
+
+    // ▼▼▼ [추가됨] 로드된 데이터를 임시 저장할 변수 (여기에 있어야 함!) ▼▼▼
+    public UserData loadedUserData;
 
     void Awake()
     {
@@ -91,112 +108,91 @@ public class DBManager : MonoBehaviour
 
     // DBManager.cs의 SaveAllData 함수를 이걸로 덮어씌우세요!
 
+    // ▼▼▼ [수정됨] 저장 로직에 '밭 저장' 추가 ▼▼▼
     public void SaveAllData(string userId)
     {
-        // 1. 디버깅 시작 로그
         Debug.Log($"💾 [저장 시작] User ID: {userId}");
 
         try
         {
             UserData data = new UserData();
 
-            // --- [1] 포잉 저장 ---
-            if (PoingManager.Instance != null)
-            {
-                data.poing = PoingManager.Instance.currentPoing;
-            }
-            data.userName = "감자농부"; // (닉네임 시스템 있으면 교체)
-            data.lastLoginDate = System.DateTime.Today.ToString("yyyy-MM-dd");
+            // 1. 포잉
+            if (PoingManager.Instance != null) data.poing = PoingManager.Instance.currentPoing;
+            data.userName = "감자농부";
+            data.lastLoginDate = DateTime.Today.ToString("yyyy-MM-dd");
 
-
-            // --- [2] 도감 & 진행도 저장 (안전장치 추가) ---
+            // 2. 도감 & 진행도
             if (GameProgressionManager.Instance != null)
             {
                 data.isShopUnlocked = GameProgressionManager.Instance.isShopUnlocked;
-
-                if (GameProgressionManager.Instance.unlockedItems != null)
-                {
-                    foreach (var item in GameProgressionManager.Instance.unlockedItems)
-                        if (item != null) data.unlockedItemNames.Add(item.itemName);
-                }
-
-                if (GameProgressionManager.Instance.unlockedRecipes != null)
-                {
-                    foreach (var recipe in GameProgressionManager.Instance.unlockedRecipes)
-                        if (recipe != null) data.unlockedRecipeNames.Add(recipe.name);
-                }
+                foreach (var item in GameProgressionManager.Instance.unlockedItems) if (item != null) data.unlockedItemNames.Add(item.itemName);
+                foreach (var recipe in GameProgressionManager.Instance.unlockedRecipes) if (recipe != null) data.unlockedRecipeNames.Add(recipe.name);
             }
 
-
-            // --- [3] 인벤토리 저장 ---
-            if (InventoryManager.Instance != null && InventoryManager.Instance.items != null)
+            // 3. 인벤토리
+            if (InventoryManager.Instance != null)
             {
                 foreach (var kvp in InventoryManager.Instance.items)
                 {
                     if (kvp.Key != null)
                     {
-                        InventorySaveData invData = new InventorySaveData();
-                        invData.itemName = kvp.Key.itemName;
-                        invData.amount = kvp.Value;
+                        InventorySaveData invData = new InventorySaveData { itemName = kvp.Key.itemName, amount = kvp.Value };
                         data.inventory.Add(invData);
                     }
                 }
             }
 
-
-            // --- [4] 퀘스트 저장
+            // 4. 퀘스트
             if (QuestManager.Instance != null)
             {
-                if (QuestManager.Instance.allQuestList != null)
+                foreach (var q in QuestManager.Instance.allQuestList)
                 {
-                    foreach (var q in QuestManager.Instance.allQuestList)
+                    if (q != null)
                     {
-                        if (q != null)
+                        QuestSaveData qData = new QuestSaveData
                         {
-                            QuestSaveData qData = new QuestSaveData();
-                            qData.key = q.key;
-                            qData.state = (int)q.state;
-
-                            if (q.currentCounts != null && q.currentCounts.Length > 0)
-                            {
-                                q.currentCount = q.currentCounts[0];
-                            }
-                            // ▲▲▲▲▲ [추가 끝] ▲▲▲▲▲
-
-                            qData.currentCount = q.currentCount; // 이제 올바른 값이 저장됨
-                            qData.rewardClaimed = q.rewardClaimed;
-                            data.quests.Add(qData);
-                        }
+                            key = q.key,
+                            state = (int)q.state,
+                            currentCount = q.currentCount,
+                            rewardClaimed = q.rewardClaimed
+                        };
+                        data.quests.Add(qData);
                     }
                 }
             }
 
+            // ▼▼▼ [추가됨] 5. 밭 데이터 저장 ▼▼▼
+            Field[] fields = FindObjectsOfType<Field>();
+            foreach (Field f in fields)
+            {
+                if (f != null) data.fields.Add(f.GetSaveData());
+            }
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-            // --- [5] 파이어베이스 전송 ---
+            // 파이어베이스 전송
             string json = JsonUtility.ToJson(data);
 
             if (reference == null)
             {
-                // 혹시 연결 끊겼으면 재연결
                 string dbUrl = "https://whatthefarm-893d5-default-rtdb.firebaseio.com/";
                 reference = FirebaseDatabase.GetInstance(dbUrl).RootReference;
             }
 
             reference.Child("users").Child(userId).SetRawJsonValueAsync(json).ContinueWithOnMainThread(task =>
             {
-                if (task.IsCompleted) Debug.Log("✅ [최종 저장 성공] 데이터 클라우드 업로드 완료!");
-                else Debug.LogError("❌ [업로드 실패] : " + task.Exception);
+                if (task.IsCompleted) Debug.Log("✅ [저장 성공]");
+                else Debug.LogError("❌ [저장 실패] : " + task.Exception);
             });
-
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
-            // ★★★ 여기서 범인을 잡습니다! ★★★
-            Debug.LogError($"❌ [저장 중단됨] 저장하다가 에러가 났습니다!\n내용: {e.Message}\n위치: {e.StackTrace}");
+            Debug.LogError($"❌ 저장 에러: {e.Message}");
         }
     }
 
-    public void LoadAllData(string userId)
+    // ▼▼▼ [수정됨] 로딩 완료 시점을 알 수 있게 Action 추가 ▼▼▼
+    public void LoadAllData(string userId, Action onComplete = null)
     {
         reference.Child("users").Child(userId).GetValueAsync().ContinueWithOnMainThread(task =>
         {
@@ -204,45 +200,73 @@ public class DBManager : MonoBehaviour
             {
                 DataSnapshot snapshot = task.Result;
 
-                // [CASE 1] 데이터가 있을 때 (기존 유저)
                 if (snapshot.Exists)
                 {
                     string json = snapshot.GetRawJsonValue();
                     UserData data = JsonUtility.FromJson<UserData>(json);
 
-                    Debug.Log("📥 로드 시작...");
+                    // [중요] 로드된 데이터를 메모리에 저장 (씬 이동 후 밭 복구용)
+                    loadedUserData = data;
 
-                    if (PoingManager.Instance != null)
-                        PoingManager.Instance.SetLoadedPoing(data.poing);
+                    Debug.Log("📥 데이터 로드 완료!");
 
-                    if (GameProgressionManager.Instance != null)
-                        GameProgressionManager.Instance.LoadProgression(data.isShopUnlocked, data.unlockedItemNames, data.unlockedRecipeNames);
-
-                    if (InventoryManager.Instance != null)
-                        InventoryManager.Instance.LoadInventory(data.inventory);
-
-                    if (QuestManager.Instance != null)
-                        QuestManager.Instance.LoadQuestData(data.quests, data.lastLoginDate);
+                    // 매니저들에 데이터 뿌리기
+                    if (PoingManager.Instance != null) PoingManager.Instance.SetLoadedPoing(data.poing);
+                    if (GameProgressionManager.Instance != null) GameProgressionManager.Instance.LoadProgression(data.isShopUnlocked, data.unlockedItemNames, data.unlockedRecipeNames);
+                    if (InventoryManager.Instance != null) InventoryManager.Instance.LoadInventory(data.inventory);
+                    if (QuestManager.Instance != null) QuestManager.Instance.LoadQuestData(data.quests, data.lastLoginDate);
                 }
-                // [CASE 2] 데이터가 없을 때 (신규 유저 / DB 초기화 직후)
                 else
                 {
-                    Debug.Log("신규 유저 -> 초기 데이터 저장");
-
-                    if (QuestManager.Instance != null)
-                    {
-                        Debug.Log("[DBManager] QuestManager 찾음. 로딩 완료 신호 보냄.");
-                        QuestManager.Instance.LoadQuestData(null, "");
-                    }
-                    else
-                    {
-                        // ★ 만약 이 로그가 뜬다면, QuestManager가 너무 늦게 켜지는 것임!
-                        Debug.LogError("[DBManager] QuestManager가 아직 없습니다! (Instance is null)");
-                    }
-
+                    Debug.Log("신규 유저 -> 초기 데이터 생성");
+                    loadedUserData = new UserData("감자농부", 0); // 빈 데이터 초기화
                     SaveAllData(userId);
+                }
+
+                // ▼▼▼ [핵심] 로딩 끝났으니 씬 넘어가라고 신호 보냄 ▼▼▼
+                if (onComplete != null)
+                {
+                    onComplete.Invoke();
                 }
             }
         });
+    }
+
+    // ▼▼▼ [추가됨] 게임 종료 시 자동 저장 ▼▼▼
+    private void OnApplicationQuit()
+    {
+        if (Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null)
+        {
+            SaveAllData(Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.UserId);
+        }
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause && Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null)
+        {
+            SaveAllData(Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.UserId);
+        }
+    }
+
+    // ▼▼▼ [추가됨] 메인 씬 시작 시 밭 복구 함수 ▼▼▼
+    public void ApplyFieldDataToScene()
+    {
+        if (loadedUserData == null || loadedUserData.fields == null) return;
+
+        Field[] sceneFields = FindObjectsOfType<Field>();
+
+        foreach (var savedField in loadedUserData.fields)
+        {
+            foreach (var realField in sceneFields)
+            {
+                if (realField.fieldID == savedField.fieldId)
+                {
+                    realField.RestoreState(savedField);
+                    break;
+                }
+            }
+        }
+        Debug.Log("🌱 밭 상태 복구 완료!");
     }
 }
