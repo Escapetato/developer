@@ -5,9 +5,13 @@ using UnityEngine.EventSystems;
 
 public class Field : MonoBehaviour
 {
+
+    // ▼▼▼ [추가] 밭 고유 ID (인스펙터에서 0, 1, 2... 지정 필수!) ▼▼▼
+    public int fieldID;
+
     // [수정] state를 currentState와 일치시킴
     public enum FieldState { Empty, Seed, Youth, Adult, Ready }
-    private FieldState currentState = FieldState.Empty;
+    public FieldState currentState = FieldState.Empty; // private -> public으로 변경 (저장용)
 
     [Header("Field Visuals (Generic)")]
     public Sprite emptySprite;
@@ -33,6 +37,80 @@ public class Field : MonoBehaviour
 
     private void Start()
     {
+        // Start에서는 초기화하지 않습니다. (DBManager가 로드해 줄 것이라)
+        // 만약 로드할 데이터가 없을 때만 초기화하려면 아래처럼 작성
+        // UpdateFieldVisual(); 
+    }
+
+    // ▼▼▼ [추가 1] 현재 상태를 저장 데이터로 변환해서 반환 ▼▼▼
+    public FieldSaveData GetSaveData()
+    {
+        FieldSaveData data = new FieldSaveData();
+        data.fieldId = this.fieldID;
+        data.state = (int)this.currentState;
+        data.fertilizerCount = this.fertilizerCount;
+        data.remainingTime = this.remainingTime;
+
+        if (plantedSeed != null)
+            data.plantedSeedName = plantedSeed.itemName;
+        else
+            data.plantedSeedName = "";
+
+        return data;
+    }
+
+    // ▼▼▼ [추가 2] 저장된 데이터를 받아서 밭 상태 복구 ▼▼▼
+    public void RestoreState(FieldSaveData data)
+    {
+        // 1. 기본 수치 복구
+        this.currentState = (FieldState)data.state;
+        this.fertilizerCount = data.fertilizerCount;
+        this.remainingTime = data.remainingTime;
+
+        // 2. 기존 식물 제거
+        if (plantInstance != null) Destroy(plantInstance);
+        if (growCoroutine != null) StopCoroutine(growCoroutine);
+
+        // 3. 심겨진 씨앗이 있었다면 복구
+        if (!string.IsNullOrEmpty(data.plantedSeedName) && currentState != FieldState.Empty)
+        {
+            // DBManager에서 이름으로 아이템 데이터 찾기
+            ItemData seedData = DBManager.Instance.FindItemByName(data.plantedSeedName);
+
+            if (seedData != null)
+            {
+                plantedSeed = seedData;
+
+                // [중요] 성장 중이거나 다 자랐다면 프리팹 생성
+                if (seedData.plantPrefab != null)
+                {
+                    plantInstance = Instantiate(seedData.plantPrefab, plantAnchor.position, Quaternion.identity, plantAnchor);
+
+                    // 크기(Scale) 복구 로직 (성장 비율에 맞춰서)
+                    float totalTime = seedData.growTime;
+                    float progress = 1f;
+                    if (totalTime > 0) progress = 1f - (remainingTime / totalTime);
+
+                    if (currentState == FieldState.Ready)
+                        plantInstance.transform.localScale = Vector3.one;
+                    else
+                        plantInstance.transform.localScale = Vector3.one * Mathf.Lerp(0.3f, 1f, progress);
+                }
+
+                // [중요] 아직 자라는 중이면 코루틴 재시작 (남은 시간만큼만)
+                if (currentState != FieldState.Ready)
+                {
+                    growCoroutine = StartCoroutine(GrowRoutine(remainingTime));
+                }
+            }
+        }
+        else
+        {
+            plantedSeed = null;
+            currentState = FieldState.Empty;
+        }
+
+        // 4. 이미지 갱신
         UpdateFieldVisual();
     }
 

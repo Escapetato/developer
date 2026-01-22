@@ -21,12 +21,12 @@ MonoBehaviour:
   price: 300
   seedCategory: 3
   plantPrefab: {fileID: 0}
-  growTime: 5
+  growTime: 54000
   harvestItem: {fileID: 11400000, guid: d610bf3fa42cdad42b18e4b755464ac4, type: 2}
-  requiredToolTier: 1
+  requiredToolTier: 4
   readyFieldSprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
-  growTimeDisplay: "1\uBD84"
-  harvestToolName: "\uD638\uBBF8"
+  growTimeDisplay: 
+  harvestToolName: 
   toolTier: 0
   growthReductionPercent: 0.25
   isDefaultUnlocked: 0

@@ -244,8 +244,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2896,17 +2896,17 @@ MonoBehaviour:
   - {fileID: 2059707437}
   - {fileID: 8242206}
   - {fileID: 1633597192}
-  iconLand: {fileID: 21300000, guid: cd337b78235dc814f97579e44a0e1565, type: 3}
+  iconLand: {fileID: 21300000, guid: dfd05fd1b1a79c54e97b150c7ee19b66, type: 3}
   iconNat: {fileID: 21300000, guid: 79fdb496fa0e0a14f908ba2886d6ee38, type: 3}
   iconSap: {fileID: 21300000, guid: 8691dcd6de667fe4ea703584d6337d7a, type: 3}
   iconGawi: {fileID: 21300000, guid: 1ad5c650a6c53de44b91fb8881150436, type: 3}
-  iconLandOff: {fileID: 21300000, guid: 681d326e8d6022a4ab44b49f1cd8f630, type: 3}
+  iconLandOff: {fileID: 21300000, guid: e91657e3eca26f246bbef64d0346051c, type: 3}
   iconNatOff: {fileID: 21300000, guid: 1fe0fae9ac0a05a49bd48a6ee0347be5, type: 3}
   iconSapOff: {fileID: 21300000, guid: 705f6ec72fca0654ea930cb732ac7bc3, type: 3}
   iconGawiOff: {fileID: 21300000, guid: 166a0cf88cd9d184fb84fd75db2f0b38, type: 3}
-  iconPoing: {fileID: 21300000, guid: be78140b2a9c58041b04171bdf9838cb, type: 3}
+  iconPoing: {fileID: 21300000, guid: b263259c9ef990f4d9b2adc9aba14534, type: 3}
   iconFertilizer: {fileID: 21300000, guid: 9b6830dd7d9d03b43959fe3a23335343, type: 3}
-  iconPoingOff: {fileID: 21300000, guid: 4aba294a941c55e448dbee323b53acc3, type: 3}
+  iconPoingOff: {fileID: 21300000, guid: 73cb2702e6135da468afbf52bbbe0b3a, type: 3}
   iconFertilizerOff: {fileID: 21300000, guid: 3df7f553ebe5adf46bab1e7f8fe12259, type: 3}
   potionIcons:
   - {fileID: 21300000, guid: 43189a52baf92a2459b1f3dc891d535b, type: 3}
@@ -2933,7 +2933,6 @@ MonoBehaviour:
   - {fileID: 779664668}
   - {fileID: 489352208}
   scrollRect: {fileID: 0}
-  closedScrollThreshold: 5
 --- !u!1 &1107534420
 GameObject:
   m_ObjectHideFlags: 0
@@ -4008,8 +4007,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -4471,8 +4470,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -4681,8 +4680,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5602,8 +5601,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

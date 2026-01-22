@@ -23,17 +23,24 @@ public class StoreUI : MonoBehaviour
     public GameObject detailPanelObject;
     public Image detailImage;
     public TextMeshProUGUI detailNameText;
-
-    // ▼ [기존] 총 가격 표시 (코인 아이콘 옆)
     public TextMeshProUGUI detailTotalPriceText;
-
-    // ▼▼▼ [추가] 현재 보유 개수 표시 (박스 아이콘 옆) ▼▼▼
     public TextMeshProUGUI detailOwnedText;
 
     [Header("Quantity Controls")]
-    public Button decreaseButton;      // 수량 감소 (<)
-    public Button increaseButton;      // 수량 증가 (>)
-    public TextMeshProUGUI quantityText; // 가운데 구매할 수량 숫자 (1)
+    public Button decreaseButton;
+    public Button increaseButton;
+    public TextMeshProUGUI quantityText;
+
+    // 버튼 이미지 제어 변수
+    private Image decreaseBtnImage;
+    private Image increaseBtnImage;
+
+    [Space(10)]
+    [Header("Button Sprites (드래그해서 채워주세요)")]
+    public Sprite leftBtnOn;   // ui_amount_pre (갈색)
+    public Sprite leftBtnOff;  // ui_amount_pre_off (회색)
+    public Sprite rightBtnOn;  // ui_amount_next (갈색)
+    public Sprite rightBtnOff; // ui_amount_next_off (회색)
 
     public Button buyButton;
     public TextMeshProUGUI buyButtonText;
@@ -51,20 +58,26 @@ public class StoreUI : MonoBehaviour
         else Destroy(gameObject);
 
         slots = new List<ItemSlot>();
-        slotParent.GetComponentsInChildren<ItemSlot>(slots);
+        if (slotParent != null)
+            slotParent.GetComponentsInChildren<ItemSlot>(slots);
 
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
 
+        // 버튼 이미지 자동 찾기
         if (decreaseButton != null)
         {
             decreaseButton.onClick.RemoveAllListeners();
             decreaseButton.onClick.AddListener(OnDecreaseQuantity);
+            decreaseBtnImage = decreaseButton.GetComponent<Image>();
         }
+
         if (increaseButton != null)
         {
             increaseButton.onClick.RemoveAllListeners();
             increaseButton.onClick.AddListener(OnIncreaseQuantity);
+            increaseBtnImage = increaseButton.GetComponent<Image>();
         }
+
         if (buyButton != null)
         {
             buyButton.onClick.RemoveAllListeners();
@@ -89,7 +102,6 @@ public class StoreUI : MonoBehaviour
 
     private void RedrawStore()
     {
-        // (기존과 동일하여 생략 가능하지만 복붙 편의를 위해 유지)
         int i = 0;
         if (storeDB == null) return;
 
@@ -158,15 +170,11 @@ public class StoreUI : MonoBehaviour
 
             if (buyButton != null) buyButton.gameObject.SetActive(true);
 
-            // ▼▼▼ [수정됨] 현재 보유량(Owned) 표시 로직 ▼▼▼
             int myCount = InventoryManager.Instance.GetItemCount(item);
             if (detailOwnedText != null)
             {
-                // 박스 아이콘 옆 텍스트에 내 개수 표시
                 detailOwnedText.text = myCount.ToString();
             }
-            // ▲▲▲ 추가 완료 ▲▲▲
-
 
             // 1. 잠긴 아이템
             if (item.itemName == "???")
@@ -204,11 +212,11 @@ public class StoreUI : MonoBehaviour
                     }
                 }
             }
-            // 3. 일반 아이템
+            // 3. 일반 아이템 (수량 조절 가능)
             else
             {
                 SetQuantityControlsActive(true);
-                UpdateQuantityUI(); // 가격 계산 갱신
+                UpdateQuantityUI();
 
                 if (buyButton != null)
                 {
@@ -241,10 +249,11 @@ public class StoreUI : MonoBehaviour
         int myPoing = PoingManager.Instance.GetPoing();
         int price = selectedItem.price > 0 ? selectedItem.price : 999999;
         int maxAffordable = myPoing / price;
-
         if (maxAffordable == 0) maxAffordable = 1;
 
-        if (currentBuyQuantity < 99)
+        int finalMax = Mathf.Min(maxAffordable, 99);
+
+        if (currentBuyQuantity < finalMax)
         {
             currentBuyQuantity++;
             UpdateQuantityUI();
@@ -259,18 +268,54 @@ public class StoreUI : MonoBehaviour
     {
         if (selectedItem == null) return;
 
-        // 1. 가운데 구매 수량 (< 1 >)
         if (quantityText != null)
             quantityText.text = currentBuyQuantity.ToString();
 
-        // 2. 총 가격 (코인 아이콘 옆)
         int totalCost = selectedItem.price * currentBuyQuantity;
         if (detailTotalPriceText != null)
             detailTotalPriceText.text = totalCost.ToString();
 
-        // 3. 버튼 텍스트
         if (buyButtonText != null)
             buyButtonText.text = $"{currentBuyQuantity}개 구매";
+
+        UpdateButtonSprites();
+    }
+
+    private void UpdateButtonSprites()
+    {
+        int myPoing = PoingManager.Instance.GetPoing();
+        int price = selectedItem.price > 0 ? selectedItem.price : 999999;
+        int maxAffordable = myPoing / price;
+        if (maxAffordable == 0) maxAffordable = 1;
+        int finalMax = Mathf.Min(maxAffordable, 99);
+
+        if (decreaseButton != null && decreaseBtnImage != null)
+        {
+            if (currentBuyQuantity <= 1)
+            {
+                decreaseButton.interactable = false;
+                if (leftBtnOff != null) decreaseBtnImage.sprite = leftBtnOff;
+            }
+            else
+            {
+                decreaseButton.interactable = true;
+                if (leftBtnOn != null) decreaseBtnImage.sprite = leftBtnOn;
+            }
+        }
+
+        if (increaseButton != null && increaseBtnImage != null)
+        {
+            if (currentBuyQuantity >= finalMax)
+            {
+                increaseButton.interactable = false;
+                if (rightBtnOff != null) increaseBtnImage.sprite = rightBtnOff;
+            }
+            else
+            {
+                increaseButton.interactable = true;
+                if (rightBtnOn != null) increaseBtnImage.sprite = rightBtnOn;
+            }
+        }
     }
 
     public void OnRealPurchaseClick()
@@ -279,23 +324,29 @@ public class StoreUI : MonoBehaviour
 
         int totalCost = selectedItem.price * currentBuyQuantity;
 
-        if (PoingManager.Instance.HasEnoughPoing(totalCost))
-        {
-            PoingManager.Instance.DecreasePoing(totalCost);
-            InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
-
-            NotifyPurchaseToQuest(selectedItem, currentBuyQuantity);
-
-            UIManager.Instance.ShowAlertPopup($"{selectedItem.itemName} {currentBuyQuantity}개 구매 완료!");
-            SoundManager.Instance.PlaySFX("Money");
-
-            // ▼▼▼ [중요] 구매 후 보유량이 늘었으니 UI를 갱신해줌! ▼▼▼
-            UpdateDetailPanel(selectedItem, true);
-        }
-        else
+        if (!PoingManager.Instance.HasEnoughPoing(totalCost))
         {
             UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
+            return;
         }
+
+        // 여기서 질문 팝업을 띄웁니다!
+        UIManager.Instance.ShowConfirmPopup(
+            $"{totalCost} 포잉으로 구매하시겠습니까?",
+            () =>
+            {
+                // [진짜 구매 로직 - 사용자가 '네'를 누르면 실행됨]
+                PoingManager.Instance.DecreasePoing(totalCost);
+                InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
+
+                NotifyPurchaseToQuest(selectedItem, currentBuyQuantity);
+
+                UIManager.Instance.ShowAlertPopup("구매 완료!");
+
+                // 구매 후 UI 갱신
+                UpdateDetailPanel(selectedItem, true);
+            }
+        );
     }
 
     public void ClearSelection()
