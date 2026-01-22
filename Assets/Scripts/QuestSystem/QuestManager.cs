@@ -89,7 +89,7 @@ public class QuestManager : MonoBehaviour
             dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
 
         // 런타임 상태(새로 생성)
-        dst.state = src.state;               // 혹은 Locked로 통일해도 됨(InitializeQuestStates가 어차피 초기화)
+        dst.state = src.state;               
         dst.currentCount = src.currentCount;
         dst.rewardClaimed = src.rewardClaimed;
         //dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
@@ -190,7 +190,6 @@ public class QuestManager : MonoBehaviour
     }
 
     // [QuestManager.cs] OpenInitialSlots 함수 수정
-    // QuestManager.cs -> OpenInitialSlots 함수 (이걸로 교체!)
     private void OpenInitialSlots()
     {
         MainQuestSlot();
@@ -441,7 +440,7 @@ public class QuestManager : MonoBehaviour
     {
         if (quest == null) return false;
 
-        // ⚠️ 일일 제외
+        // 일일 제외
         if (quest.type == QuestType.Daily) return false;
 
         // 이미 받았으면 종료
@@ -450,7 +449,7 @@ public class QuestManager : MonoBehaviour
         // 완료 안 됐으면 종료 (테스트로 counts 조작하면 통과 가능)
         if (!IsCompletedByCounts(quest)) return false;
 
-        // ⚠️ 땅 확장 구현 필요 
+        // 땅 확장 구현 필요 
         if (quest.rewardItem == null) return false;
 
         int amount = Mathf.Max(1, quest.rewardAmount);
