@@ -23,9 +23,12 @@ MonoBehaviour:
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
+  readyFieldSprite: {fileID: 0}
   growTimeDisplay: "10\uC2DC\uAC04"
   harvestToolName: "\uBAA8\uC885\uC0BD"
   toolTier: 0
   growthReductionPercent: 0.25
   isDefaultUnlocked: 0
-  itemDescription: 
+  itemDescription: "\uD587\uC0B4\uC744 \uBA38\uAE08\uC740 \uB2EC\uCF64\uD55C \uC904\uAE30.
+    \uBD80\uB4DC\uB7FD\uAC8C \uC539\uC744\uC218\uB85D \uC740\uC740\uD55C \uB2E8\uB9DB\uC774
+    \uC785\uC548\uC5D0 \uBC88\uC9C4\uB2E4."
