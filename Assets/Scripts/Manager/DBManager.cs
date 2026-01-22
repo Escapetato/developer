@@ -46,6 +46,10 @@ public class QuestSaveData
     public int state;
     public int currentCount;
     public bool rewardClaimed;
+
+    // ▼▼▼ [추가] 일일 퀘스트 복구용 데이터 ▼▼▼
+    public int dailyDifficulty; // 0:Low, 1:Medium, 2:High
+    public int dailyRewardKey;  // 보상 아이템 ID
 }
 
 [Serializable]
@@ -155,7 +159,12 @@ public class DBManager : MonoBehaviour
                             key = q.key,
                             state = (int)q.state,
                             currentCount = q.currentCount,
-                            rewardClaimed = q.rewardClaimed
+                            rewardClaimed = q.rewardClaimed,
+
+                            // ▼▼▼ [수정됨] 일일 퀘스트 정보 저장 추가 ▼▼▼
+                            dailyDifficulty = (int)q.dailyDifficulty,
+                            dailyRewardKey = q.rewardKey
+                            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
                         };
                         data.quests.Add(qData);
                     }

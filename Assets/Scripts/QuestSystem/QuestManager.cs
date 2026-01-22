@@ -325,43 +325,44 @@ public class QuestManager : MonoBehaviour
         return cnt;
     }
 
-    // 수정
     public void LoadQuestData(List<QuestSaveData> savedQuests, string dateStr)
     {
         Debug.Log($"[QuestManager] LoadQuestData 호출됨. 저장된 퀘스트 수: {(savedQuests != null ? savedQuests.Count : 0)}");
 
         lastSavedDate = dateStr;
 
-        // 1. 초기화 (일일 퀘스트 내용/목표 설정됨)
+        // 1. 기본 퀘스트 데이터 로드 (DB에서 원본 가져오기)
         InitializeIfNeeded();
 
-        // [CASE 1] 저장된 데이터가 없는 경우 (신규 유저 / DB 초기화)
+        // [CASE 1] 신규 유저 (저장 데이터 없음)
         if (savedQuests == null || savedQuests.Count == 0)
         {
             Debug.Log("[QuestManager] 저장된 퀘스트 데이터가 없습니다. (신규 시작)");
-
             if (string.IsNullOrEmpty(lastSavedDate))
                 lastSavedDate = System.DateTime.Today.ToString("yyyy-MM-dd");
 
-            isLoaded = true; // 로딩 완료 도장
+            isLoaded = true;
             OpenInitialSlots(); // 초기 슬롯 오픈 + 저장
             return;
         }
 
-        // [CASE 2] 저장된 데이터가 있는 경우 (기존 유저)
+        // [CASE 2] 기존 유저 (데이터 복구)
 
-        // 상태 리셋
+        // 2-1. 일단 모든 퀘스트 상태를 초기화 (Locked)
         foreach (var q in allQuestList)
         {
             q.state = QuestState.Locked;
             q.currentCount = 0;
             q.rewardClaimed = false;
             q.isNewlyOpened = false;
+
+            // 배열 안전하게 초기화
+            EnsureConditionArrays(q);
             if (q.currentCounts != null)
                 for (int i = 0; i < q.currentCounts.Length; i++) q.currentCounts[i] = 0;
         }
 
-        // 데이터 덮어쓰기
+        // 2-2. 저장된 데이터 덮어쓰기 반복문 안에서 수정
         foreach (var savedQ in savedQuests)
         {
             if (savedQ == null) continue;
@@ -369,51 +370,38 @@ public class QuestManager : MonoBehaviour
             QuestData myQuest = allQuestList.Find(q => q.key == savedQ.key);
             if (myQuest != null)
             {
-                // 저장된 상태 복구
+                // ▼▼▼ [추가] 일일 퀘스트라면, 상태 적용 전에 '내용(목표/제목)'부터 복구해야 함! ▼▼▼
+                if (myQuest.type == QuestType.Daily)
+                {
+                    // 저장된 난이도와 보상 키로 퀘스트 스펙 재설정
+                    DailyQuestSelector.RestoreDailyQuest(myQuest, savedQ.dailyDifficulty, savedQ.dailyRewardKey);
+                }
+                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+                // 상태 복구
                 myQuest.state = (QuestState)savedQ.state;
                 myQuest.currentCount = savedQ.currentCount;
                 myQuest.rewardClaimed = savedQ.rewardClaimed;
 
                 EnsureConditionArrays(myQuest);
 
-                // 배열에도 값 동기화
+                // 현재 수치 배열 복구
                 if (myQuest.currentCounts != null && myQuest.currentCounts.Length > 0)
                 {
                     myQuest.currentCounts[0] = savedQ.currentCount;
                 }
-
-                // ▼▼▼ [여기 추가됨!] 일일 퀘스트 완료 체크 보정 ▼▼▼
-                // 불러온 카운트가 목표치 이상이면, 상태를 'Completed(완료)'로 강제 변경
-                if (myQuest.type == QuestType.Daily && myQuest.state == QuestState.Active)
-                {
-                    if (myQuest.targetCounts != null && myQuest.targetCounts.Length > 0)
-                    {
-                        int target = myQuest.targetCounts[0];
-                        int current = myQuest.currentCounts[0];
-
-                        // 목표 달성했으면 완료 상태로!
-                        if (target > 0 && current >= target)
-                        {
-                            myQuest.state = QuestState.Completed;
-                            Debug.Log($"[Load] 일일 퀘스트({myQuest.title}) 완료 상태로 보정됨 ({current}/{target})");
-                        }
-                    }
-                }
-                // ▲▲▲ [추가 끝] ▲▲▲
             }
         }
 
-        // 로딩 완료 도장 찍기 (먼저 찍어야 OpenInitialSlots에서 저장됨)
+        // 로딩 완료
         isLoaded = true;
 
-        // 슬롯 갱신
+        // 슬롯 및 상태 갱신
         OpenInitialSlots();
         RebuildActiveConditionIndex();
-
-        // DB 로드 완료(=로그인) 시점에 LoginStreak 갱신
         ApplyLoginStreakOnLogin(lastSavedDate);
 
-        Debug.Log($"[QuestManager] 퀘스트 복구 최종 완료! 메인 진행중: {CountActive(mainQuests)}개");
+        Debug.Log($"[QuestManager] 퀘스트 복구 완료! 메인 진행중: {CountActive(mainQuests)}개");
     }
 
 
