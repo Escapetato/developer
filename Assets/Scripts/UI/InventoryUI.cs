@@ -19,18 +19,30 @@ public class InventoryUI : MonoBehaviour
     public Image detailImage;
     public TextMeshProUGUI detailNameText;
 
-    // ▼ 가격 대신 '판매 불가' 텍스트를 띄울 곳
+    // 가격 대신 '판매 불가' 텍스트를 띄울 곳
     public TextMeshProUGUI detailTotalPriceText;
 
-    // ▼ 현재 보유 수량 표시
+    // 현재 보유 수량 표시
     public TextMeshProUGUI detailOwnedCountText;
 
-    // ▼ 수량 조절 버튼들
+    [Header("Quantity Controls")]
     public Button decreaseButton;
     public Button increaseButton;
     public TextMeshProUGUI quantityText;
 
-    // ▼ 판매 버튼
+    // ▼▼▼ [수정] Image 변수는 삭제하고, 그림(Sprite) 변수만 남김 ▼▼▼
+    private Image decreaseBtnImage; // 코드에서 자동으로 찾음
+    private Image increaseBtnImage; // 코드에서 자동으로 찾음
+
+    [Space(10)]
+    [Header("Button Sprites (드래그해서 채워주세요)")]
+    public Sprite arrowLeftOn;          // 켜짐 (<) - 원래 색
+    public Sprite arrowLeftOff;         // 꺼짐 (<) - 회색
+    public Sprite arrowRightOn;         // 켜짐 (>) - 원래 색
+    public Sprite arrowRightOff;        // 꺼짐 (>) - 회색
+    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+    // 판매 버튼
     public Button sellButton;
     public TextMeshProUGUI sellButtonText;
 
@@ -47,21 +59,26 @@ public class InventoryUI : MonoBehaviour
         else Destroy(gameObject);
 
         slots = new List<ItemSlot>();
-        slotParent.GetComponentsInChildren<ItemSlot>(slots);
+        if (slotParent != null)
+            slotParent.GetComponentsInChildren<ItemSlot>(slots);
 
         if (detailPanelObject != null) detailPanelObject.SetActive(false);
 
-        // 버튼 리스너 연결
+        // ▼▼▼ [핵심] 버튼 오브젝트에서 바로 Image 컴포넌트를 가져옴 ▼▼▼
         if (decreaseButton != null)
         {
             decreaseButton.onClick.RemoveAllListeners();
             decreaseButton.onClick.AddListener(OnDecreaseQuantity);
+            decreaseBtnImage = decreaseButton.GetComponent<Image>();
         }
         if (increaseButton != null)
         {
             increaseButton.onClick.RemoveAllListeners();
             increaseButton.onClick.AddListener(OnIncreaseQuantity);
+            increaseBtnImage = increaseButton.GetComponent<Image>();
         }
+        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
         if (sellButton != null)
         {
             sellButton.onClick.RemoveAllListeners();
@@ -114,18 +131,15 @@ public class InventoryUI : MonoBehaviour
         else ClearSelection();
     }
 
-    // ▼▼▼ [수정됨] UI 갱신 로직 ▼▼▼
     private void UpdateDetailPanel(ItemData item)
     {
         if (item != null)
         {
             detailPanelObject.SetActive(true);
 
-            // 기본 정보 표시 (아이콘, 이름)
             if (detailImage != null) detailImage.sprite = item.itemIcon;
             if (detailNameText != null) detailNameText.text = item.itemName;
 
-            // 보유 수량 표시 (항상 표시)
             int myCount = 0;
             if (InventoryManager.Instance.items.ContainsKey(item))
                 myCount = InventoryManager.Instance.items[item];
@@ -133,21 +147,14 @@ public class InventoryUI : MonoBehaviour
             if (detailOwnedCountText != null)
                 detailOwnedCountText.text = myCount.ToString();
 
-            // 판매 버튼 일단 켜두기 (위치 잡기용)
             if (sellButton != null) sellButton.gameObject.SetActive(true);
 
-            // ------------------------------------------------
             // [분기점] 작물(Crop) vs 그 외
-            // ------------------------------------------------
             if (item.itemCategory == "Crop")
             {
-                // 1. 수량 조절 버튼 활성화
                 SetQuantityControlsActive(true);
+                UpdateQuantityUI(); // 여기서 버튼 이미지 갱신됨
 
-                // 2. 가격 및 수량 텍스트 정상 갱신
-                UpdateQuantityUI();
-
-                // 3. 판매 버튼 활성화 (보유량이 있을 때만 클릭 가능)
                 if (sellButton != null)
                 {
                     sellButton.interactable = (myCount > 0);
@@ -156,38 +163,31 @@ public class InventoryUI : MonoBehaviour
             }
             else
             {
-                // [작물이 아님 -> 판매 불가]
-
-                // 1. 수량 조절 버튼(<, >)과 숫자 숨기기
+                // 작물이 아니면 수량 조절 숨김
                 if (decreaseButton != null) decreaseButton.gameObject.SetActive(false);
                 if (increaseButton != null) increaseButton.gameObject.SetActive(false);
                 if (quantityText != null) quantityText.gameObject.SetActive(false);
 
-                // 2. [요청사항] 포잉(가격) 텍스트에 "판매 불가" 띄우기
                 if (detailTotalPriceText != null)
                 {
-                    detailTotalPriceText.gameObject.SetActive(true); // 텍스트는 켜고
-                    detailTotalPriceText.text = "판매 불가";         // 내용을 변경
+                    detailTotalPriceText.gameObject.SetActive(true);
+                    detailTotalPriceText.text = "판매 불가";
                 }
 
-                // 3. [요청사항] 판매 버튼은 보이지만 "판매 불가"로 변경
                 if (sellButton != null)
                 {
-                    sellButton.interactable = false; // 클릭 금지
+                    sellButton.interactable = false;
                     if (sellButtonText != null) sellButtonText.text = "판매 불가";
                 }
             }
         }
     }
 
-    // 수량 조절 버튼 활성/비활성 헬퍼 함수
     private void SetQuantityControlsActive(bool isActive)
     {
         if (decreaseButton != null) decreaseButton.gameObject.SetActive(isActive);
         if (increaseButton != null) increaseButton.gameObject.SetActive(isActive);
         if (quantityText != null) quantityText.gameObject.SetActive(isActive);
-
-        // 가격 텍스트는 위에서 따로 제어하므로 여기서는 켜줍니다.
         if (detailTotalPriceText != null) detailTotalPriceText.gameObject.SetActive(true);
     }
 
@@ -197,6 +197,7 @@ public class InventoryUI : MonoBehaviour
         {
             currentSellQuantity--;
             UpdateQuantityUI();
+            SoundManager.Instance.PlaySFX("button");
         }
     }
 
@@ -209,6 +210,7 @@ public class InventoryUI : MonoBehaviour
         {
             currentSellQuantity++;
             UpdateQuantityUI();
+            SoundManager.Instance.PlaySFX("button");
         }
     }
 
@@ -221,13 +223,46 @@ public class InventoryUI : MonoBehaviour
 
         // 가격 계산
         int totalEarnings = selectedItem.price * currentSellQuantity;
-
-        // 가격 텍스트
         if (detailTotalPriceText != null) detailTotalPriceText.text = totalEarnings.ToString();
 
         // 버튼 텍스트
         if (sellButtonText != null) sellButtonText.text = $"{currentSellQuantity}개 판매";
+
+        // ▼▼▼ [핵심] 버튼 이미지 갱신 ▼▼▼
+        UpdateArrowButtons();
     }
+
+    // ▼▼▼ [추가] 버튼 상태 및 이미지 갱신 함수 ▼▼▼
+    private void UpdateArrowButtons()
+    {
+        if (selectedItem == null) return;
+        int maxCount = InventoryManager.Instance.GetItemCount(selectedItem);
+
+        // 1. 감소 버튼 (최소 1개)
+        if (currentSellQuantity <= 1)
+        {
+            if (decreaseButton != null) decreaseButton.interactable = false;
+            if (decreaseBtnImage != null && arrowLeftOff != null) decreaseBtnImage.sprite = arrowLeftOff;
+        }
+        else
+        {
+            if (decreaseButton != null) decreaseButton.interactable = true;
+            if (decreaseBtnImage != null && arrowLeftOn != null) decreaseBtnImage.sprite = arrowLeftOn;
+        }
+
+        // 2. 증가 버튼 (최대 보유량)
+        if (currentSellQuantity >= maxCount)
+        {
+            if (increaseButton != null) increaseButton.interactable = false;
+            if (increaseBtnImage != null && arrowRightOff != null) increaseBtnImage.sprite = arrowRightOff;
+        }
+        else
+        {
+            if (increaseButton != null) increaseButton.interactable = true;
+            if (increaseBtnImage != null && arrowRightOn != null) increaseBtnImage.sprite = arrowRightOn;
+        }
+    }
+    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
     public void OnRealSellClick()
     {
