@@ -12,7 +12,6 @@ public class CollectionUI : MonoBehaviour
     public List<EvolutionRecipe> allRecipes;
 
     [Header("--- Category Buttons (탭) ---")]
-    // ★ [추가] 탭 버튼들을 관리할 리스트
     public List<CategoryButton> categoryButtons;
 
     [Header("--- Assets ---")]
@@ -52,31 +51,24 @@ public class CollectionUI : MonoBehaviour
 
     void OnEnable()
     {
-        // 첫 번째 탭 버튼을 자동으로 누르게 함
         if (categoryButtons != null && categoryButtons.Count > 0)
         {
             SetCategoryButton(categoryButtons[0]);
         }
         else
         {
-            // 버튼 연결 안 했을 때를 대비한 안전장치
             SetCategory("Vegetable");
         }
     }
 
-    // ★ [추가] 탭 버튼 클릭 시 호출되는 함수 (이미지 교체 + 페이지 갱신)
+    // 탭 버튼 클릭 시 호출
     public void SetCategoryButton(CategoryButton clickedButton)
     {
-        // 1. 모든 버튼을 '선택 안 됨(Default)' 상태로
         foreach (CategoryButton btn in categoryButtons)
         {
             btn.SetSelected(false);
         }
-
-        // 2. 클릭한 버튼만 '선택 됨(Selected)' 상태로
         clickedButton.SetSelected(true);
-
-        // 3. 실제 카테고리 데이터 갱신
         SetCategory(clickedButton.categoryName);
     }
 
@@ -112,9 +104,59 @@ public class CollectionUI : MonoBehaviour
         UpdateLeftPage();
     }
 
+    // ▼▼▼ [핵심] 외부에서 특정 아이템을 보여달라고 할 때 쓰는 함수 ▼▼▼
+    public void ShowItem(ItemData itemToShow)
+    {
+        if (itemToShow == null) return;
+
+        // 1. 이 아이템이 진화 결과물인지 확인하고, 베이스 작물(어미) 찾기
+        EvolutionRecipe targetRecipe = allRecipes.Find(r => r.resultItem == itemToShow);
+        ItemData baseItem = null;
+
+        if (targetRecipe != null)
+        {
+            baseItem = targetRecipe.material; // 진화 재료(베이스 작물)를 찾음
+        }
+        else
+        {
+            baseItem = itemToShow; // 진화 결과물이 아니면 그 자체가 베이스라고 가정
+        }
+
+        // 2. 해당 카테고리 탭으로 이동 (버튼 색상도 같이 갱신)
+        if (categoryButtons != null)
+        {
+            foreach (var btn in categoryButtons)
+            {
+                if (btn.categoryName == baseItem.collectionCategory)
+                {
+                    SetCategoryButton(btn);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            SetCategory(baseItem.collectionCategory);
+        }
+
+        // 3. 리스트에서 해당 작물 페이지 찾기
+        int targetIndex = currentCategoryList.FindIndex(x => x == baseItem);
+        if (targetIndex != -1)
+        {
+            currentIndex = targetIndex;
+            UpdateLeftPage(); // 왼쪽 페이지 갱신
+        }
+
+        // 4. 진화 결과물이라면 오른쪽 상세페이지도 즉시 보여주기
+        if (targetRecipe != null)
+        {
+            ShowRightPage(targetRecipe);
+        }
+    }
+    // ▲▲▲ 추가 완료 ▲▲▲
+
     private void UpdateLeftPage()
     {
-        // 1. 데이터 안전 점검
         if (currentCategoryList == null || currentCategoryList.Count == 0) return;
 
         if (rightPageGroup != null) rightPageGroup.SetActive(false);
@@ -122,13 +164,9 @@ public class CollectionUI : MonoBehaviour
         if (evoSlot2 != null) evoSlot2.SetSelected(false);
 
         ItemData currentBaseItem = currentCategoryList[currentIndex];
-
-        // 2. 메인 작물(베이스) 해금 여부 확인
         bool isBaseUnlocked = GameProgressionManager.Instance.IsItemUnlocked(currentBaseItem);
 
-        // [디버깅용 로그] 메인 작물 상태 확인
-        Debug.Log($"현재 작물: {currentBaseItem.itemName}, 메인 해금여부: {isBaseUnlocked}");
-
+        // 왼쪽 페이지 표시
         if (isBaseUnlocked)
         {
             if (baseCropImage != null) baseCropImage.sprite = currentBaseItem.itemIcon;
@@ -144,7 +182,7 @@ public class CollectionUI : MonoBehaviour
             if (toolText != null) toolText.text = "수확 도구: ???";
         }
 
-        // 3. 진화 레시피 찾기
+        // 하단 진화 슬롯 설정
         List<EvolutionRecipe> myRecipes = new List<EvolutionRecipe>();
         foreach (var recipe in allRecipes)
         {
@@ -154,18 +192,11 @@ public class CollectionUI : MonoBehaviour
             }
         }
 
-        // 슬롯 1 처리
+        // 슬롯 1
         if (myRecipes.Count > 0)
         {
-            // 원래 결과물이 해금되었는지?
-            bool isResultOriginallyUnlocked = GameProgressionManager.Instance.IsItemUnlocked(myRecipes[0].resultItem);
-
-            // ★ [최종 판정] 메인 작물도 뚫리고(AND) && 결과물도 뚫려야 진짜 보여줌
-            bool finalShow = isBaseUnlocked && isResultOriginallyUnlocked;
-
-            // 디버깅: 왜 false인지 확인해보세요
-            // Debug.Log($"슬롯1 판정: 메인({isBaseUnlocked}) && 결과({isResultOriginallyUnlocked}) = 최종({finalShow})");
-
+            bool isResultUnlocked = GameProgressionManager.Instance.IsItemUnlocked(myRecipes[0].resultItem);
+            bool finalShow = isBaseUnlocked && isResultUnlocked;
             evoSlot1.Setup(myRecipes[0], finalShow);
         }
         else
@@ -173,14 +204,11 @@ public class CollectionUI : MonoBehaviour
             evoSlot1.Setup(null, false);
         }
 
-        // 슬롯 2 처리
+        // 슬롯 2
         if (myRecipes.Count > 1)
         {
-            bool isResultOriginallyUnlocked = GameProgressionManager.Instance.IsItemUnlocked(myRecipes[1].resultItem);
-
-            // ★ [최종 판정] 여기도 똑같이 && 연산자 필수
-            bool finalShow = isBaseUnlocked && isResultOriginallyUnlocked;
-
+            bool isResultUnlocked = GameProgressionManager.Instance.IsItemUnlocked(myRecipes[1].resultItem);
+            bool finalShow = isBaseUnlocked && isResultUnlocked;
             evoSlot2.Setup(myRecipes[1], finalShow);
         }
         else
@@ -211,10 +239,8 @@ public class CollectionUI : MonoBehaviour
 
         if (resultCropImage != null) resultCropImage.sprite = recipe.resultItem.itemIcon;
         if (resultName != null) resultName.text = recipe.resultItem.itemName;
-
-        if (potionUsedText != null) potionUsedText.text = "생명의 물방울: " + recipe.potion.itemName;
+        if (potionUsedText != null) potionUsedText.text = recipe.potion.itemName;
         if (potionUsedImage != null) potionUsedImage.sprite = recipe.potion.itemIcon;
-
         if (descriptionText != null) descriptionText.text = recipe.resultItem.itemDescription;
     }
 
@@ -222,5 +248,4 @@ public class CollectionUI : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
-
 }
