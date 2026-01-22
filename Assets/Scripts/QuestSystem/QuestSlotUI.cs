@@ -1,6 +1,8 @@
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class QuestSlotUI : MonoBehaviour
 {
@@ -12,7 +14,10 @@ public class QuestSlotUI : MonoBehaviour
     [SerializeField] private Sprite selectedSprite;
 
     [Header("새로 열린 퀘스트 (빨간 점)")]
-    [SerializeField] private GameObject newDotObject; 
+    [SerializeField] private GameObject newDotObject;
+
+    [Header("일일퀘스트 선택 상태 계속 유지(보상 완료 버튼 후에도)")]
+    [SerializeField] private Image borderImage; // 실제 테두리(라인) Image
 
     private QuestData boundQuest;
     private bool isDailySlot = false;
@@ -29,9 +34,11 @@ public class QuestSlotUI : MonoBehaviour
         if (button != null)
         {
             button.onClick.AddListener(OnClickSlot);
+            button.transition = Selectable.Transition.None;
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
         }
 
-        SetSelected(false);
+        //SetSelected(false);
     }
 
     // QuestManager에서 데이터 넘겨줄 때 호출
@@ -68,18 +75,36 @@ public class QuestSlotUI : MonoBehaviour
     {
         isSelected = selected;
 
+        // 1) 테두리(라인)용 이미지가 지정되어 있으면 그걸 최우선으로 사용
+        if (borderImage != null)
+        {
+            if (selected)
+            {
+                if (selectedSprite != null) borderImage.sprite = selectedSprite;
+            }
+            else
+            {
+                if (normalSprite != null) borderImage.sprite = normalSprite;
+            }
+            return;
+        }
+
+        // 2) fallback: 슬롯 자신에 Image가 있으면 그걸 사용
         var img = GetComponent<Image>();
-        if (img == null) return;
+        if (img == null)
+        {
+            Debug.LogWarning($"[QuestSlotUI] No Image / borderImage on {name}. " +
+                             $"Please assign 'borderImage' in prefab or add Image component.");
+            return;
+        }
 
         if (selected)
         {
-            if (selectedSprite != null)
-                img.sprite = selectedSprite;   
+            if (selectedSprite != null) img.sprite = selectedSprite;
         }
         else
         {
-            if (normalSprite != null)
-                img.sprite = normalSprite;     
+            if (normalSprite != null) img.sprite = normalSprite;
         }
     }
 

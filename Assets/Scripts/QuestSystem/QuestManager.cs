@@ -54,7 +54,7 @@ public class QuestManager : MonoBehaviour
         BuildQuestLists();
         InitializeQuestStates();
         OpenInitialSlots();
-        RebuildActiveConditionIndex(); 
+        RebuildActiveConditionIndex();
 
 
         Debug.Log($"[QuestManager] 초기 슬롯 오픈 완료 - " +
@@ -89,7 +89,7 @@ public class QuestManager : MonoBehaviour
             dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
 
         // 런타임 상태(새로 생성)
-        dst.state = src.state;               // 혹은 Locked로 통일해도 됨(InitializeQuestStates가 어차피 초기화)
+        dst.state = src.state;               
         dst.currentCount = src.currentCount;
         dst.rewardClaimed = src.rewardClaimed;
         //dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
@@ -190,7 +190,6 @@ public class QuestManager : MonoBehaviour
     }
 
     // [QuestManager.cs] OpenInitialSlots 함수 수정
-    // QuestManager.cs -> OpenInitialSlots 함수 (이걸로 교체!)
     private void OpenInitialSlots()
     {
         MainQuestSlot();
@@ -299,6 +298,7 @@ public class QuestManager : MonoBehaviour
                 q.state = QuestState.Active;
                 q.isNewlyOpened = true;
                 openCount++;
+                InitializeLoginStreakIfNeeded(q);
                 Debug.Log($"[QuestManager] 서브 퀘스트 오픈: key={q.key}, title={q.title}");
                 // ▼▼▼ 진행도가 올랐으니 저장 ▼▼▼
                 SaveToDB();
@@ -410,6 +410,9 @@ public class QuestManager : MonoBehaviour
         OpenInitialSlots();
         RebuildActiveConditionIndex();
 
+        // DB 로드 완료(=로그인) 시점에 LoginStreak 갱신
+        ApplyLoginStreakOnLogin(lastSavedDate);
+
         Debug.Log($"[QuestManager] 퀘스트 복구 최종 완료! 메인 진행중: {CountActive(mainQuests)}개");
     }
 
@@ -437,7 +440,7 @@ public class QuestManager : MonoBehaviour
     {
         if (quest == null) return false;
 
-        // ⚠️ 일일 제외
+        // 일일 제외
         if (quest.type == QuestType.Daily) return false;
 
         // 이미 받았으면 종료
@@ -446,7 +449,7 @@ public class QuestManager : MonoBehaviour
         // 완료 안 됐으면 종료 (테스트로 counts 조작하면 통과 가능)
         if (!IsCompletedByCounts(quest)) return false;
 
-        // ⚠️ 땅 확장 구현 필요 
+        // 땅 확장 구현 필요 
         if (quest.rewardItem == null) return false;
 
         int amount = Mathf.Max(1, quest.rewardAmount);
@@ -481,7 +484,27 @@ public class QuestManager : MonoBehaviour
 
         return true;
     }
-    
+
+    // 일일퀘스트: 수령 가능한 것만 일괄 수령
+    public int ClaimRewardsDailyBatch(List<QuestData> dailyList)
+    {
+        if (dailyList == null) return 0;
+
+        int claimed = 0;
+
+        foreach (var q in dailyList)
+        {
+            if (q == null) continue;
+
+            // 기존 단일 수령 로직 재사용
+            if (ClaimRewardDaily(q))
+                claimed++;
+        }
+
+        return claimed;
+    }
+
+
     public bool ClaimRewardDaily(QuestData quest)
     {
         if (quest == null) return false;
@@ -762,4 +785,140 @@ public class QuestManager : MonoBehaviour
             DBManager.Instance.SaveAllData(myId);
         }
     }
+
+
+    // 연속 로그인 추적 헬퍼 함수 
+    private const string DATE_FMT = "yyyy-MM-dd";
+
+    // (1) 새로 Active 된 LoginStreak 퀘스트는 1/7로 보이게
+    private void InitializeLoginStreakIfNeeded(QuestData q)
+    {
+        if (q == null) return;
+
+        EnsureConditionArrays(q);
+
+        // 서브 퀘스트에만 있다고 했으니, 안전하게 서브만 처리
+        if (q.type != QuestType.Sub) return;
+
+        for (int i = 0; i < q.conditionTypes.Length; i++)
+        {
+            if (q.conditionTypes[i] != QuestConditionType.LoginStreak) continue;
+
+            // "저장된 값이 없다면 1로 보여지게"
+            if (q.currentCounts[i] <= 0)
+            {
+                q.currentCounts[i] = 1;
+                if (q.targetCounts.Length == 1) q.currentCount = q.currentCounts[0];
+            }
+        }
+    }
+
+    // (2) 로그인 이벤트(=LoadQuestData 완료) 때, 직전 로그인 날짜와 오늘을 비교해서 +1 / 리셋
+    private void ApplyLoginStreakOnLogin(string prevLoginDateStr)
+    {
+        // prevLoginDateStr = DB에 저장된 lastLoginDate (직전 접속 날짜)
+        // 오늘 날짜
+        var today = System.DateTime.Today;
+        var todayStr = today.ToString(DATE_FMT);
+
+        // prev 날짜가 비었으면(신규 등) 오늘을 첫날로 취급: 초기화는 SubQuestSlot에서 이미 1로 됨
+        if (string.IsNullOrEmpty(prevLoginDateStr))
+            return;
+
+        if (!System.DateTime.TryParseExact(prevLoginDateStr, DATE_FMT,
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out var prevDate))
+        {
+            return; // 파싱 실패면 안전하게 스킵
+        }
+
+        // 수정 
+        // 같은 날 재접속이면: 증가하지는 않지만, 0이면 첫날이므로 1로 보정
+        if (prevDate.Date == today.Date)
+        {
+            bool changed = false;
+
+            foreach (var q in subQuests)
+            {
+                if (q == null) continue;
+                if (q.state != QuestState.Active) continue;
+
+                EnsureConditionArrays(q);
+
+                for (int i = 0; i < q.conditionTypes.Length; i++)
+                {
+                    if (q.conditionTypes[i] != QuestConditionType.LoginStreak) continue;
+
+                    if (q.currentCounts[i] <= 0)
+                    {
+                        q.currentCounts[i] = 1;
+                        if (q.targetCounts.Length == 1)
+                            q.currentCount = q.currentCounts[0];
+
+                        changed = true;
+
+                        Debug.Log($"[LoginStreak][Fix] 첫날 보정: quest={q.key} -> 1/{q.targetCounts[i]}");
+                    }
+                }
+            }
+
+            if (changed)
+            {
+                OnQuestChanged?.Invoke();
+                SaveToDB();
+            }
+
+            return;
+        }
+
+
+        bool changedAny = false;
+
+        foreach (var q in subQuests)
+        {
+            if (q == null) continue;
+            if (q.state != QuestState.Active) continue;
+
+            EnsureConditionArrays(q);
+
+            // “처음 Active 된 날”은 1/7 고정 (오늘 새로 열린 퀘스트는 스킵)
+            if (q.isNewlyOpened) continue;
+
+            for (int i = 0; i < q.conditionTypes.Length; i++)
+            {
+                if (q.conditionTypes[i] != QuestConditionType.LoginStreak) continue;
+
+                int target = q.targetCounts[i];
+                int before = q.currentCounts[i];
+                int after = before;
+
+                // 어제면 +1, 그 외(연속 끊김)이면 1로 리셋
+                if (prevDate.Date.AddDays(1) == today.Date)
+                    after = Mathf.Clamp(before + 1, 0, target);
+                else
+                    after = 1;
+
+                if (after != before)
+                {
+                    q.currentCounts[i] = after;
+                    if (q.targetCounts.Length == 1) q.currentCount = q.currentCounts[0];
+                    changedAny = true;
+                }
+
+                if (IsCompletedByCounts(q) && q.state == QuestState.Active)
+                {
+                    q.state = QuestState.Completed;
+                    changedAny = true;
+                }
+            }
+        }
+
+        if (changedAny)
+        {
+            OnQuestChanged?.Invoke();
+            SaveToDB();
+        }
+    }
+
 }
