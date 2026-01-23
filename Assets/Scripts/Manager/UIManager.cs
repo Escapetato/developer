@@ -312,6 +312,7 @@ public class UIManager : MonoBehaviour
         // '확인' 버튼 누르면 팝업 꺼지도록 설정
         decoCloseButton.onClick.AddListener(() =>
         {
+            SoundManager.Instance.PlaySFX("close");
             decoPopup.SetActive(false);
         });
 
