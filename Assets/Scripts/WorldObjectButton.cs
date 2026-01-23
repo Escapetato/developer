@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class WorldObjectButton : MonoBehaviour
 {
-    public enum WorldObjectType { Store, Lab }
+    public enum WorldObjectType { Store, Lab , home}
     public WorldObjectType objectType;
 
     private void OnMouseDown()
@@ -30,6 +30,9 @@ public class WorldObjectButton : MonoBehaviour
             case WorldObjectType.Lab:
                 UIManager.Instance.OpenResearchLabPopup();
                 break;
+            case WorldObjectType.home:
+                UIManager.Instance.OpendecoPopup();
+                break;
         }
     }
 
@@ -42,6 +45,7 @@ public class WorldObjectButton : MonoBehaviour
         return ui.inventoryPopup.activeSelf ||
                ui.researchLabPopup.activeSelf ||
                ui.storePopup.activeSelf ||
+               ui.decoPopup.activeSelf ||
                ui.collectionPopup.activeSelf ||
                ui.seedPopup.activeSelf ||
                ui.fertilizerPopup.activeSelf ||

@@ -17,6 +17,7 @@ public class UIManager : MonoBehaviour
     public GameObject inventoryPopup;   // 인벤토리 창
     public GameObject researchLabPopup; // 연구실 창
     public GameObject storePopup;       // 상점 창
+    public GameObject decoPopup;       // 테마 창
     public GameObject collectionPopup; // 도감 창
     public GameObject questPopup;       // 퀘스트 창
 
@@ -47,6 +48,7 @@ public class UIManager : MonoBehaviour
     [Header("Farm Popups")]
     public GameObject seedPopup;
     public GameObject fertilizerPopup;
+    public Button decoCloseButton; 
 
     private Field currentField; // [추가] 씨앗을 심을 밭
     // private Field lastField = null;   // 마지막으로 클릭한 밭 (경고 때문에 잠깐 주석 처리!)
@@ -131,6 +133,7 @@ public class UIManager : MonoBehaviour
         bool wasAnyPopupOpen = (inventoryPopup != null && inventoryPopup.activeSelf) ||
                                (researchLabPopup != null && researchLabPopup.activeSelf) ||
                                (storePopup != null && storePopup.activeSelf) ||
+                               (decoPopup != null && decoPopup.activeSelf) ||
                                (collectionPopup != null && collectionPopup.activeSelf) ||
                                (fertilizerPopup != null && fertilizerPopup.activeSelf) ||
                                (questPopup != null && questPopup.activeSelf); // 퀘스트 창도 체크
@@ -148,6 +151,7 @@ public class UIManager : MonoBehaviour
         if (fertilizerPopup != null) fertilizerPopup.SetActive(false);
         if (inventoryPopup != null) inventoryPopup.SetActive(false);
         if (researchLabPopup != null) researchLabPopup.SetActive(false);
+        if (decoPopup != null) decoPopup.SetActive(false);
         if (seedPopup != null) seedPopup.SetActive(false);
         if (storePopup != null) storePopup.SetActive(false);
         if (collectionPopup != null) collectionPopup.SetActive(false);
@@ -290,6 +294,28 @@ public class UIManager : MonoBehaviour
             SoundManager.Instance.PlayBGM("store");
             SoundManager.Instance.PlaySFX("enter");
         }
+    }
+    public void OpendecoPopup()
+    {
+        CloseAllPopups();
+
+        if (SideMenuUI.Instance != null) SideMenuUI.Instance.CloseMenu();
+
+        if (decoPopup != null)
+        {
+            decoPopup.SetActive(true);
+            MovePoingUIToPopup(inventoryPopup.transform);
+            SoundManager.Instance.PlaySFX("enter");
+        }
+        decoCloseButton.onClick.RemoveAllListeners();
+
+        // '확인' 버튼 누르면 팝업 꺼지도록 설정
+        decoCloseButton.onClick.AddListener(() =>
+        {
+            decoPopup.SetActive(false);
+        });
+
+
     }
 
     public void OpenCollectionPopup()
