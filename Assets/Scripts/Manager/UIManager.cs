@@ -304,19 +304,22 @@ public class UIManager : MonoBehaviour
         if (decoPopup != null)
         {
             decoPopup.SetActive(true);
-            MovePoingUIToPopup(inventoryPopup.transform);
+            MovePoingUIToPopup(storePopup.transform); 
+            
             SoundManager.Instance.PlaySFX("enter");
         }
+        
         decoCloseButton.onClick.RemoveAllListeners();
 
         // '확인' 버튼 누르면 팝업 꺼지도록 설정
         decoCloseButton.onClick.AddListener(() =>
         {
             SoundManager.Instance.PlaySFX("close");
-            decoPopup.SetActive(false);
+            
+            // 단순히 SetActive(false)만 하지 말고, 
+            // CloseAllPopups()를 호출해야 포잉 바가 원래 자리로 돌아옵니다.
+            CloseAllPopups(); 
         });
-
-
     }
 
     public void OpenCollectionPopup()
