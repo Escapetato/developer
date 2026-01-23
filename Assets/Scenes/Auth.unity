@@ -819,7 +819,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: e63b71eee132edb448a986e5badaa55f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4046,6 +4046,7 @@ MonoBehaviour:
   inventoryPopup: {fileID: 0}
   researchLabPopup: {fileID: 0}
   storePopup: {fileID: 0}
+  decoPopup: {fileID: 0}
   collectionPopup: {fileID: 0}
   questPopup: {fileID: 0}
   alertPopup: {fileID: 707096921}
@@ -4064,6 +4065,7 @@ MonoBehaviour:
   mainToolUI: {fileID: 0}
   seedPopup: {fileID: 0}
   fertilizerPopup: {fileID: 0}
+  decoCloseButton: {fileID: 0}
 --- !u!4 &1460846529
 Transform:
   m_ObjectHideFlags: 0
