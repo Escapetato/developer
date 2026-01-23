@@ -14,15 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uBC14\uB78C \uC5D0\uB108\uC9C0"
   description: 
-  itemIcon: {fileID: 21300000, guid: 6a7c9aa8476dd8741880b967646c1852, type: 3}
+  itemIcon: {fileID: 21300000, guid: c869fb40413b06545baada10b47f901a, type: 3}
+  itemIconOffVer: {fileID: 0}
   itemCategory: Potion
   collectionCategory: 
   price: 150
   seedCategory: 0
-  plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
+  readyFieldSprite: {fileID: 0}
   growTimeDisplay: "1\uBD84"
   harvestToolName: "\uD638\uBBF8"
   toolTier: 0

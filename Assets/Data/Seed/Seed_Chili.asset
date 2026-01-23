@@ -14,13 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uACE0\uCD94 \uC528\uC557"
   description: 
-  itemIcon: {fileID: 21300000, guid: 2a380b2263d9f1a4a8402de223cf8d39, type: 3}
+  itemIcon: {fileID: 21300000, guid: 2bb52a82b1280d84ba516e0370fa6fbf, type: 3}
   itemIconOffVer: {fileID: 21300000, guid: fad6ce1a1b54bc64e9a966fbadbbfbc5, type: 3}
   itemCategory: Seed
   collectionCategory: 
   price: 300
   seedCategory: 3
-  plantPrefab: {fileID: 0}
   growTime: 25200
   harvestItem: {fileID: 11400000, guid: 937ae693d49875e4aa994cc8eefcace9, type: 2}
   requiredToolTier: 3
