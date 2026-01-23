@@ -11797,10 +11797,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1335169737}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -476, y: 382}
-  m_SizeDelta: {x: 64, y: 64}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 96, y: 101}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &286691216
 MonoBehaviour:
@@ -11815,8 +11815,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   categoryName: Fruit
-  defaultSprite: {fileID: 21300000, guid: bb0f362ccf0808f4eb192513d03cab0f, type: 3}
-  selectedSprite: {fileID: 21300000, guid: b00ccd6a41311704aab1bd8d1a312a21, type: 3}
+  defaultSprite: {fileID: 21300000, guid: 5142ddce18da08141b13ed5c4087f1ba, type: 3}
+  selectedSprite: {fileID: 21300000, guid: 5e015588c6d186d4c94a6fb994af0bbf, type: 3}
 --- !u!114 &286691217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11860,7 +11860,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 286691218}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1246507287}
+        m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
+        m_MethodName: PlaySFX
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: button
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &286691218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11881,7 +11893,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 741519704f78d314fb4088225f8f39d2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5e015588c6d186d4c94a6fb994af0bbf, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -20652,7 +20664,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &472269357
 RectTransform:
   m_ObjectHideFlags: 0
@@ -26812,10 +26824,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1335169737}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -476, y: 312}
-  m_SizeDelta: {x: 64, y: 64}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 96, y: 101}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &673614869
 MonoBehaviour:
@@ -26830,8 +26842,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   categoryName: Vegetable
-  defaultSprite: {fileID: 21300000, guid: d022c95c286a1f447995cb1f43085c74, type: 3}
-  selectedSprite: {fileID: 21300000, guid: 741519704f78d314fb4088225f8f39d2, type: 3}
+  defaultSprite: {fileID: 21300000, guid: 8b560c4ca5ec5164f99b3589dc682cd3, type: 3}
+  selectedSprite: {fileID: 21300000, guid: 833f096532e3a764487bae7f2d39c18c, type: 3}
 --- !u!114 &673614870
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26875,7 +26887,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 673614871}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1246507287}
+        m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
+        m_MethodName: PlaySFX
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: button
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &673614871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26896,7 +26920,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 3f7a011b75b19434c944b9aca3940205, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8b560c4ca5ec5164f99b3589dc682cd3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -30901,7 +30925,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -834, y: -112}
+  m_AnchoredPosition: {x: -834, y: -96}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &766021114
@@ -30918,7 +30942,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuContainer: {fileID: 766021112}
   toggleButton: {fileID: 875203712}
-  arrowIcon: {fileID: 0}
 --- !u!114 &766021115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30937,7 +30960,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 25
+  m_Spacing: 20
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -35205,7 +35228,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -836, y: -458}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 206, y: 69}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &875203712
 MonoBehaviour:
@@ -35271,8 +35294,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: 42545c9bcb6c47547b8c7f021fbade27, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -35626,7 +35649,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 24, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &881982016
@@ -39249,12 +39272,12 @@ RectTransform:
   - {fileID: 1098557378}
   - {fileID: 694466116}
   - {fileID: 1475056173}
+  - {fileID: 1768293779}
   - {fileID: 877150358}
   - {fileID: 344722632}
   - {fileID: 1301772683}
   - {fileID: 1840860879}
   - {fileID: 998544534}
-  - {fileID: 1768293779}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -54417,6 +54440,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1335169737}
+  - component: {fileID: 1335169738}
   m_Layer: 5
   m_Name: Category
   m_TagString: Untagged
@@ -54443,9 +54467,35 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -258.99994, y: -73}
+  m_AnchoredPosition: {x: 298, y: 367}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1335169738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335169736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 20
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &1337623001
 GameObject:
   m_ObjectHideFlags: 0
@@ -75067,10 +75117,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1335169737}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -476, y: 247}
-  m_SizeDelta: {x: 64, y: 64}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 96, y: 101}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1855910035
 MonoBehaviour:
@@ -75085,8 +75135,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   categoryName: Grain
-  defaultSprite: {fileID: 21300000, guid: bb0f362ccf0808f4eb192513d03cab0f, type: 3}
-  selectedSprite: {fileID: 21300000, guid: b00ccd6a41311704aab1bd8d1a312a21, type: 3}
+  defaultSprite: {fileID: 21300000, guid: 459d310c61e67f74c825745c216cd41a, type: 3}
+  selectedSprite: {fileID: 21300000, guid: 662313301968b2c4186e4f063295d6cc, type: 3}
 --- !u!114 &1855910036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75130,7 +75180,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1855910037}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1246507287}
+        m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
+        m_MethodName: PlaySFX
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: button
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1855910037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75151,7 +75213,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b00ccd6a41311704aab1bd8d1a312a21, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 459d310c61e67f74c825745c216cd41a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
