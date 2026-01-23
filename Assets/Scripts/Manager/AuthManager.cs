@@ -6,30 +6,31 @@ using Firebase.Auth;
 using Firebase.Extensions;
 using Google;
 using System.Threading.Tasks;
+using System.Collections;
 
 public class AuthManager : MonoBehaviour
 {
     [Header("=== Panels (패널 연결) ===")]
-    public GameObject loginPanel;      // 로그인 화면 패널
-    public GameObject registerPanel;   // 회원가입 화면 패널
+    public GameObject loginPanel;
+    public GameObject registerPanel;
 
     [Header("=== Login UI (로그인 화면) ===")]
     public TMP_InputField emailField;
     public TMP_InputField passwordField;
     public Button loginButton;
     public Button goToRegisterButton;
-    public Toggle rememberIdToggle;    // 아이디 저장 토글
+    public Toggle rememberIdToggle;
 
     [Header("=== Register UI (회원가입 화면) ===")]
     public TMP_InputField regEmailField;
     public TMP_InputField regPasswordField;
-    public TMP_InputField regConfirmPasswordField; // [추가] 비밀번호 재확인 필드
+    public TMP_InputField regConfirmPasswordField;
     public Button registerButton;
     public Button goToLoginButton;
 
     [Header("=== Common UI (공통) ===")]
     public Button googleLoginButton;
-    public TextMeshProUGUI statusText; // [부활] 상태 메시지 (에러 표시용)
+    public TextMeshProUGUI statusText;
 
     [Header("Google Login")]
     public string webClientId;
@@ -41,11 +42,18 @@ public class AuthManager : MonoBehaviour
     private bool loggedAuthNotReady = false;
     private bool loggedWebClientEmpty = false;
 
+    // ▼▼▼ [핵심 수정] 스레드 문제를 피하기 위한 깃발 변수들 ▼▼▼
+    private bool isRegisterSuccess = false; // 회원가입 성공했나?
+    private string registeredEmailTemp = ""; // 가입한 이메일 임시 저장
+
+    private bool isLoginSuccess = false;    // 로그인 성공했나?
+    private string loginUserIdTemp = "";    // 로그인한 UID 임시 저장
+    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
     void Awake() { }
 
-    System.Collections.IEnumerator Start()
+    IEnumerator Start()
     {
-        // 버튼 리스너 연결
         if (loginButton) loginButton.onClick.AddListener(TryLogin);
         if (registerButton) registerButton.onClick.AddListener(TryRegister);
         if (googleLoginButton) googleLoginButton.onClick.AddListener(TryGoogleLogin);
@@ -53,27 +61,55 @@ public class AuthManager : MonoBehaviour
         if (goToRegisterButton) goToRegisterButton.onClick.AddListener(ShowRegisterPanel);
         if (goToLoginButton) goToLoginButton.onClick.AddListener(ShowLoginPanel);
 
-        // 초기 상태
         ShowLoginPanel();
 
-        // 저장된 아이디 불러오기
         if (PlayerPrefs.HasKey("SavedEmail"))
         {
             emailField.text = PlayerPrefs.GetString("SavedEmail");
             if (rememberIdToggle != null) rememberIdToggle.isOn = true;
         }
 
-        while (FirebaseBootstrap.Auth == null)
-            yield return null;
+        // FirebaseBootstrap 기다리기
+        var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
+        yield return new WaitUntil(() => dependencyTask.IsCompleted);
+
+        if (dependencyTask.Result == DependencyStatus.Available)
+        {
+            auth = FirebaseAuth.DefaultInstance;
+            initialized = true;
+        }
+        else
+        {
+            Debug.LogError("Firebase Init Failed: " + dependencyTask.Result);
+        }
 
         EnsureInitialized();
     }
+
+    // ▼▼▼ [핵심 수정] Update에서 깃발을 감시하다가 실행 (이건 무조건 메인스레드임) ▼▼▼
+    void Update()
+    {
+        // 1. 회원가입 성공 감지
+        if (isRegisterSuccess)
+        {
+            isRegisterSuccess = false; // 깃발 내리기
+            StartCoroutine(RegisterSuccessRoutine(registeredEmailTemp));
+        }
+
+        // 2. 로그인 성공 감지
+        if (isLoginSuccess)
+        {
+            isLoginSuccess = false; // 깃발 내리기
+            ProceedLogin(loginUserIdTemp);
+        }
+    }
+    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
     void ShowLoginPanel()
     {
         if (loginPanel) loginPanel.SetActive(true);
         if (registerPanel) registerPanel.SetActive(false);
-        if (statusText) statusText.text = ""; // 패널 바꿀 때 에러 메시지 초기화
+        if (statusText) statusText.text = "";
         if (passwordField) passwordField.text = "";
     }
 
@@ -81,9 +117,8 @@ public class AuthManager : MonoBehaviour
     {
         if (loginPanel) loginPanel.SetActive(false);
         if (registerPanel) registerPanel.SetActive(true);
-        if (statusText) statusText.text = ""; // 패널 바꿀 때 에러 메시지 초기화
+        if (statusText) statusText.text = "";
 
-        // 가입창 초기화
         if (regEmailField) regEmailField.text = "";
         if (regPasswordField) regPasswordField.text = "";
         if (regConfirmPasswordField) regConfirmPasswordField.text = "";
@@ -92,26 +127,9 @@ public class AuthManager : MonoBehaviour
     void EnsureInitialized()
     {
         if (initialized) return;
-        auth = FirebaseBootstrap.Auth;
-        if (auth == null)
-        {
-            if (!loggedAuthNotReady)
-            {
-                Debug.LogWarning("[AuthManager] FirebaseAuth not ready");
-                loggedAuthNotReady = true;
-            }
-            return;
-        }
+        if (auth == null) auth = FirebaseAuth.DefaultInstance;
 
-        if (string.IsNullOrEmpty(webClientId))
-        {
-            if (!loggedWebClientEmpty)
-            {
-                Debug.LogWarning("[AuthManager] Web Client ID 비어 있음");
-                loggedWebClientEmpty = true;
-            }
-        }
-        else
+        if (!string.IsNullOrEmpty(webClientId))
         {
             googleConfig = new GoogleSignInConfiguration
             {
@@ -124,7 +142,6 @@ public class AuthManager : MonoBehaviour
         initialized = true;
     }
 
-    // [수정된 회원가입 시도 함수]
     void TryRegister()
     {
         EnsureInitialized();
@@ -133,7 +150,6 @@ public class AuthManager : MonoBehaviour
         string pass = regPasswordField.text.Trim();
         string confirmPass = regConfirmPasswordField != null ? regConfirmPasswordField.text.Trim() : "";
 
-        // 1. 유효성 검사
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(pass))
         {
             SetStatusMessage("이메일과 비밀번호를 모두 입력해 주세요.", true);
@@ -152,7 +168,6 @@ public class AuthManager : MonoBehaviour
 
         SetStatusMessage("회원가입 중...", false);
 
-        // 2. Firebase 가입 요청
         auth.CreateUserWithEmailAndPasswordAsync(email, pass).ContinueWithOnMainThread(task =>
         {
             if (task.IsCanceled)
@@ -163,48 +178,39 @@ public class AuthManager : MonoBehaviour
             if (task.IsFaulted)
             {
                 string errorMsg = "회원가입 실패!";
-                if (task.Exception != null)
-                {
-                    Debug.LogError(task.Exception);
-                    errorMsg = "이미 가입된 이메일이거나 형식이 잘못되었습니다.";
-                }
+                if (task.Exception != null) errorMsg = "이미 가입된 이메일이거나 형식이 잘못되었습니다.";
                 SetStatusMessage(errorMsg, true);
                 return;
             }
 
-            // 3. 성공 시 처리 (안전하게 코루틴으로 넘김)
-            FirebaseUser newUser = ((Task<FirebaseUser>)task).Result;
+            // ▼▼▼ [수정된 부분] AuthResult로 받아서 User 꺼내기 ▼▼▼
+            AuthResult result = task.Result;
+            FirebaseUser newUser = result.User; // 여기서 꺼냄
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
             Debug.Log("가입 성공 UID: " + newUser.UserId);
 
-            // 여기서 바로 화면 전환 로직을 코루틴으로 실행
-            StartCoroutine(RegisterSuccessRoutine(email));
+            // 성공 시 -> 깃발 들기
+            registeredEmailTemp = email;
+            isRegisterSuccess = true;
         });
     }
 
-    // [추가] 가입 성공 후 대기 및 화면 전환을 담당하는 코루틴
-    System.Collections.IEnumerator RegisterSuccessRoutine(string email)
+    IEnumerator RegisterSuccessRoutine(string email)
     {
-        // 성공 메시지 출력
-        SetStatusMessage("가입 성공! 잠시 후 로그인 화면으로 이동합니다.", false);
-
-        // 0.5초 대기
+        SetStatusMessage("가입 성공! 로그인 화면으로 이동합니다.", false);
         yield return new WaitForSeconds(0.5f);
 
-        // 로그인 화면으로 전환
         ShowLoginPanel();
 
-        // 입력창 비우기
         regEmailField.text = "";
         regPasswordField.text = "";
         if (regConfirmPasswordField) regConfirmPasswordField.text = "";
 
-        // 로그인 편의를 위해 이메일 채워주기
         emailField.text = email;
-
-        // 상태 메시지 초기화 (선택사항)
         SetStatusMessage("", false);
     }
-    // [핵심] 로그인 시도
+
     void TryLogin()
     {
         EnsureInitialized();
@@ -214,7 +220,7 @@ public class AuthManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(pass))
         {
-            SetStatusMessage("이메일과 비밀번호를 입력해 주세요.", true);
+            SetStatusMessage("이메일과 비밀번호를 모두 입력해 주세요.", true);
             return;
         }
 
@@ -229,22 +235,18 @@ public class AuthManager : MonoBehaviour
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("로그인 실패: " + task.Exception);
-                // 포괄적인 에러 메시지
                 SetStatusMessage("이메일이나 비밀번호를 확인해 주세요!", true);
                 return;
             }
 
-            FirebaseUser user = null;
-            if (task is Task<FirebaseUser> userTask) user = userTask.Result;
-            else if (task is Task<AuthResult> authTask) user = authTask.Result.User;
-
-            if (user == null) return;
+            // ▼▼▼ [수정된 부분] AuthResult로 받아서 User 꺼내기 ▼▼▼
+            AuthResult result = task.Result;
+            FirebaseUser user = result.User;
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
             Debug.Log("로그인 성공 UID: " + user.UserId);
-            SetStatusMessage("로그인 성공!", false);
 
-            // 아이디 저장 로직
+            // 아이디 저장
             if (rememberIdToggle != null && rememberIdToggle.isOn)
             {
                 PlayerPrefs.SetString("SavedEmail", email);
@@ -255,20 +257,29 @@ public class AuthManager : MonoBehaviour
                 PlayerPrefs.DeleteKey("SavedEmail");
             }
 
-            // 씬 이동
-            var db = FindObjectOfType<DBManager>();
-            if (db != null)
-            {
-                db.LoadAllData(user.UserId, () =>
-                {
-                    UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
-                });
-            }
-            else
+            // 성공 시 -> 깃발 들기
+            loginUserIdTemp = user.UserId;
+            isLoginSuccess = true;
+        });
+    }
+
+    // 로그인 후처리 함수 (Update에서 호출됨)
+    void ProceedLogin(string userId)
+    {
+        SetStatusMessage("로그인 성공!", false);
+
+        var db = FindObjectOfType<DBManager>();
+        if (db != null)
+        {
+            db.LoadAllData(userId, () =>
             {
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
-            }
-        });
+            });
+        }
+        else
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
+        }
     }
 
     public void TryGoogleLogin()
@@ -277,7 +288,6 @@ public class AuthManager : MonoBehaviour
         if (!initialized || auth == null) return;
 
         SetStatusMessage("Google 로그인 시도 중...", false);
-
         GoogleSignIn.Configuration = googleConfig;
         GoogleSignIn.DefaultInstance.SignOut();
 
@@ -289,8 +299,7 @@ public class AuthManager : MonoBehaviour
                 return;
             }
 
-            Task<GoogleSignInUser> signInTask = (Task<GoogleSignInUser>)task;
-            GoogleSignInUser googleUser = signInTask.Result;
+            GoogleSignInUser googleUser = task.Result;
             Credential credential = GoogleAuthProvider.GetCredential(googleUser.IdToken, null);
 
             auth.SignInWithCredentialAsync(credential).ContinueWithOnMainThread(fbTask =>
@@ -301,53 +310,28 @@ public class AuthManager : MonoBehaviour
                     return;
                 }
 
-                FirebaseUser firebaseUser = ((Task<FirebaseUser>)fbTask).Result;
-                Debug.Log("Google 로그인 성공 UID: " + firebaseUser.UserId);
-                SetStatusMessage("Google 로그인 성공!", false);
+                FirebaseUser firebaseUser = fbTask.Result;
 
-                var db = FindObjectOfType<DBManager>();
-                if (db != null)
-                {
-                    db.LoadAllData(firebaseUser.UserId, () =>
-                    {
-                        UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
-                    });
-                }
-                else
-                {
-                    UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
-                }
+                // 성공 시 -> 깃발 들기
+                loginUserIdTemp = firebaseUser.UserId;
+                isLoginSuccess = true;
             });
         });
     }
 
-    // 헬퍼 함수: 상태 메시지 색상 및 텍스트 설정
     void SetStatusMessage(string msg, bool isError)
     {
         if (statusText == null) return;
         statusText.text = msg;
 
-        string errorColorHex = "#6B3F00";   // 에러일 때 색상 (아까 설정한 갈색)
-        string successColorHex = "#6B3F00"; // 성공일 때 색상 (지금은 똑같이 갈색으로 해둠, 원하면 #228B22(초록) 등으로 변경 가능)
-
-        // 상황에 맞는 색상 코드 선택
+        string errorColorHex = "#6B3F00";
+        string successColorHex = "#6B3F00";
         string targetHex = isError ? errorColorHex : successColorHex;
 
         Color customColor;
-        // Hex 코드를 컬러로 변환 시도
         if (ColorUtility.TryParseHtmlString(targetHex, out customColor))
-        {
             statusText.color = customColor;
-        }
         else
-        {
-            // 혹시라도 코드가 오타나서 변환 실패하면 유니티 기본색 사용
             statusText.color = isError ? Color.red : Color.green;
-        }
-    }
-
-    void LogAuthException(System.Exception ex, string prefix)
-    {
-        Debug.LogError($"{prefix}: {ex}");
     }
 }

@@ -34,17 +34,24 @@ public class SoundManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+
+            // ▼▼▼ [이 줄 추가!] 부모(@Managers) 밑에 있으면 같이 죽으니까 탈출! ▼▼▼
+            transform.SetParent(null);
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
             DontDestroyOnLoad(gameObject);
             InitSoundDictionary();
 
             if (bgmSource != null)
             {
                 bgmSource.loop = true;
-                bgmSource.volume = 1f; // 시작 볼륨 확실하게 설정
+                bgmSource.volume = 1f;
             }
         }
         else
         {
+            // 이미 Auth 씬에서 만들어진 SoundManager가 넘어왔다면,
+            // Main 씬에 원래 있던 놈은 파괴
             Destroy(gameObject);
         }
     }

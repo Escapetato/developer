@@ -83,11 +83,14 @@ public class DBManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            transform.SetParent(null); // [핵심] 부모(@Managers)에서 탈출!
             DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Destroy(gameObject); 
+            // 이미 Auth씬에서 넘어온 DBManager가 있다면, 
+            // Main씬에 있는 "새로운 DBManager"는 필요 없으니 삭제.
+            Destroy(gameObject);
         }
     }
 
