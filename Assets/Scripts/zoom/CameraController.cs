@@ -20,10 +20,33 @@ public class CameraController : MonoBehaviour
 
     private Vector3 lastMousePos;
 
-    void Awake() => _cam = GetComponent<Camera>();
+    // ※ 추가 : 퀘스트 화면 시 스크롤 차단 
+    [SerializeField] private GameObject questPanelRoot;
+
+    // ※ 추가 : 기본 카메라 설정 저장 변수 
+    private float defaultOrthographicSize;
+    private Vector3 defaultCameraPosition;
+
+    // ※ 추가 : 카메라 상태 저장 변수 
+    private float savedOrthographicSize;
+    private Vector3 savedCameraPosition;
+    private bool hasSavedState = false;
+
+    void Awake()
+    {
+        _cam = GetComponent<Camera>();
+
+        // ※ 추가 : 기본값 저장 
+        defaultOrthographicSize = _cam.orthographicSize;
+        defaultCameraPosition = transform.position;
+    }
 
     void Update()
     {
+        //Debug.Log($"[Cam] focused={Application.isFocused} questPanelActive={(questPanelRoot != null ? questPanelRoot.activeInHierarchy.ToString() : "null")}");
+        if (!Application.isFocused) return;
+        if (questPanelRoot != null && questPanelRoot.activeInHierarchy) return;
+
         // 1. UI 위를 클릭 중이면 무시
         if (IsPointerOverUI()) return;
 
@@ -40,7 +63,12 @@ public class CameraController : MonoBehaviour
 
         // 4. 마우스 휠 (PC 테스트용)
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll != 0) ZoomCamera(-scroll * 10f);
+        if (scroll != 0)
+        {
+            //Debug.Log("[Zoom] wheel input detected");
+            ZoomCamera(-scroll * 10f);
+        }
+
     }
 
     // 카메라 위치 보정은 모든 이동이 끝난 후 LateUpdate에서 하는 것이 가장 정확합니다.
@@ -131,5 +159,35 @@ public class CameraController : MonoBehaviour
         Vector3 center = new Vector3((mapMinX + mapMaxX) / 2, (mapMinY + mapMaxY) / 2, 0);
         Vector3 size = new Vector3(mapMaxX - mapMinX, mapMaxY - mapMinY, 0);
         Gizmos.DrawWireCube(center, size);
+    }
+
+    // ※ 추가 : 카메라 상태 저장 메서드
+    public void SaveCameraState()
+    {
+        if (_cam != null)
+        {
+            savedOrthographicSize = _cam.orthographicSize;
+            savedCameraPosition = transform.position;
+            hasSavedState = true;
+        }
+    }
+
+    public void RestoreCameraState()
+    {
+        if (_cam != null && hasSavedState)
+        {
+            _cam.orthographicSize = savedOrthographicSize;
+            transform.position = savedCameraPosition;
+        }
+    }
+
+    // ※ 추가 : 퀘스트 진입 시 카메라 리셋 메서드 
+    public void ResetCameraForQuest()
+    {
+        if (_cam != null)
+        {
+            _cam.orthographicSize = defaultOrthographicSize;
+            transform.position = defaultCameraPosition;
+        }
     }
 }

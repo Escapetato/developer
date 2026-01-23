@@ -67,6 +67,7 @@ public class QuestListController : MonoBehaviour
         // 패널이 켜졌을 때만 퀘스트 변경 이벤트를 받는다
         if (QuestManager.Instance != null)
             QuestManager.Instance.OnQuestChanged += HandleQuestChanged;
+
     }
 
     private void OnDisable()
@@ -86,6 +87,8 @@ public class QuestListController : MonoBehaviour
 
     private void HandleQuestChanged()
     {
+        Debug.Log($"[QuestListController] HandleQuestChanged called. active={gameObject.activeInHierarchy}");
+
         bool wantKeepDaily = lastSelectedWasDaily && !showClosedMains;
 
         // 직전 선택이 일일 슬롯이면: 왼쪽 리스트를 Refresh 하지 않는다.
@@ -189,6 +192,7 @@ public class QuestListController : MonoBehaviour
         }
 
         ApplyScrollForCurrent();
+
 
     }
 
@@ -476,6 +480,5 @@ public class QuestListController : MonoBehaviour
         pendingAutoSelect = null;
     }
 
-    
 
 }
