@@ -242,7 +242,7 @@ public class UIManager : MonoBehaviour
             if (poingBarRect != null)
                 poingBarRect.gameObject.SetActive(false);
 
-            SoundManager.Instance.PlaySFX("quest");
+            SoundManager.Instance.PlaySFX("enter");
         }
     }
 
@@ -356,7 +356,7 @@ public class UIManager : MonoBehaviour
         poingBarRect.anchorMin = new Vector2(1, 1);
         poingBarRect.anchorMax = new Vector2(1, 1);
         poingBarRect.pivot = new Vector2(1, 1);
-        poingBarRect.anchoredPosition = new Vector2(-50, -50); // 여백 조정
+        poingBarRect.anchoredPosition = new Vector2(-200, -50); // 여백 조정
         poingBarRect.localScale = Vector3.one; // 크기 초기화
     }
 

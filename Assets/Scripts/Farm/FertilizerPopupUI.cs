@@ -130,6 +130,7 @@ public class FertilizerPopupUI : MonoBehaviour
         InventoryManager.Instance.RemoveItem(fertilizerData, currentApplyAmount);
         currentField.ApplyFertilizer(currentApplyAmount);
 
+        SoundManager.Instance.PlaySFX("fertilizer"); //효과음 추가
         Debug.Log($"{currentApplyAmount}개 비료 적용 완료");
         gameObject.SetActive(false); // 팝업 닫기
     }
