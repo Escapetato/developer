@@ -51,13 +51,28 @@ public class CollectionUI : MonoBehaviour
 
     void OnEnable()
     {
-        if (categoryButtons != null && categoryButtons.Count > 0)
+        string defaultCategory = "Fruit"; // ★ 여기에 원하는 카테고리 이름(ItemData와 동일해야 함)을 적으세요!
+
+        CategoryButton targetBtn = null;
+
+        // 1. 버튼 목록에서 해당 카테고리 찾기
+        if (categoryButtons != null)
         {
-            SetCategoryButton(categoryButtons[0]);
+            targetBtn = categoryButtons.Find(btn => btn.categoryName == defaultCategory);
+        }
+
+        // 2. 찾았으면 그 버튼 선택, 못 찾았으면 목록의 첫 번째 선택
+        if (targetBtn != null)
+        {
+            SetCategoryButton(targetBtn);
+        }
+        else if (categoryButtons != null && categoryButtons.Count > 0)
+        {
+            SetCategoryButton(categoryButtons[0]); // fallback
         }
         else
         {
-            SetCategory("Vegetable");
+            SetCategory(defaultCategory); // 버튼이 아예 없을 때
         }
     }
 
