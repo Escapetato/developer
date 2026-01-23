@@ -17,6 +17,10 @@ public class SoundManager : MonoBehaviour
     public AudioSource sfxSource;
     public AudioSource bgmSource;
 
+    [Header("Volume Settings")]
+    [Range(0f, 1f)] public float bgmVolume = 0.3f;
+    [Range(0f, 1f)] public float sfxVolume = 1f;
+
     [Range(0.1f, 3.0f)]
     public float fadeDuration = 0.3f;
 
@@ -42,10 +46,12 @@ public class SoundManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             InitSoundDictionary();
 
+            if (bgmSource != null) bgmSource.volume = bgmVolume;
+            if (sfxSource != null) sfxSource.volume = sfxVolume;
+
             if (bgmSource != null)
             {
                 bgmSource.loop = true;
-                bgmSource.volume = 1f;
             }
         }
         else
@@ -118,12 +124,12 @@ public class SoundManager : MonoBehaviour
         bgmSource.Play();
 
         // 3단계: 새 음악 페이드 인 (볼륨 0 -> 1)
-        while (bgmSource.volume < 1f)
+        while (bgmSource.volume < bgmVolume)
         {
             bgmSource.volume += Time.deltaTime / fadeDuration;
             yield return null;
         }
 
-        bgmSource.volume = 1f; // 볼륨 확실하게 1로 고정
+        bgmSource.volume = bgmVolume;
     }
 }
