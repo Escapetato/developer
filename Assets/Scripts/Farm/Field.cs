@@ -217,6 +217,9 @@ public class Field : MonoBehaviour
             // 2. 아이템 지급
             InventoryManager.Instance.AddItem(plantedSeed.harvestItem, 1);
 
+            // 퀘스트 진행도: 수확(특정 작물 필터는 conditionItems로 처리)
+            QuestManager.Instance?.NotifyAction(QuestConditionType.HarvestCrop, plantedSeed.harvestItem, 1);
+
             // 3. 수확 애니메이션 실행 (완성된 밭 이미지가 아니라 '아이템 아이콘'을 넘김)
             StartCoroutine(HarvestPopUpRoutine(itemIcon));
 
