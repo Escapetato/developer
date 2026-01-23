@@ -38,6 +38,7 @@ public class HarvestToolManager : MonoBehaviour
     public void SelectTool(int tier)
     {
         currentToolTier = tier;
+        SoundManager.Instance.PlaySFX("tool_change"); // 효과음 추가
 
         if (currentToolSpriteRenderer != null && toolIcons.Length >= tier)
         {
@@ -45,7 +46,7 @@ public class HarvestToolManager : MonoBehaviour
         }
 
         // 도구를 선택하면 큰 사분원은 자동으로 닫히게 설정
-       // if (bigQuadrantPanel != null) bigQuadrantPanel.SetActive(false);
+        if (bigQuadrantPanel != null) bigQuadrantPanel.SetActive(false);
 
         Debug.Log($"도구 {tier}번 선택 및 메뉴 닫힘");
     }

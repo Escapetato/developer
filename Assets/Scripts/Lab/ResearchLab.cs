@@ -224,7 +224,7 @@ public class ResearchLab : MonoBehaviour
     IEnumerator ProcessEvolutionRoutine()
     {
         if (loadingPopupObject != null) loadingPopupObject.SetActive(true);
-        // SoundManager.Instance.PlaySFX("ev_processing"); 
+        SoundManager.Instance.PlaySFX("ev_ing"); 
 
         yield return new WaitForSeconds(evolutionDelay);
 

@@ -486,6 +486,7 @@ public class QuestDetailUI : MonoBehaviour
 
             if (QuestManager.Instance != null && QuestManager.Instance.ClaimRewardMainSub(currentQuest))
             {
+                SoundManager.Instance.PlaySFX("quest_reward");
                 UIManager.Instance?.ShowAlertPopup("보상이 지급되었습니다.");
                 RefreshConditions();
             }
@@ -501,6 +502,7 @@ public class QuestDetailUI : MonoBehaviour
 
         if (claimed > 0)
         {
+            SoundManager.Instance.PlaySFX("quest_reward");
             UIManager.Instance?.ShowAlertPopup("보상이 지급되었습니다.");
             ShowDailyQuests(currentDailyQuests); // 버튼/체크 갱신
         }
