@@ -223,14 +223,17 @@ public static class DailyQuestSelector
         {
             case DailyRewardType.Poing:
                 info.label = "포잉";
-                if (poingTable.TryGetValue(difficulty, out var candidates) && candidates.Length > 0)
+                switch (difficulty)
                 {
-                    int pick = UnityEngine.Random.Range(0, candidates.Length);
-                    info.amount = candidates[pick];
-                }
-                else
-                {
-                    info.amount = 0; // 안전장치
+                    case DailyQuestDifficulty.High:
+                        info.amount = 850;
+                        break;
+                    case DailyQuestDifficulty.Medium:
+                        info.amount = 400;
+                        break;
+                    default:
+                        info.amount = 150;
+                        break;                    
                 }
                 break;
 

@@ -172,6 +172,8 @@ public class Field : MonoBehaviour
     public void Plant(ItemData seed, bool isRandom = false)
     {
         Debug.Log($"<color=cyan>심기 시도 - 씨앗: {seed.itemName}, 랜덤여부: {isRandom}</color>");
+        SoundManager.Instance.PlaySFX("plant"); // 효과음 추가
+
         plantedSeed = seed;
         remainingTime = seed.growTime;
         fertilizerCount = 0;
@@ -205,8 +207,10 @@ public class Field : MonoBehaviour
         int myTier = HarvestToolManager.Instance.currentToolTier;
         int requiredTier = plantedSeed.requiredToolTier;
 
-        if (myTier >= requiredTier)
+        if (myTier == requiredTier)
         {
+            SoundManager.Instance.PlaySFX("harvest"); // 효과음 추가
+
             // 1. 수확할 아이템의 아이콘 미리 저장
             Sprite itemIcon = plantedSeed.harvestItem.itemIcon;
 
@@ -220,6 +224,10 @@ public class Field : MonoBehaviour
             plantedSeed = null;
             isFromRandomSeed = false;
             SetState(FieldState.Empty);
+        }
+        else
+        {
+            SoundManager.Instance.PlaySFX("harvest_fail"); // 수확 실패시 효과음
         }
     }
 

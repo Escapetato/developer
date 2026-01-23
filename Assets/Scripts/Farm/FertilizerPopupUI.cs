@@ -57,6 +57,7 @@ public class FertilizerPopupUI : MonoBehaviour
         closeButton.onClick.AddListener(() =>
         {
             Debug.Log("닫기 버튼 클릭됨");
+            SoundManager.Instance.PlaySFX("close");
             gameObject.SetActive(false); // 직접 끄거나 UIManager 호출
             // UIManager.Instance.CloseAllPopups(); // 원래 사용하던 방식 유지
         });
