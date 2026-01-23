@@ -442,7 +442,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: b7c82a1309b92e444a8aef5a0a21a531, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cec88dae26d9c494d838e53353487518, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1149,6 +1149,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 937a18249d2f73e47b9332aa4e592597, type: 2}
   - {fileID: 11400000, guid: fc160dc35553f0b4f91068d055162ab8, type: 2}
   - {fileID: 11400000, guid: 1f64bd9698d9c5440afbed9a4950fc52, type: 2}
+  firstFields: {fileID: 0}
+  lockFirstFields: {fileID: 0}
+  secondFields: {fileID: 0}
+  lockSecondFields: {fileID: 0}
+  thirdFields: {fileID: 0}
+  lockThirdFields: {fileID: 0}
 --- !u!1 &374979958
 GameObject:
   m_ObjectHideFlags: 0
@@ -1329,6 +1335,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sfxSource: {fileID: 0}
   bgmSource: {fileID: 0}
+  bgmVolume: 0.3
+  sfxVolume: 1
   fadeDuration: 0.3
   sfxList: []
   bgmList: []
@@ -5258,6 +5266,7 @@ MonoBehaviour:
   inventoryPopup: {fileID: 0}
   researchLabPopup: {fileID: 0}
   storePopup: {fileID: 0}
+  decoPopup: {fileID: 0}
   collectionPopup: {fileID: 0}
   questPopup: {fileID: 0}
   alertPopup: {fileID: 727452931}
@@ -5276,6 +5285,7 @@ MonoBehaviour:
   mainToolUI: {fileID: 0}
   seedPopup: {fileID: 0}
   fertilizerPopup: {fileID: 0}
+  decoCloseButton: {fileID: 0}
 --- !u!1 &2059707435
 GameObject:
   m_ObjectHideFlags: 0
