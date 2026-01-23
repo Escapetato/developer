@@ -153,6 +153,16 @@ public class UIManager : MonoBehaviour
         if (collectionPopup != null) collectionPopup.SetActive(false);
         if (confirmPopup != null) confirmPopup.SetActive(false);
 
+        // ※ 추가 : 퀘스트 창이 열려있었다면 카메라 상태 복원
+        if (questPopup != null && questPopup.activeSelf)
+        {
+            CameraController cameraController = FindObjectOfType<CameraController>();
+            if (cameraController != null)
+            {
+                cameraController.RestoreCameraState(); 
+            }
+        }
+
         // ★ [추가] 퀘스트 창 끄기
         if (questPopup != null) questPopup.SetActive(false);
 
@@ -218,6 +228,14 @@ public class UIManager : MonoBehaviour
 
         if (questPopup != null)
         {
+            // ※ 추가 : 퀘스트 화면 진입 전 현재 카메라 상태 저장
+            CameraController cameraController = FindObjectOfType<CameraController>();
+            if (cameraController != null)
+            {
+                cameraController.SaveCameraState();  // 현재 상태 저장
+                cameraController.ResetCameraForQuest();  // 기본값으로 리셋
+            }
+
             questPopup.SetActive(true);
 
             // ★ [추가] 퀘스트 창 열릴 때 포잉 바 숨기기
