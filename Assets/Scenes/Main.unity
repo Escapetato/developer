@@ -298,8 +298,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 2673854}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &2673854 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -3314,8 +3314,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 103093310}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &103093310 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -3889,8 +3889,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 113767524}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &113767524 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -6476,8 +6476,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 160950483}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &160950483 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -7364,8 +7364,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 179083203}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &179083203 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -8513,8 +8513,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 198791954}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &198791954 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -8696,8 +8696,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 200949156}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &200949156 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -9705,8 +9705,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 227602619}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &227602619 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -10633,8 +10633,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 244612291}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &244612291 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -12352,8 +12352,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 299406786}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &299406786 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -12828,8 +12828,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 306620770}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &306620770 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -13266,8 +13266,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 322657230}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &322657230 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -13662,8 +13662,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 333418526}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &333418526 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -13864,8 +13864,8 @@ MonoBehaviour:
   adultSprite: {fileID: 0}
   readySprite: {fileID: 21300000, guid: 70a7d574c6e804a4098f8211d83dbdc9, type: 3}
   fieldImage: {fileID: 334412249}
-  plantAnchor: {fileID: 997670837}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &334412249 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -15276,8 +15276,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 362482878}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &362482878 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -18659,8 +18659,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 433185643}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &433185643 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -21501,8 +21501,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 491730332}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &491730332 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -22294,8 +22294,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 510591999}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &510591999 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -22806,8 +22806,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 534711894}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &534711894 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -25526,8 +25526,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 634697733}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &634697733 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -28380,8 +28380,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 711093804}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &711093804 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -28805,8 +28805,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 715313525}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &715313525 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -31340,8 +31340,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 780979847}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &780979847 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -32643,8 +32643,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 811058510}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &811058510 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -33438,8 +33438,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 823725764}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &823725764 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -35057,8 +35057,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 870530051}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &870530051 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -35805,8 +35805,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 883661439}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &883661439 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -37445,8 +37445,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 913096141}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &913096141 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -37686,8 +37686,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 927554074}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &927554074 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -38541,8 +38541,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 948387326}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &948387326 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -40286,8 +40286,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1000071402}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1000071402 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -41876,8 +41876,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1039148755}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1039148755 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -42872,8 +42872,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1095626094}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1095626094 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -44812,8 +44812,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1139551212}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1139551212 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -50474,8 +50474,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1263096819}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1263096819 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -51479,8 +51479,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1276673403}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1276673403 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -54782,8 +54782,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1349873527}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1349873527 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -55244,8 +55244,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1356929905}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1356929905 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -57086,8 +57086,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1386130583}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1386130583 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -59346,8 +59346,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1444399168}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1444399168 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -60020,8 +60020,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1457602080}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1457602080 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -61217,8 +61217,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1482257748}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1482257748 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -62324,8 +62324,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1518518653}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1518518653 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -62848,8 +62848,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1526123265}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1526123265 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -67738,8 +67738,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1640872063}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1640872063 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -69996,8 +69996,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1723738859}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1723738859 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -70582,8 +70582,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1744620515}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1744620515 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -70959,8 +70959,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1751267750}
-  plantAnchor: {fileID: 1001528775}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1751267750 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -71066,8 +71066,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1752515761}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1752515761 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -76488,8 +76488,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1886529204}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1886529204 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -77124,8 +77124,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 1897459520}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &1897459520 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -84570,8 +84570,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 2104042751}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &2104042751 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
@@ -86539,8 +86539,8 @@ MonoBehaviour:
   adultSprite: {fileID: 21300000, guid: d68b4fd22275c442fa801cc7e0aa71a9, type: 3}
   readySprite: {fileID: 21300000, guid: b3460a5d9b7c04d5c92826abe210b87d, type: 3}
   fieldImage: {fileID: 2143942900}
-  plantAnchor: {fileID: 871225135}
   fertilizerCount: 0
+  randomSeedReadySprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
 --- !u!212 &2143942900 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3561858789340295885, guid: 2b9b05acc78ec4a5fbb2cc44f42cab9a, type: 3}
