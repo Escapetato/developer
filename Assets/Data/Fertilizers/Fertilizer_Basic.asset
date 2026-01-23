@@ -18,7 +18,7 @@ MonoBehaviour:
   itemIconOffVer: {fileID: 0}
   itemCategory: Fertilizer
   collectionCategory: 
-  price: 500
+  price: 400
   seedCategory: 0
   growTime: 0
   harvestItem: {fileID: 0}

@@ -15,11 +15,11 @@ MonoBehaviour:
   itemName: "\uD1A0\uB9C8\uD1A0"
   description: 
   itemIcon: {fileID: 21300000, guid: 03832da25e4290545aac5baef9a2f956, type: 3}
+  itemIconOffVer: {fileID: 0}
   itemCategory: Crop
   collectionCategory: Fruit
-  price: 50
+  price: 150
   seedCategory: 0
-  plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
