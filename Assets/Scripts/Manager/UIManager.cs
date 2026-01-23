@@ -458,12 +458,14 @@ public class UIManager : MonoBehaviour
                     // 클릭한 대상이 밭(Field)이 아니면 팝업 닫기
                     if (clickedField == null)
                     {
+                        SoundManager.Instance.PlaySFX("close");
                         CloseAllPopups();
                     }
                 }
                 else
                 {
                     // 아무것도 없는 허공을 클릭했을 때도 팝업 닫기
+                    SoundManager.Instance.PlaySFX("close");
                     CloseAllPopups();
                 }
             }
