@@ -18,7 +18,7 @@ MonoBehaviour:
   itemIconOffVer: {fileID: 21300000, guid: c45479f53e6f9a443ad1cb5aa2d2072b, type: 3}
   itemCategory: Seed
   collectionCategory: 
-  price: 300
+  price: 250
   seedCategory: 1
   growTime: 1800
   harvestItem: {fileID: 11400000, guid: cdd542ae1919f9743a54088d6e19a46a, type: 2}

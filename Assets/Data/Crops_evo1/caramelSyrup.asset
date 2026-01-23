@@ -15,14 +15,15 @@ MonoBehaviour:
   itemName: "\uCE74\uB77C\uBA5C \uC2DC\uB7FD"
   description: 
   itemIcon: {fileID: 21300000, guid: 017e6afc435c04c4ab56da9886710b9c, type: 3}
+  itemIconOffVer: {fileID: 0}
   itemCategory: Crop
   collectionCategory: 
-  price: 1500
+  price: 1650
   seedCategory: 0
-  plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
+  readyFieldSprite: {fileID: 0}
   growTimeDisplay: "1\uBD84"
   harvestToolName: "\uD638\uBBF8"
   toolTier: 0

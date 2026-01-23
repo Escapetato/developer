@@ -18,7 +18,7 @@ MonoBehaviour:
   itemIconOffVer: {fileID: 0}
   itemCategory: Potion
   collectionCategory: 
-  price: 150
+  price: 200
   seedCategory: 0
   growTime: 0
   harvestItem: {fileID: 0}

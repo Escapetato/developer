@@ -18,7 +18,7 @@ MonoBehaviour:
   itemIconOffVer: {fileID: 0}
   itemCategory: Crop
   collectionCategory: Grain
-  price: 50
+  price: 100
   seedCategory: 0
   growTime: 0
   harvestItem: {fileID: 0}
