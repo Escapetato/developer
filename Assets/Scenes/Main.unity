@@ -18591,8 +18591,8 @@ MonoBehaviour:
   confirmPopupObject: {fileID: 651934086}
   confirmPopupText: {fileID: 1386006293}
   successPopupObject: {fileID: 227316346}
-  successItemIcon: {fileID: 0}
-  successNameText: {fileID: 0}
+  successItemIcon: {fileID: 1055504538}
+  successNameText: {fileID: 185591703}
   successMessageText: {fileID: 185591703}
   successConfirmButton: {fileID: 334011931}
   successCollectionButton: {fileID: 1402743492}
