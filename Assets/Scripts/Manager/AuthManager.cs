@@ -4,7 +4,7 @@ using TMPro;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
-using System.Threading.Tasks;
+// using Google; // [삭제] 구글 로그인 네임스페이스 제거
 using System.Collections;
 
 public class AuthManager : MonoBehaviour
@@ -28,24 +28,22 @@ public class AuthManager : MonoBehaviour
     public Button goToLoginButton;
 
     [Header("=== Common UI (공통) ===")]
+    // public Button googleLoginButton; // [삭제]
     public TextMeshProUGUI statusText;
 
-    [Header("Google Login")]
-    public string webClientId;
+    // [Header("Google Login")] // [삭제]
+    // public string webClientId; // [삭제]
 
     private FirebaseAuth auth;
+    // private GoogleSignInConfiguration googleConfig; // [삭제]
     private bool initialized = false;
 
-    private bool loggedAuthNotReady = false;
-    private bool loggedWebClientEmpty = false;
+    // 스레드 제어용 변수
+    private bool isRegisterSuccess = false;
+    private string registeredEmailTemp = "";
 
-    // ▼▼▼ [핵심 수정] 스레드 문제를 피하기 위한 깃발 변수들 ▼▼▼
-    private bool isRegisterSuccess = false; // 회원가입 성공했나?
-    private string registeredEmailTemp = ""; // 가입한 이메일 임시 저장
-
-    private bool isLoginSuccess = false;    // 로그인 성공했나?
-    private string loginUserIdTemp = "";    // 로그인한 UID 임시 저장
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+    private bool isLoginSuccess = false;
+    private string loginUserIdTemp = "";
 
     void Awake() { }
 
@@ -53,6 +51,7 @@ public class AuthManager : MonoBehaviour
     {
         if (loginButton) loginButton.onClick.AddListener(TryLogin);
         if (registerButton) registerButton.onClick.AddListener(TryRegister);
+        // if (googleLoginButton) googleLoginButton.onClick.AddListener(TryGoogleLogin); // [삭제]
 
         if (goToRegisterButton) goToRegisterButton.onClick.AddListener(ShowRegisterPanel);
         if (goToLoginButton) goToLoginButton.onClick.AddListener(ShowLoginPanel);
@@ -65,7 +64,7 @@ public class AuthManager : MonoBehaviour
             if (rememberIdToggle != null) rememberIdToggle.isOn = true;
         }
 
-        // FirebaseBootstrap 기다리기
+        // Firebase 의존성 확인
         var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
         yield return new WaitUntil(() => dependencyTask.IsCompleted);
 
@@ -78,28 +77,22 @@ public class AuthManager : MonoBehaviour
         {
             Debug.LogError("Firebase Init Failed: " + dependencyTask.Result);
         }
-
-        EnsureInitialized();
     }
 
-    // ▼▼▼ [핵심 수정] Update에서 깃발을 감시하다가 실행 (이건 무조건 메인스레드임) ▼▼▼
     void Update()
     {
-        // 1. 회원가입 성공 감지
         if (isRegisterSuccess)
         {
-            isRegisterSuccess = false; // 깃발 내리기
+            isRegisterSuccess = false;
             StartCoroutine(RegisterSuccessRoutine(registeredEmailTemp));
         }
 
-        // 2. 로그인 성공 감지
         if (isLoginSuccess)
         {
-            isLoginSuccess = false; // 깃발 내리기
+            isLoginSuccess = false;
             ProceedLogin(loginUserIdTemp);
         }
     }
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
     void ShowLoginPanel()
     {
@@ -168,14 +161,11 @@ public class AuthManager : MonoBehaviour
                 return;
             }
 
-            // ▼▼▼ [수정된 부분] AuthResult로 받아서 User 꺼내기 ▼▼▼
             AuthResult result = task.Result;
-            FirebaseUser newUser = result.User; // 여기서 꺼냄
-            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+            FirebaseUser newUser = result.User;
 
             Debug.Log("가입 성공 UID: " + newUser.UserId);
 
-            // 성공 시 -> 깃발 들기
             registeredEmailTemp = email;
             isRegisterSuccess = true;
         });
@@ -224,14 +214,11 @@ public class AuthManager : MonoBehaviour
                 return;
             }
 
-            // ▼▼▼ [수정된 부분] AuthResult로 받아서 User 꺼내기 ▼▼▼
             AuthResult result = task.Result;
             FirebaseUser user = result.User;
-            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
             Debug.Log("로그인 성공 UID: " + user.UserId);
 
-            // 아이디 저장
             if (rememberIdToggle != null && rememberIdToggle.isOn)
             {
                 PlayerPrefs.SetString("SavedEmail", email);
@@ -242,13 +229,11 @@ public class AuthManager : MonoBehaviour
                 PlayerPrefs.DeleteKey("SavedEmail");
             }
 
-            // 성공 시 -> 깃발 들기
             loginUserIdTemp = user.UserId;
             isLoginSuccess = true;
         });
     }
 
-    // 로그인 후처리 함수 (Update에서 호출됨)
     void ProceedLogin(string userId)
     {
         SetStatusMessage("로그인 성공!", false);
@@ -267,6 +252,7 @@ public class AuthManager : MonoBehaviour
         }
     }
 
+    // [삭제] TryGoogleLogin 함수 전체 삭제
 
     void SetStatusMessage(string msg, bool isError)
     {
