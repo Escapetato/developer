@@ -114,6 +114,8 @@ public class CollectionUI : MonoBehaviour
         if (currentIndex > 0)
         {
             currentIndex--;
+            SoundManager.Instance.PlaySFX("paper");
+
             UpdateLeftPage();
             UpdateNavigationButtons(); // 버튼 상태 갱신
         }
@@ -127,6 +129,8 @@ public class CollectionUI : MonoBehaviour
         if (currentIndex < currentCategoryList.Count - 1)
         {
             currentIndex++;
+            SoundManager.Instance.PlaySFX("paper");
+            
             UpdateLeftPage();
             UpdateNavigationButtons(); // 버튼 상태 갱신
         }
@@ -284,6 +288,7 @@ public class CollectionUI : MonoBehaviour
 
     public void OnCloseBtnClick()
     {
+        SoundManager.Instance.PlaySFX("close");
         gameObject.SetActive(false);
     }
 }
