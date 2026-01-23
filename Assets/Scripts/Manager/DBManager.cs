@@ -4,6 +4,7 @@ using Firebase.Extensions;
 using System.Collections.Generic;
 using System;
 using UnityEngine.SceneManagement;
+using System.Collections; // 코루틴용
 
 [Serializable]
 public class UserData
@@ -66,6 +67,7 @@ public class DBManager : MonoBehaviour
     public List<EvolutionRecipe> allGameRecipes = new List<EvolutionRecipe>();
 
     DatabaseReference reference;
+
     public UserData loadedUserData;
 
     void Awake()
@@ -73,7 +75,7 @@ public class DBManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            transform.SetParent(null); // 부모(@Managers)에서 탈출하여 독립
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
@@ -94,36 +96,57 @@ public class DBManager : MonoBehaviour
         reference = FirebaseDatabase.GetInstance(dbUrl).RootReference;
     }
 
-    // ▼▼▼ [핵심] 씬 이동 완료 시 데이터 주입 ▼▼▼
+    // ▼▼▼ [핵심 수정] 씬 로드 시 데이터 주입 (1프레임 대기) ▼▼▼
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "Main")
         {
-            // 씬 로드 직후에는 매니저들이 초기화 상태(0)이므로,
-            // 들고 있던 loadedUserData를 다시 꽂아줘야 합니다.
-            ApplyDataToManagers();
-            ApplyFieldDataToScene();
+            // 바로 실행하면 매니저들이 준비 안 됐을 수도 있으니 1프레임 쉼
+            StartCoroutine(DelayedRestore());
         }
     }
 
-    // 매니저들에게 데이터 뿌리기
+    IEnumerator DelayedRestore()
+    {
+        yield return null; // 1프레임 대기 (매니저들 Awake/Start 완료 대기)
+
+        Debug.Log("🔄 [데이터 복구] 매니저들에게 데이터 주입 시작");
+        ApplyDataToManagers(); // 포잉, 인벤, 도감 등 복구
+        ApplyFieldDataToScene(); // 밭 복구
+    }
+
+    // ▼▼▼ [새로 추가된 함수] 매니저들에게 데이터 꽂아주기 ▼▼▼
     void ApplyDataToManagers()
     {
         if (loadedUserData == null) return;
 
-        Debug.Log("🔄 [데이터 복구] 씬 로드 후 매니저들에게 데이터 주입 중...");
-
+        // 1. 포잉 복구
         if (PoingManager.Instance != null)
+        {
             PoingManager.Instance.SetLoadedPoing(loadedUserData.poing);
+        }
 
+        // 2. 인벤토리 복구
         if (InventoryManager.Instance != null)
+        {
             InventoryManager.Instance.LoadInventory(loadedUserData.inventory);
+        }
 
+        // 3. 도감 복구
         if (GameProgressionManager.Instance != null)
-            GameProgressionManager.Instance.LoadProgression(loadedUserData.isShopUnlocked, loadedUserData.unlockedItemNames, loadedUserData.unlockedRecipeNames);
+        {
+            GameProgressionManager.Instance.LoadProgression(
+                loadedUserData.isShopUnlocked,
+                loadedUserData.unlockedItemNames,
+                loadedUserData.unlockedRecipeNames
+            );
+        }
 
+        // 4. 퀘스트 복구
         if (QuestManager.Instance != null)
+        {
             QuestManager.Instance.LoadQuestData(loadedUserData.quests, loadedUserData.lastLoginDate);
+        }
     }
 
     public ItemData FindItemByName(string name)
@@ -142,9 +165,10 @@ public class DBManager : MonoBehaviour
 
         try
         {
+            // 메모리에 데이터가 없으면 새로 만듦
             if (loadedUserData == null) loadedUserData = new UserData("감자농부", 0);
 
-            // 매니저가 살아있을 때만 최신 값으로 갱신 (죽었으면 기존 값 유지)
+            // 매니저가 살아있으면 최신 값으로 업데이트
             if (PoingManager.Instance != null) loadedUserData.poing = PoingManager.Instance.currentPoing;
 
             loadedUserData.lastLoginDate = DateTime.Today.ToString("yyyy-MM-dd");
@@ -152,9 +176,11 @@ public class DBManager : MonoBehaviour
             if (GameProgressionManager.Instance != null)
             {
                 loadedUserData.isShopUnlocked = GameProgressionManager.Instance.isShopUnlocked;
+
                 loadedUserData.unlockedItemNames.Clear();
                 foreach (var item in GameProgressionManager.Instance.unlockedItems)
                     if (item != null) loadedUserData.unlockedItemNames.Add(item.itemName);
+
                 loadedUserData.unlockedRecipeNames.Clear();
                 foreach (var recipe in GameProgressionManager.Instance.unlockedRecipes)
                     if (recipe != null) loadedUserData.unlockedRecipeNames.Add(recipe.name);
@@ -197,6 +223,13 @@ public class DBManager : MonoBehaviour
             }
 
             string json = JsonUtility.ToJson(loadedUserData);
+
+            if (reference == null)
+            {
+                string dbUrl = "https://whatthefarm-893d5-default-rtdb.firebaseio.com/";
+                reference = FirebaseDatabase.GetInstance(dbUrl).RootReference;
+            }
+
             reference.Child("users").Child(userId).SetRawJsonValueAsync(json).ContinueWithOnMainThread(task =>
             {
                 if (task.IsCompleted) Debug.Log("✅ [저장 성공]");
@@ -216,6 +249,7 @@ public class DBManager : MonoBehaviour
             if (task.IsCompleted)
             {
                 DataSnapshot snapshot = task.Result;
+
                 if (snapshot.Exists)
                 {
                     string json = snapshot.GetRawJsonValue();
@@ -226,13 +260,14 @@ public class DBManager : MonoBehaviour
                     if (loadedUserData.quests == null) loadedUserData.quests = new List<QuestSaveData>();
 
                     Debug.Log("📥 데이터 로드 완료!");
-                    // Auth씬에서는 매니저가 없으니 여기선 적용 안 됨 -> OnSceneLoaded에서 적용됨
                 }
                 else
                 {
+                    Debug.Log("신규 유저 -> 초기 데이터 생성");
                     loadedUserData = new UserData("감자농부", 0);
                     SaveAllData(userId);
                 }
+
                 if (onComplete != null) onComplete.Invoke();
             }
         });
