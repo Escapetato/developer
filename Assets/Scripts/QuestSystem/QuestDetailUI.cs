@@ -426,6 +426,7 @@ public class QuestDetailUI : MonoBehaviour
         // 추가: 메인/서브는 조건 변화에 따라 아이콘도 즉시 갱신
         if (currentQuest.type == QuestType.Main) UpdateRewardUI_Main(currentQuest);
         else if (currentQuest.type == QuestType.Sub) UpdateRewardUI_Sub(currentQuest);
+
     }
 
     public void Clear()
@@ -696,12 +697,12 @@ public class QuestDetailUI : MonoBehaviour
 
         switch (q.key)
         {
-            case 1: SetRewardSlot(1, land, ""); break;
-            case 2: SetRewardSlot(1, nat, ""); break;
-            case 3: SetRewardSlot(1, land, ""); break;
-            case 4: SetRewardSlot(1, sap, ""); break;
-            case 5: SetRewardSlot(1, land, ""); break;
-            case 6: SetRewardSlot(1, gawi, ""); break;
+            case 101: SetRewardSlot(1, land, ""); break;
+            case 102: SetRewardSlot(1, nat, ""); break;
+            case 103: SetRewardSlot(1, land, ""); break;
+            case 104: SetRewardSlot(1, sap, ""); break;
+            case 105: SetRewardSlot(1, land, ""); break;
+            case 106: SetRewardSlot(1, gawi, ""); break;
             default: SetRewardSlot(1, land, ""); break;
         }
     }
