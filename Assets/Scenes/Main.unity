@@ -53169,7 +53169,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isShopUnlocked: 0
   startingItems:
-  - {fileID: 11400000, guid: c750a806cdddfa54db1a5ac00afb8b69, type: 2}
   - {fileID: 11400000, guid: c1edb44d15c8f3a4199d472ece42d97c, type: 2}
   - {fileID: 11400000, guid: dcfb69a9af18e9e4fb690b5db3124344, type: 2}
 --- !u!1 &1263464163
