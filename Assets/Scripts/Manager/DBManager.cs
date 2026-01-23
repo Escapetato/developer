@@ -130,13 +130,25 @@ public class DBManager : MonoBehaviour
     }
 
     void ApplyDataToManagers()
+{
+    if (loadedUserData == null) return;
+
+    // 1. 인벤토리 데이터 복구 전 '호미' 체크 (메모리 상의 리스트에 직접 추가)
+    if (loadedUserData.inventory != null)
     {
-        if (loadedUserData == null) return;
-        if (PoingManager.Instance != null) PoingManager.Instance.SetLoadedPoing(loadedUserData.poing);
-        if (InventoryManager.Instance != null) InventoryManager.Instance.LoadInventory(loadedUserData.inventory);
-        if (GameProgressionManager.Instance != null) GameProgressionManager.Instance.LoadProgression(loadedUserData.isShopUnlocked, loadedUserData.unlockedItemNames, loadedUserData.unlockedRecipeNames);
-        if (QuestManager.Instance != null) QuestManager.Instance.LoadQuestData(loadedUserData.quests, loadedUserData.lastLoginDate);
+        // 호미가 데이터에 없으면 리스트에 즉시 추가
+        if (!loadedUserData.inventory.Exists(x => x.itemName == "호미"))
+        {
+            loadedUserData.inventory.Add(new InventorySaveData { itemName = "호미", amount = 1 });
+        }
     }
+
+    // 2. 각 매니저에 데이터 주입
+    if (PoingManager.Instance != null) PoingManager.Instance.SetLoadedPoing(loadedUserData.poing);
+    if (InventoryManager.Instance != null) InventoryManager.Instance.LoadInventory(loadedUserData.inventory);
+    if (GameProgressionManager.Instance != null) GameProgressionManager.Instance.LoadProgression(loadedUserData.isShopUnlocked, loadedUserData.unlockedItemNames, loadedUserData.unlockedRecipeNames);
+    if (QuestManager.Instance != null) QuestManager.Instance.LoadQuestData(loadedUserData.quests, loadedUserData.lastLoginDate);
+}
 
     public ItemData FindItemByName(string name) { return allGameItems.Find(item => item.itemName == name); }
     public EvolutionRecipe FindRecipeByName(string name) { return allGameRecipes.Find(recipe => recipe.name == name); }
