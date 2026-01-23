@@ -24,8 +24,8 @@ MonoBehaviour:
   harvestItem: {fileID: 11400000, guid: eaa77d76b2039774c9230adfceb61aca, type: 2}
   requiredToolTier: 1
   readyFieldSprite: {fileID: 21300000, guid: 70a7d574c6e804a4098f8211d83dbdc9, type: 3}
-  growTimeDisplay: "1\uBD84"
-  harvestToolName: "\uD638\uBBF8"
+  growTimeDisplay: 
+  harvestToolName: 
   toolTier: 0
   growthReductionPercent: 0.25
   isDefaultUnlocked: 0

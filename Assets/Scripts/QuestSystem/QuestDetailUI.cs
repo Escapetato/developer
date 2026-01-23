@@ -78,15 +78,13 @@ public class QuestDetailUI : MonoBehaviour
     [Header("스크롤 제어(Scrollbar UI는 유니티에서 숨김)")]
     [SerializeField] private ScrollRect scrollRect;
 
-    [Tooltip("Closed 메인 슬롯이 이 개수 이상일 때만 휠 스크롤 ON")]
-    [SerializeField] private int closedScrollThreshold = 5;
-
+    //[Tooltip("Closed 메인 슬롯이 이 개수 이상일 때만 휠 스크롤 ON")]
+    //[SerializeField] private int closedScrollThreshold = 5;
 
     private QuestData currentQuest;
     private List<QuestData> currentDailyQuests;
 
     private bool isDailyQuestView = false;  // 현재 화면이 '일일퀘스트(3개 리스트)' 모드인지 여부
-    // 일일퀘스트는 최대 몇 개까지 UI 슬롯에 표시할지
     private const int DailyQuestSlotCount = 3;
 
     public void Show(QuestData data)
@@ -296,19 +294,6 @@ public class QuestDetailUI : MonoBehaviour
                 conditionCheckOn[i].SetActive(completed);
         }
 
-        //// 남는 버튼 숨김
-        //if (rewardButtons != null)
-        //{
-        //    for (int i = rowCount; i < rewardButtons.Length; i++)
-        //    {
-        //        if (rewardButtons[i] != null)
-        //        {
-        //            rewardButtons[i].gameObject.SetActive(false);
-        //            rewardButtons[i].interactable = false;
-        //        }
-        //    }
-        //}
-
         // 공용 '보상받기' 버튼: 활성화된 보상(=canClaim) 이 하나라도 있으면 활성
         if (rewardButton != null)
         {
@@ -441,6 +426,7 @@ public class QuestDetailUI : MonoBehaviour
         // 추가: 메인/서브는 조건 변화에 따라 아이콘도 즉시 갱신
         if (currentQuest.type == QuestType.Main) UpdateRewardUI_Main(currentQuest);
         else if (currentQuest.type == QuestType.Sub) UpdateRewardUI_Sub(currentQuest);
+
     }
 
     public void Clear()
@@ -489,16 +475,6 @@ public class QuestDetailUI : MonoBehaviour
             rewardButton.onClick.AddListener(OnClickReward);
         }
 
-        //if (rewardButtons == null) return;
-
-        //for (int i = 0; i < rewardButtons.Length; i++)
-        //{
-        //    int idx = i;
-        //    if (rewardButtons[idx] == null) continue;
-
-        //    rewardButtons[idx].onClick.RemoveAllListeners();
-        //    rewardButtons[idx].onClick.AddListener(() => OnClickReward(idx));
-        //}
     }
 
     void OnClickReward()
@@ -531,68 +507,6 @@ public class QuestDetailUI : MonoBehaviour
             ShowDailyQuests(currentDailyQuests); // 버튼/체크 갱신
         }
     }
-
-    //private void OnClickReward(int index)
-    //{
-    //    // 단일 퀘스트 화면: 1번 버튼만 동작
-    //    if (!isDailyQuestView)
-    //    {
-    //        if (index != 1) return;
-    //        if (currentQuest == null) return;
-
-    //        if (QuestManager.Instance != null && QuestManager.Instance.ClaimRewardMainSub(currentQuest))
-    //        {
-    //            UIManager.Instance?.ShowAlertPopup("보상이 지급되었습니다.");
-    //            RefreshConditions();
-    //        }
-    //        return;
-    //    }
-
-    //    // 일일퀘스트 화면: 0~2 버튼이 각각 해당 퀘스트를 처리
-    //    if (currentDailyQuests == null) return;
-    //    if (index < 0 || index >= currentDailyQuests.Count) return;
-
-    //    QuestData q = currentDailyQuests[index];
-    //    if (q == null) return;
-
-    //    if (QuestManager.Instance != null && QuestManager.Instance.ClaimRewardDaily(q))
-    //    {
-    //        UIManager.Instance?.ShowAlertPopup("보상이 지급되었습니다.");
-    //        ShowDailyQuests(currentDailyQuests); // 진행도/체크/버튼까지 재갱신
-    //    }
-    //}
-
-    //private Button GetSingleRewardButton()
-    //{
-    //    if (rewardButtons == null) return null;
-    //    if (rewardButtons.Length <= 1) return null;
-    //    return rewardButtons[1];
-    //}
-
-    //private void SetAllRewardButtons(bool active)
-    //{
-    //    if (rewardButtons == null) return;
-    //    for (int i = 0; i < rewardButtons.Length; i++)
-    //    {
-    //        if (rewardButtons[i] == null) continue;
-    //        rewardButtons[i].gameObject.SetActive(active);
-    //        rewardButtons[i].interactable = false;
-    //    }
-    //}
-
-    //private void ShowSingleRewardButtonOnly()
-    //{
-    //    if (rewardButtons == null) return;
-
-    //    for (int i = 0; i < rewardButtons.Length; i++)
-    //    {
-    //        if (rewardButtons[i] == null) continue;
-
-    //        bool isSingle = (i == 1);
-    //        rewardButtons[i].gameObject.SetActive(isSingle);
-    //        rewardButtons[i].interactable = false;
-    //    }
-    //}
 
     // 지난 메인 퀘스트 UI 
     public void ShowClosed(QuestData data)
@@ -768,6 +682,7 @@ public class QuestDetailUI : MonoBehaviour
         return null;
     }
 
+    // ✔️ 여기부터 수정된 보상 UI 
 
     // 메인 1칸 고정 
     private void UpdateRewardUI_Main(QuestData q)
@@ -784,12 +699,12 @@ public class QuestDetailUI : MonoBehaviour
 
         switch (q.key)
         {
-            case 1: SetRewardSlot(1, land, ""); break;
-            case 2: SetRewardSlot(1, nat, ""); break;
-            case 3: SetRewardSlot(1, land, ""); break;
-            case 4: SetRewardSlot(1, sap, ""); break;
-            case 5: SetRewardSlot(1, land, ""); break;
-            case 6: SetRewardSlot(1, gawi, ""); break;
+            case 101: SetRewardSlot(1, land, ""); break;
+            case 102: SetRewardSlot(1, nat, ""); break;
+            case 103: SetRewardSlot(1, land, ""); break;
+            case 104: SetRewardSlot(1, sap, ""); break;
+            case 105: SetRewardSlot(1, land, ""); break;
+            case 106: SetRewardSlot(1, gawi, ""); break;
             default: SetRewardSlot(1, land, ""); break;
         }
     }
@@ -994,8 +909,8 @@ public class QuestDetailUI : MonoBehaviour
     // 지난퀘스트(Closed) 리스트가 비었을 때 전용
     public void ShowEmptyRightPanel()
     {
-        Clear();                // 텍스트/행들 정리
-        SetDetailVisible(false); // "아예 안 보이게"
+        Clear();               
+        SetDetailVisible(false); // 아예 안 보이게
     }
 
 

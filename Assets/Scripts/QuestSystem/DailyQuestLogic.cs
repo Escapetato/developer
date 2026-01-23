@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -313,5 +313,43 @@ public static class DailyQuestSelector
         public string label;
         public int amount;
         public int rewardKey;
+    }
+
+    // 추가
+    public static void RestoreDailyQuest(QuestData quest, int difficultyInt, int rewardKey)
+    {
+        if (quest == null) return;
+
+        // 1. 난이도 복구
+        DailyQuestDifficulty difficulty = (DailyQuestDifficulty)difficultyInt;
+        quest.dailyDifficulty = difficulty;
+        quest.rewardKey = rewardKey;
+
+        // 2. 제목 복구 (캐시된 원본 사용)
+        string baseTitle = GetBaseTitle(quest);
+        if (string.IsNullOrEmpty(baseTitle)) baseTitle = quest.title;
+
+        // 3. 목표 횟수 재계산
+        int target = GetTargetCount(quest, difficulty);
+
+        // 4. 보상 수량 재계산
+        DailyRewardType rType = DailyRewardType.Poing;
+        if (rewardKey == 1) rType = DailyRewardType.Fertilizer;
+        else if (rewardKey >= 100) rType = DailyRewardType.Potion;
+
+        DailyRewardInfo rewardInfo = BuildRewardInfo(rType, difficulty);
+        quest.rewardAmount = rewardInfo.amount;
+
+        // 5. 텍스트 및 목표 배열 적용
+        quest.title = $"{baseTitle} {target}회";
+        quest.questDesc = $"난이도: {GetDifficultyLabel(difficulty)}\n보상: {rewardInfo.label} x{rewardInfo.amount}";
+
+        quest.targetCounts = new int[] { target };
+
+        // currentCounts 배열 안전장치
+        if (quest.currentCounts == null || quest.currentCounts.Length == 0)
+            quest.currentCounts = new int[] { 0 };
+
+        Debug.Log($"[DailyRestore] {quest.title} 복구 완료 (난이도:{difficulty}, 목표:{target})");
     }
 }

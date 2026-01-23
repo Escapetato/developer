@@ -15,16 +15,17 @@ MonoBehaviour:
   itemName: "\uB79C\uB364 \uC528\uC557"
   description: 
   itemIcon: {fileID: 21300000, guid: 9fd0567db076b4f459209de36e08df45, type: 3}
+  itemIconOffVer: {fileID: 0}
   itemCategory: Seed
   collectionCategory: 
   price: 500
   seedCategory: 0
-  plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
-  growTimeDisplay: "1\uBD84"
-  harvestToolName: "\uD638\uBBF8"
+  readyFieldSprite: {fileID: 21300000, guid: 404d06a10e1d84d77bc7b7791bf99223, type: 3}
+  growTimeDisplay: 
+  harvestToolName: 
   toolTier: 0
   growthReductionPercent: 0.25
   isDefaultUnlocked: 0

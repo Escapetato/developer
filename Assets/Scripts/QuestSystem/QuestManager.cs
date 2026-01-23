@@ -22,6 +22,16 @@ public class QuestManager : MonoBehaviour
     [SerializeField] private ItemData dailyFertilizerItem;   // 비료 ItemData (1개)
     [SerializeField] private ItemData[] dailyPotionItems;    // 포션 ItemData 8개 (불~무지개 순서)
 
+    [Header("밭 확장 보상")]
+    [SerializeField] private GameObject firstFields;
+    [SerializeField] private GameObject lockFirstFields;
+
+    [SerializeField] private GameObject secondFields;
+    [SerializeField] private GameObject lockSecondFields;
+
+    [SerializeField] private GameObject thirdFields;
+    [SerializeField] private GameObject lockThirdFields;
+
     // 한 플레이 세션에서 한 번만 초기화 
     private bool initialized = false;
 
@@ -89,7 +99,7 @@ public class QuestManager : MonoBehaviour
             dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
 
         // 런타임 상태(새로 생성)
-        dst.state = src.state;               // 혹은 Locked로 통일해도 됨(InitializeQuestStates가 어차피 초기화)
+        dst.state = src.state;               
         dst.currentCount = src.currentCount;
         dst.rewardClaimed = src.rewardClaimed;
         //dst.currentCounts = (dst.targetCounts != null) ? new int[dst.targetCounts.Length] : null;
@@ -190,7 +200,6 @@ public class QuestManager : MonoBehaviour
     }
 
     // [QuestManager.cs] OpenInitialSlots 함수 수정
-    // QuestManager.cs -> OpenInitialSlots 함수 (이걸로 교체!)
     private void OpenInitialSlots()
     {
         MainQuestSlot();
@@ -326,43 +335,44 @@ public class QuestManager : MonoBehaviour
         return cnt;
     }
 
-    // 수정
     public void LoadQuestData(List<QuestSaveData> savedQuests, string dateStr)
     {
         Debug.Log($"[QuestManager] LoadQuestData 호출됨. 저장된 퀘스트 수: {(savedQuests != null ? savedQuests.Count : 0)}");
 
         lastSavedDate = dateStr;
 
-        // 1. 초기화 (일일 퀘스트 내용/목표 설정됨)
+        // 1. 기본 퀘스트 데이터 로드 (DB에서 원본 가져오기)
         InitializeIfNeeded();
 
-        // [CASE 1] 저장된 데이터가 없는 경우 (신규 유저 / DB 초기화)
+        // [CASE 1] 신규 유저 (저장 데이터 없음)
         if (savedQuests == null || savedQuests.Count == 0)
         {
             Debug.Log("[QuestManager] 저장된 퀘스트 데이터가 없습니다. (신규 시작)");
-
             if (string.IsNullOrEmpty(lastSavedDate))
                 lastSavedDate = System.DateTime.Today.ToString("yyyy-MM-dd");
 
-            isLoaded = true; // 로딩 완료 도장
+            isLoaded = true;
             OpenInitialSlots(); // 초기 슬롯 오픈 + 저장
             return;
         }
 
-        // [CASE 2] 저장된 데이터가 있는 경우 (기존 유저)
+        // [CASE 2] 기존 유저 (데이터 복구)
 
-        // 상태 리셋
+        // 2-1. 일단 모든 퀘스트 상태를 초기화 (Locked)
         foreach (var q in allQuestList)
         {
             q.state = QuestState.Locked;
             q.currentCount = 0;
             q.rewardClaimed = false;
             q.isNewlyOpened = false;
+
+            // 배열 안전하게 초기화
+            EnsureConditionArrays(q);
             if (q.currentCounts != null)
                 for (int i = 0; i < q.currentCounts.Length; i++) q.currentCounts[i] = 0;
         }
 
-        // 데이터 덮어쓰기
+        // 2-2. 저장된 데이터 덮어쓰기 반복문 안에서 수정
         foreach (var savedQ in savedQuests)
         {
             if (savedQ == null) continue;
@@ -370,51 +380,41 @@ public class QuestManager : MonoBehaviour
             QuestData myQuest = allQuestList.Find(q => q.key == savedQ.key);
             if (myQuest != null)
             {
-                // 저장된 상태 복구
+                // ▼▼▼ [추가] 일일 퀘스트라면, 상태 적용 전에 '내용(목표/제목)'부터 복구해야 함! ▼▼▼
+                if (myQuest.type == QuestType.Daily)
+                {
+                    // 저장된 난이도와 보상 키로 퀘스트 스펙 재설정
+                    DailyQuestSelector.RestoreDailyQuest(myQuest, savedQ.dailyDifficulty, savedQ.dailyRewardKey);
+                }
+                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+                // 상태 복구
                 myQuest.state = (QuestState)savedQ.state;
                 myQuest.currentCount = savedQ.currentCount;
                 myQuest.rewardClaimed = savedQ.rewardClaimed;
 
                 EnsureConditionArrays(myQuest);
 
-                // 배열에도 값 동기화
+                // 현재 수치 배열 복구
                 if (myQuest.currentCounts != null && myQuest.currentCounts.Length > 0)
                 {
                     myQuest.currentCounts[0] = savedQ.currentCount;
                 }
-
-                // ▼▼▼ [여기 추가됨!] 일일 퀘스트 완료 체크 보정 ▼▼▼
-                // 불러온 카운트가 목표치 이상이면, 상태를 'Completed(완료)'로 강제 변경
-                if (myQuest.type == QuestType.Daily && myQuest.state == QuestState.Active)
-                {
-                    if (myQuest.targetCounts != null && myQuest.targetCounts.Length > 0)
-                    {
-                        int target = myQuest.targetCounts[0];
-                        int current = myQuest.currentCounts[0];
-
-                        // 목표 달성했으면 완료 상태로!
-                        if (target > 0 && current >= target)
-                        {
-                            myQuest.state = QuestState.Completed;
-                            Debug.Log($"[Load] 일일 퀘스트({myQuest.title}) 완료 상태로 보정됨 ({current}/{target})");
-                        }
-                    }
-                }
-                // ▲▲▲ [추가 끝] ▲▲▲
             }
         }
 
-        // 로딩 완료 도장 찍기 (먼저 찍어야 OpenInitialSlots에서 저장됨)
+        // 로딩 완료
         isLoaded = true;
 
-        // 슬롯 갱신
+        // 슬롯 및 상태 갱신
         OpenInitialSlots();
         RebuildActiveConditionIndex();
-
-        // DB 로드 완료(=로그인) 시점에 LoginStreak 갱신
         ApplyLoginStreakOnLogin(lastSavedDate);
 
-        Debug.Log($"[QuestManager] 퀘스트 복구 최종 완료! 메인 진행중: {CountActive(mainQuests)}개");
+        // 메인퀘스트 상태 기반으로 밭 확장 복구
+        ApplyFarmExpansionByQuestState();
+
+        Debug.Log($"[QuestManager] 퀘스트 복구 완료! 메인 진행중: {CountActive(mainQuests)}개");
     }
 
 
@@ -441,7 +441,7 @@ public class QuestManager : MonoBehaviour
     {
         if (quest == null) return false;
 
-        // ⚠️ 일일 제외
+        // 일일 제외
         if (quest.type == QuestType.Daily) return false;
 
         // 이미 받았으면 종료
@@ -450,7 +450,35 @@ public class QuestManager : MonoBehaviour
         // 완료 안 됐으면 종료 (테스트로 counts 조작하면 통과 가능)
         if (!IsCompletedByCounts(quest)) return false;
 
-        // ⚠️ 땅 확장 구현 필요 
+        // 땅 확장 
+        if (quest.type == QuestType.Main)
+        {
+            int stage = -1;
+
+            switch (quest.key)
+            {
+                case 101: stage = 1; break;
+                case 103: stage = 2; break;
+                case 105: stage = 3; break;
+            }
+
+            if (stage != -1)
+            {
+                ApplyFarmExpansion(stage);
+
+                quest.rewardClaimed = true;
+                quest.state = QuestState.Closed;
+                RebuildActiveConditionIndex();
+
+                MainQuestSlot(); 
+                OnQuestChanged?.Invoke();
+                SaveToDB();
+
+                return true;
+            }
+        }
+
+        // 땅 확장 제외 보상 
         if (quest.rewardItem == null) return false;
 
         int amount = Mathf.Max(1, quest.rewardAmount);
@@ -921,5 +949,48 @@ public class QuestManager : MonoBehaviour
             SaveToDB();
         }
     }
+
+    // 밭 확장 보상 (메인퀘스트 0, 2, 4)
+    private void ApplyFarmExpansion(int stage)
+    {
+        if (stage >= 1)
+        {
+            if (lockFirstFields != null) lockFirstFields.SetActive(false);
+            if (firstFields != null) firstFields.SetActive(true);
+        }
+
+        if (stage >= 2)
+        {
+            if (lockSecondFields != null) lockSecondFields.SetActive(false);
+            if (secondFields != null) secondFields.SetActive(true);
+        }
+
+        if (stage >= 3)
+        {
+            if (lockThirdFields != null) lockThirdFields.SetActive(false);
+            if (thirdFields != null) thirdFields.SetActive(true);
+        }
+    }
+
+    // 메인 퀘스트 상태 따라 밭 상태 복구 
+    private void ApplyFarmExpansionByQuestState()
+    {
+        int stage = 0;
+
+        // 메인퀘스트 key 기준 (Closed 여부로 판단)
+        if (mainQuests.Exists(q => q.key == 101 && q.state == QuestState.Closed))
+            stage = 1;
+        if (mainQuests.Exists(q => q.key == 103 && q.state == QuestState.Closed))
+            stage = 2;
+        if (mainQuests.Exists(q => q.key == 105 && q.state == QuestState.Closed))
+            stage = 3;
+
+        if (stage > 0)
+        {
+            ApplyFarmExpansion(stage);
+            Debug.Log($"[FarmExpansion] 복구 적용: stage={stage}");
+        }
+    }
+
 
 }

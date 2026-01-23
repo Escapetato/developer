@@ -25,7 +25,7 @@ public class ItemData : ScriptableObject
 
     [Header("씨앗 전용 정보 (Seed)")]
     public SeedType seedCategory = SeedType.None;
-    public GameObject plantPrefab;
+    //public GameObject plantPrefab;
     public float growTime;         // 실제 로직용 시간 (초)
     public ItemData harvestItem;   // 수확물
     public int requiredToolTier = 1;
