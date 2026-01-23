@@ -139,7 +139,7 @@ public class UIManager : MonoBehaviour
         if (wasAnyPopupOpen && goToMain)
         {
             SoundManager.Instance.PlayBGM("mainfarm");
-            SoundManager.Instance.PlaySFX("button"); // 
+            SoundManager.Instance.PlaySFX("back"); 
         }
 
         isSeedPopupOpen = false;
@@ -258,6 +258,7 @@ public class UIManager : MonoBehaviour
         {
             inventoryPopup.SetActive(true); // 인벤토리 열기
             MovePoingUIToPopup(inventoryPopup.transform); // 포잉 바를 인벤토리 창 안으로 이동
+            SoundManager.Instance.PlaySFX("enter");
         }
     }
 
@@ -272,6 +273,7 @@ public class UIManager : MonoBehaviour
             researchLabPopup.SetActive(true);
             MovePoingUIToPopup(researchLabPopup.transform);
             SoundManager.Instance.PlayBGM("lab");
+            SoundManager.Instance.PlaySFX("enter");
         }
     }
 
@@ -286,6 +288,7 @@ public class UIManager : MonoBehaviour
             storePopup.SetActive(true);
             MovePoingUIToPopup(storePopup.transform); // 포잉 바를 상점 창 안으로 이동
             SoundManager.Instance.PlayBGM("store");
+            SoundManager.Instance.PlaySFX("enter");
         }
     }
 
@@ -300,6 +303,7 @@ public class UIManager : MonoBehaviour
             collectionPopup.SetActive(true); // 도감 열기
             // (도감은 화면을 꽉 채우니까 포잉 바 이동은 선택사항. 필요하면 아래 줄 주석 해제)
             // MovePoingUIToPopup(collectionPopup.transform); 
+            SoundManager.Instance.PlaySFX("open");
         }
     }
 
@@ -312,6 +316,7 @@ public class UIManager : MonoBehaviour
         {
             seedPopup.SetActive(true);
             seedPopup.GetComponent<SeedPopupUI>()?.RefreshButtons(field);
+            SoundManager.Instance.PlaySFX("open");
         }
 
         isSeedPopupOpen = true;
@@ -335,6 +340,7 @@ public class UIManager : MonoBehaviour
             {
                 Debug.LogError("FertilizerPopup에 FertilizerPopupUI 스크립트가 없습니다.");
             }
+            SoundManager.Instance.PlaySFX("open");
         }
     }
 
