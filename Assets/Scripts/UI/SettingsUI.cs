@@ -32,6 +32,9 @@ public class SettingsUI : MonoBehaviour
     [SerializeField] private Button logoutButton;        // Settings_Popup/LogoutButton
     [SerializeField] private string authSceneName = "Auth";
 
+    [Header("Quest")]
+    [SerializeField] private GameObject questPopup;
+
     private const string PREF_SFX_MUTED = "PREF_SFX_MUTED";
     private const string PREF_BGM_MUTED = "PREF_BGM_MUTED";
 
@@ -104,6 +107,14 @@ public class SettingsUI : MonoBehaviour
         settingsButton.interactable = true;
 
         SoundManager.Instance?.PlaySFX("close");
+    }
+
+    private void Update()
+    {
+        if (questPopup == null || settingsButton == null) return;
+
+        bool isQuestOpen = questPopup.activeSelf;
+        settingsButton.gameObject.SetActive(!isQuestOpen);
     }
 
     // =====================

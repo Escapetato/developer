@@ -535,6 +535,7 @@ MonoBehaviour:
   soundManager: {fileID: 1246507287}
   logoutButton: {fileID: 1271359384}
   authSceneName: Auth
+  questPopup: {fileID: 1039852477}
 --- !u!1 &19888340
 GameObject:
   m_ObjectHideFlags: 0
@@ -45957,13 +45958,13 @@ MonoBehaviour:
   fadeDuration: 0.3
   sfxList:
   - soundName: open
-    clip: {fileID: 8300000, guid: 51b94b26f6fc348de88f4edd4bda3ef5, type: 3}
-  - soundName: close
     clip: {fileID: 8300000, guid: 0ac2718ebd75d4d668f462f4cc208277, type: 3}
+  - soundName: close
+    clip: {fileID: 8300000, guid: 51b94b26f6fc348de88f4edd4bda3ef5, type: 3}
   - soundName: enter
-    clip: {fileID: 8300000, guid: 707a14b7b5dd04c58a94dd5e10960e6c, type: 3}
-  - soundName: back
     clip: {fileID: 8300000, guid: 93364cbe64339466590f1e1da7e8b062, type: 3}
+  - soundName: back
+    clip: {fileID: 8300000, guid: 707a14b7b5dd04c58a94dd5e10960e6c, type: 3}
   - soundName: fertilizer
     clip: {fileID: 8300000, guid: 8610938ad6bf244ecb65c10896540324, type: 3}
   - soundName: harvest
