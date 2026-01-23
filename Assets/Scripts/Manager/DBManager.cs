@@ -2,7 +2,7 @@
 using Firebase.Database;
 using Firebase.Extensions;
 using System.Collections.Generic;
-using System; // 날짜 계산용
+using System;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
@@ -13,10 +13,7 @@ public class UserData
     public int poing;
     public bool isShopUnlocked;
     public string lastLoginDate;
-
-    // ▼▼▼ [추가] 마지막으로 저장한 시간 (로그아웃 시간) ▼▼▼
-    public string logoutTime;
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+    public string logoutTime; // 오프라인 시간 저장용
 
     public List<string> unlockedItemNames = new List<string>();
     public List<InventorySaveData> inventory = new List<InventorySaveData>();
@@ -32,7 +29,6 @@ public class UserData
     }
 }
 
-// (InventorySaveData, QuestSaveData, FieldSaveData 클래스는 그대로 둠)
 [Serializable] public class InventorySaveData { public string itemName; public int amount; }
 [Serializable] public class QuestSaveData { public int key; public int state; public int currentCount; public bool rewardClaimed; public int dailyDifficulty; public int dailyRewardKey; }
 [Serializable] public class FieldSaveData { public int fieldId; public string plantedSeedName; public float remainingTime; public int fertilizerCount; public int state; }
@@ -49,6 +45,9 @@ public class DBManager : MonoBehaviour
 
     DatabaseReference reference;
     public UserData loadedUserData;
+
+    // ▼▼▼ [사라졌던 핵심 변수 복구] ▼▼▼
+    private bool isDataRestored = false;
 
     void Awake()
     {
@@ -72,15 +71,62 @@ public class DBManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "Main") StartCoroutine(DelayedRestore());
+        if (scene.name == "Main")
+        {
+            // ▼▼▼ 메인 씬 진입 시 저장 잠금 (0원 초기화 방지) ▼▼▼
+            isDataRestored = false;
+            Debug.Log("🚫 [안전장치] 데이터 복구 전까지 저장을 차단합니다.");
+
+            StartCoroutine(DelayedRestore());
+        }
+        else
+        {
+            // 로그인 화면 등에서는 해제
+            isDataRestored = true;
+        }
     }
 
     IEnumerator DelayedRestore()
     {
-        yield return null;
-        Debug.Log("🔄 [데이터 복구] 매니저들에게 데이터 주입 시작");
+        yield return null; // 1프레임 대기 (매니저/밭 생성 대기)
+
+        Debug.Log("[데이터 복구] 매니저들에게 데이터 주입 시작");
+
+        CheckDuplicateFieldIDs();
+
         ApplyDataToManagers();
         ApplyFieldDataToScene();
+
+        // 복구 완료 후 저장 잠금 해제
+        isDataRestored = true;
+    }
+
+    // 밭 ID 중복 감별사 (함수로 분리)
+    void CheckDuplicateFieldIDs()
+    {
+        Field[] allFields = FindObjectsOfType<Field>();
+        Debug.Log($"Main 씬에서 발견된 밭 개수: {allFields.Length}개");
+
+        Dictionary<int, string> idCheck = new Dictionary<int, string>();
+
+        foreach (var f in allFields)
+        {
+            // 부모 이름까지 포함해서 출력 (예: primary_fields > Field (1))
+            string fieldName = $"{f.transform.parent.name} > {f.name}";
+
+            if (idCheck.ContainsKey(f.fieldID))
+            {
+                // ★★★ 중복 발견! 범인 출력 ★★★
+                Debug.LogError($"🚨 [중복 검거] ID {f.fieldID}번이 겹칩니다");
+                Debug.LogError($"   1. 먼저 발견된: {idCheck[f.fieldID]}");
+                Debug.LogError($"   2. 지금 발견된: {fieldName}");
+                Debug.LogError("👉 [해결법] '잠긴 밭(lock_...)'에 Field 스크립트가 붙어 있다면 제거하거나, ID를 바꾸세요");
+            }
+            else
+            {
+                idCheck.Add(f.fieldID, fieldName);
+            }
+        }
     }
 
     void ApplyDataToManagers()
@@ -95,23 +141,27 @@ public class DBManager : MonoBehaviour
     public ItemData FindItemByName(string name) { return allGameItems.Find(item => item.itemName == name); }
     public EvolutionRecipe FindRecipeByName(string name) { return allGameRecipes.Find(recipe => recipe.name == name); }
 
-    // ▼▼▼ [수정됨] SaveAllData: 현재 시간을 logoutTime에 기록 ▼▼▼
     public void SaveAllData(string userId)
     {
+        // ▼▼▼ [사라졌던 방어 코드 복구] ▼▼▼
+        if (SceneManager.GetActiveScene().name == "Main" && isDataRestored == false)
+        {
+            Debug.LogWarning("⛔ [저장 거부] 아직 데이터 복구 중입니다! (초기화 방지됨)");
+            return;
+        }
+        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
         Debug.Log($"💾 [저장 시작] User ID: {userId}");
         try
         {
-            if (loadedUserData == null) loadedUserData = new UserData("감자농부", 0);
+            if (loadedUserData == null) loadedUserData = new UserData("감자농부", 1000); 
 
+            // 매니저 살아있으면 데이터 갱신
             if (PoingManager.Instance != null) loadedUserData.poing = PoingManager.Instance.currentPoing;
 
-            // [날짜 저장]
             loadedUserData.lastLoginDate = DateTime.Today.ToString("yyyy-MM-dd");
-
-            // ★★★ [시간 저장] 현재 시간(세계 표준시)을 저장 ★★★
             loadedUserData.logoutTime = DateTime.UtcNow.ToString();
 
-            // (매니저 데이터 갱신 로직들...)
             if (GameProgressionManager.Instance != null)
             {
                 loadedUserData.isShopUnlocked = GameProgressionManager.Instance.isShopUnlocked;
@@ -151,7 +201,6 @@ public class DBManager : MonoBehaviour
         catch (Exception e) { Debug.LogError($"❌ 저장 에러: {e.Message}"); }
     }
 
-    // LoadAllData는 기존과 동일
     public void LoadAllData(string userId, Action onComplete = null)
     {
         reference.Child("users").Child(userId).GetValueAsync().ContinueWithOnMainThread(task =>
@@ -172,7 +221,11 @@ public class DBManager : MonoBehaviour
                 }
                 else
                 {
-                    loadedUserData = new UserData("감자농부", 0);
+                    Debug.Log("신규 유저 -> 초기 데이터 생성");
+
+                    loadedUserData = new UserData("감자농부", 1000);
+
+                    isDataRestored = true;
                     SaveAllData(userId);
                 }
                 if (onComplete != null) onComplete.Invoke();
@@ -183,22 +236,16 @@ public class DBManager : MonoBehaviour
     private void OnApplicationQuit() { if (Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null) SaveAllData(Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.UserId); }
     private void OnApplicationPause(bool pause) { if (pause && Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null) SaveAllData(Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.UserId); }
 
-    // ▼▼▼ [대폭 수정됨] 밭 복구 시 '흐른 시간' 계산 적용 ▼▼▼
     public void ApplyFieldDataToScene()
     {
         if (loadedUserData == null || loadedUserData.fields == null) return;
 
-        // 1. 흐른 시간 계산하기
         double secondsPassed = 0;
-
-        // 저장된 시간이 있다면 계산
         if (!string.IsNullOrEmpty(loadedUserData.logoutTime))
         {
             DateTime lastSaveTime;
-            // 문자열을 날짜로 변환 시도
             if (DateTime.TryParse(loadedUserData.logoutTime, out lastSaveTime))
             {
-                // 현재 시간(UTC) - 저장된 시간(UTC)
                 TimeSpan timeSpan = DateTime.UtcNow - lastSaveTime;
                 secondsPassed = timeSpan.TotalSeconds;
                 Debug.Log($"⏰ 오프라인 경과 시간: {secondsPassed:F1}초");
@@ -214,19 +261,11 @@ public class DBManager : MonoBehaviour
             {
                 if (realField.fieldID == savedField.fieldId)
                 {
-                    // 2. 흐른 시간만큼 밭의 남은 시간을 줄여줌 (심어져 있을 때만)
-                    if (savedField.state != 0 && savedField.state != 4) // Empty(0)나 Ready(4)가 아닐 때
+                    if (savedField.state != 0 && savedField.state != 4)
                     {
                         savedField.remainingTime -= (float)secondsPassed;
-
-                        // 만약 시간이 다 지났으면 0으로 맞춤 (Field 스크립트가 알아서 자라게 처리함)
-                        if (savedField.remainingTime <= 0)
-                        {
-                            savedField.remainingTime = 0;
-                        }
+                        if (savedField.remainingTime <= 0) savedField.remainingTime = 0;
                     }
-
-                    // 3. 변경된 시간으로 밭 상태 복구
                     realField.RestoreState(savedField);
                     break;
                 }

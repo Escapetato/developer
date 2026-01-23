@@ -470,4 +470,17 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    // ▼▼▼ [추가] 마우스가 UI 위에 있는지 확인하는 함수 ▼▼▼
+    public bool IsPointerOverUI()
+    {
+        // PC (마우스)
+        if (EventSystem.current.IsPointerOverGameObject())
+            return true;
+
+        // 모바일 (터치)
+        if (Input.touchCount > 0 && EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+            return true;
+
+        return false;
+    }
 }
