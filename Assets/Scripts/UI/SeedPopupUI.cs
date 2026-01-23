@@ -3,14 +3,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class SeedPopupUI : MonoBehaviour // [수정] 이름
+public class SeedPopupUI : MonoBehaviour 
 {
     public Transform buttonContainer;
     public GameObject seedButtonPrefab;
     private Field currentField;
     private List<GameObject> spawnedButtons = new List<GameObject>();
-
-    // [삭제] Start(), Show(), Hide() 함수 삭제 (UIManager가 대신함)
 
     private void ClearButtons()
     {
@@ -18,59 +16,96 @@ public class SeedPopupUI : MonoBehaviour // [수정] 이름
         spawnedButtons.Clear();
     }
 
-    // UIManager가 호출할 수 있도록 public으로 변경
     public void RefreshButtons(Field field)
     {
         currentField = field;
         ClearButtons();
 
-// 'Seed_InventoryManager' 대신 'InventoryManager' 사용
-var dict = InventoryManager.Instance.items;
-Debug.Log("총 아이템 종류: " + dict.Count);
+        var dict = InventoryManager.Instance.items;
+        
+        foreach (var kv in dict)
+        {
+            ItemData item = kv.Key; 
+            int count = kv.Value;
 
-foreach (var kv in dict)
-{
-ItemData item = kv.Key; // [수정] SeedData -> ItemData
-int count = kv.Value;
+            // 씨앗 카테고리가 아니면 생성하지 않음
+            if (item.itemCategory != "Seed") continue;
 
-// 아이템 카테고리가 "Seed"가 아니면 건너뛰기
-if (item.itemCategory != "Seed")
-{
-continue;
-}
+            GameObject btn = Instantiate(seedButtonPrefab, buttonContainer);
+            spawnedButtons.Add(btn);
 
-GameObject btn = Instantiate(seedButtonPrefab, buttonContainer);
-spawnedButtons.Add(btn);
+            // UI 요소 연결
+            Transform icon = btn.transform.Find("Icon");
+            Transform nameText = btn.transform.Find("Name");
+            Transform countText = btn.transform.Find("Count");
 
-// [수정] ItemData의 변수명 사용
-Transform icon = btn.transform.Find("Icon");
-Transform name = btn.transform.Find("Name");
-Transform cnt = btn.transform.Find("Count");
+            if (icon != null) icon.GetComponent<Image>().sprite = item.itemIcon;
+            if (nameText != null) nameText.GetComponent<TextMeshProUGUI>().text = item.itemName;
+            if (countText != null) countText.GetComponent<TextMeshProUGUI>().text = count.ToString();
 
-if (icon != null) icon.GetComponent<Image>().sprite = item.itemIcon; // icon
-if (name != null) name.GetComponent<TextMeshProUGUI>().text = item.itemName; // itemName
-if (cnt != null) cnt.GetComponent<TextMeshProUGUI>().text = count.ToString();
+            Button btnComp = btn.GetComponent<Button>();
+            if (btnComp != null)
+            {
+                // 클릭 리스너 설정
+                btnComp.onClick.RemoveAllListeners();
+                btnComp.onClick.AddListener(() => OnSeedClicked(item));
+            }
+        }
+    }
 
-Button btnComp = btn.GetComponent<Button>();
-if (btnComp != null)
-btnComp.onClick.AddListener(() => OnSeedClicked(item)); // ItemData
-else
-Debug.LogError("Button 컴포넌트가 btn에 없음!");
-}
-}
+    // 씨앗 클릭 시 실행되는 핵심 로직
+    private void OnSeedClicked(ItemData seed)
+    {
+        if (currentField == null) return;
 
-// [수정] SeedData -> ItemData
-private void OnSeedClicked(ItemData seed)
-{
-if (currentField == null) return;
+        // 1. 인벤토리 개수 확인 
+        if (InventoryManager.Instance.items.ContainsKey(seed) && InventoryManager.Instance.items[seed] > 0)
+        {
+            // 인벤토리에서 일단 선택한 씨앗(또는 랜덤 씨앗) 1개 차감
+            InventoryManager.Instance.RemoveItem(seed, 1);
 
-// 'Seed_InventoryManager' 대신 'InventoryManager' 사용
-if (InventoryManager.Instance.items.ContainsKey(seed) && InventoryManager.Instance.items[seed] > 0)
-{
-InventoryManager.Instance.RemoveItem(seed, 1); // UseSeed 대신 RemoveItem
-currentField.Plant(seed); // Plant 함수는 ItemData를 받도록 수정 필요
-UIManager.Instance.CloseAllPopups(); // [수정] UIManager가 닫도록 함
-}
-else Debug.Log("씨앗이 없습니다.");
-}
+            ItemData seedToPlant = seed; // 실제로 밭에 전달될 데이터
+
+            bool israndom = false;
+            // 2. 랜덤 씨앗 추첨 로직
+            if (seed.itemName == "랜덤 씨앗")
+            {
+                israndom = true;
+                List<ItemData> realSeeds = new List<ItemData>();
+
+                // StoreDB를 뒤져서 랜덤 씨앗 후보군(실제 씨앗들)을 만듭니다.
+                if (StoreUI.Instance != null && StoreUI.Instance.storeDB != null)
+                {
+                    foreach (var item in StoreUI.Instance.storeDB.itemsForSale)
+                    {
+                        // 조건: 카테고리가 씨앗이고, 이름이 "랜덤 씨앗"이 아니며, 잠금상태(?)가 아닌 것
+                        if (item.itemCategory == "Seed" && item.itemName != "랜덤 씨앗" && !item.itemName.Contains("?"))
+                        {
+                            realSeeds.Add(item);
+                        }
+                    }
+                }
+
+                // 후보가 있다면 그 중 하나를 랜덤으로 선택
+                if (realSeeds.Count > 0)
+                {
+                    int randIndex = Random.Range(0, realSeeds.Count);
+                    seedToPlant = realSeeds[randIndex];
+
+                    // 어떤 씨앗이 당첨되었는지 알림창 띄우기
+                    Debug.Log($"{seedToPlant.itemName}이(가) 심겼습니다!");
+                }
+            }
+
+            // 3. 밭에 최종 결정된 씨앗 데이터를 전달
+            currentField.Plant(seedToPlant, israndom);
+
+            // 팝업 닫기
+            UIManager.Instance.CloseAllPopups();
+        }
+        else 
+        {
+            Debug.Log("씨앗이 부족합니다.");
+        }
+    }
 }
