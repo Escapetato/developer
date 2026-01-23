@@ -90,9 +90,10 @@ public class Field : MonoBehaviour
         if (currentState == FieldState.Ready) return "수확 가능!";
 
         int totalSeconds = Mathf.CeilToInt(remainingTime);
-        int minutes = totalSeconds / 60;
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
         int seconds = totalSeconds % 60;
-        return string.Format("{0:00}:{1:00}", minutes, seconds);
+        return string.Format("{0:00}:{1:00}:{2:00}", hours, minutes, seconds);
     }
 
     public Sprite GetFieldSprite() => fieldImage.sprite;
