@@ -43,6 +43,7 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
+        // ※ 추가 : 퀘스트 씬에서 줌/이동 차단 
         //Debug.Log($"[Cam] focused={Application.isFocused} questPanelActive={(questPanelRoot != null ? questPanelRoot.activeInHierarchy.ToString() : "null")}");
         if (!Application.isFocused) return;
         if (questPanelRoot != null && questPanelRoot.activeInHierarchy) return;

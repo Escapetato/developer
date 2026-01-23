@@ -181,6 +181,9 @@ public class Field : MonoBehaviour
         // 프리팹 생성(Instantiate) 코드 삭제
         if (growCoroutine != null) StopCoroutine(growCoroutine);
         growCoroutine = StartCoroutine(GrowRoutine(remainingTime));
+
+        // 퀘스트 진행도 : "심기"
+        QuestManager.Instance?.NotifyAction(QuestConditionType.PlantCrop, seed, 1);
     }
 
     public float GetGrowthMultiplier() => BASE_SPEED_MULTIPLIER + (fertilizerCount * FFERTILIZER_EFFECT);
@@ -190,6 +193,9 @@ public class Field : MonoBehaviour
         fertilizerCount += count;
         if (growCoroutine != null) StopCoroutine(growCoroutine);
         growCoroutine = StartCoroutine(GrowRoutine(remainingTime));
+
+        // 퀘스트 진행도: 비료 주입
+        QuestManager.Instance?.NotifyAction(QuestConditionType.UseFertilizer, null, count);
     }
 
     public void Harvest()
@@ -198,6 +204,8 @@ public class Field : MonoBehaviour
         if (HarvestToolManager.Instance.currentToolTier == plantedSeed.requiredToolTier)
         {
             InventoryManager.Instance.AddItem(plantedSeed.harvestItem, 1);
+            // 퀘스트 진행도: 수확(특정 작물 필터는 conditionItems로 처리)
+            QuestManager.Instance?.NotifyAction(QuestConditionType.HarvestCrop, plantedSeed.harvestItem, 1);
             // 식물 오브젝트 삭제(Destroy) 코드 삭제
             plantedSeed = null;
             SetState(FieldState.Empty);
