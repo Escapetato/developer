@@ -15,7 +15,8 @@ MonoBehaviour:
   itemName: "\uACE0\uCD94 \uC528\uC557"
   description: 
   itemIcon: {fileID: 21300000, guid: 2bb52a82b1280d84ba516e0370fa6fbf, type: 3}
-  itemIconOffVer: {fileID: 21300000, guid: fad6ce1a1b54bc64e9a966fbadbbfbc5, type: 3}
+  itemIconOnVer: {fileID: 21300000, guid: c5dfb63a72236ad4d828ff094f804c8d, type: 3}
+  itemIconOffVer: {fileID: 21300000, guid: 56ffd870f920f6041aef03d31f55c170, type: 3}
   itemCategory: Seed
   collectionCategory: 
   price: 500

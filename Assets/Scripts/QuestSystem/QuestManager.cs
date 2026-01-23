@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -476,6 +476,29 @@ public class QuestManager : MonoBehaviour
 
                 return true;
             }
+        }
+
+        // 상점 해금 (102, 104, 106)
+        if (quest.key == 102 || quest.key == 104 || quest.key == 106)
+        {
+            // 상점 해금
+            GameProgressionManager.Instance?.UnlockShop();
+
+            // 도구 아이템 해금 (상점에 표시되도록)
+            if (quest.rewardItem != null)
+            {
+                GameProgressionManager.Instance?.UnlockItem(quest.rewardItem);
+            }
+
+            quest.rewardClaimed = true;
+            quest.state = QuestState.Closed;
+            RebuildActiveConditionIndex();
+
+            MainQuestSlot();
+            OnQuestChanged?.Invoke();
+            SaveToDB();
+
+            return true;
         }
 
         // 땅 확장 제외 보상 
