@@ -37,6 +37,8 @@ public class Field : MonoBehaviour
 
     private void Start()
     {
+        Camera.main.transparencySortMode = TransparencySortMode.CustomAxis;
+        Camera.main.transparencySortAxis = new Vector3(0, 1, 0);
         // DBManager 로드를 기다리거나 기본 비주얼 업데이트
         UpdateFieldVisual();
     }

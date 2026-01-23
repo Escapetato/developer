@@ -46,3 +46,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: crop
+    uniqueID: 3651730887
+    locked: 0
