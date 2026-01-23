@@ -211,13 +211,13 @@ public class ResearchLab : MonoBehaviour
             UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
             return;
         }
+        materialSlot.ClearSlot();
+        potionSlot.ClearSlot();
 
         PoingManager.Instance.DecreasePoing(currentEvolutionCost);
         if (materialSlot.item != null) InventoryManager.Instance.RemoveItem(materialSlot.item, 1);
         if (potionSlot.item != null) InventoryManager.Instance.RemoveItem(potionSlot.item, 1);
-        materialSlot.ClearSlot();
-        potionSlot.ClearSlot();
-
+        
         StartCoroutine(ProcessEvolutionRoutine());
     }
 
