@@ -32309,7 +32309,7 @@ MonoBehaviour:
   mapMaxX: 19.2
   mapMinY: -10.8
   mapMaxY: 10.8
-  questPanelRoot: {fileID: 1039852477}
+  questPanelRoot: {fileID: 0}
 --- !u!114 &806649009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32329,7 +32329,7 @@ MonoBehaviour:
   mapMaxX: 19.2
   mapMinY: -10.8
   mapMaxY: 10.8
-  questPanelRoot: {fileID: 1039852477}
+  questPanelRoot: {fileID: 0}
 --- !u!1 &808607575
 GameObject:
   m_ObjectHideFlags: 0
@@ -69342,7 +69342,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -2
-  m_Sprite: {fileID: 21300000, guid: 47a0d181e702d4c27acdec376e7fda70, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 117abbc1ae701414cb74cfa35ded3be7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -75590,12 +75590,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 937a18249d2f73e47b9332aa4e592597, type: 2}
   - {fileID: 11400000, guid: fc160dc35553f0b4f91068d055162ab8, type: 2}
   - {fileID: 11400000, guid: 1f64bd9698d9c5440afbed9a4950fc52, type: 2}
-  firstFields: {fileID: 122197438}
-  lockFirstFields: {fileID: 180032607}
-  secondFields: {fileID: 1141836313}
-  lockSecondFields: {fileID: 376574797}
-  thirdFields: {fileID: 437004716}
-  lockThirdFields: {fileID: 272546548}
+  firstFields: {fileID: 0}
+  lockFirstFields: {fileID: 0}
+  secondFields: {fileID: 0}
+  lockSecondFields: {fileID: 0}
+  thirdFields: {fileID: 0}
+  lockThirdFields: {fileID: 0}
 --- !u!1 &1863140748
 GameObject:
   m_ObjectHideFlags: 0
