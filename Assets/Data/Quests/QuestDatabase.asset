@@ -63,7 +63,7 @@ MonoBehaviour:
     - "\uD1A0\uB9C8\uD1A0 5\uAC1C \uC218\uD655\uD558\uAE30"
     - "\uBA4B\uC7C1\uC774 \uD1A0\uB9C8\uD1A0 \uC9C4\uD654\uC2DC\uD0A4\uAE30"
     targetCounts: 0500000001000000
-    currentCounts: 0000000000000000
+    currentCounts: 0400000000000000
     conditionTypes: 0200000009000000
     conditionItems:
     - {fileID: 11400000, guid: 0189d90933e11354faf6ba4ffb34e421, type: 2}

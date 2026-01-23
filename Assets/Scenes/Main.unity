@@ -6357,8 +6357,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   categoryName: Fertilizer
-  defaultSprite: {fileID: 21300000, guid: 1680ee9c8a9c44e498f666de43681d0f, type: 3}
-  selectedSprite: {fileID: 21300000, guid: 3f7a011b75b19434c944b9aca3940205, type: 3}
+  defaultSprite: {fileID: 21300000, guid: fd234348262f04c8b87c35e6cb77b065, type: 3}
+  selectedSprite: {fileID: 21300000, guid: 8ddee188877a64a25b4cb41e173f36a6, type: 3}
 --- !u!114 &151754392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6423,7 +6423,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1680ee9c8a9c44e498f666de43681d0f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fd234348262f04c8b87c35e6cb77b065, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -18535,7 +18535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b966b3aa39cda1740b2f7bf606aea23f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultFailureCost: 100
+  defaultFailureCost: 300
   materialSlot: {fileID: 427182453}
   potionSlot: {fileID: 400748189}
   slotParent: {fileID: 1855059414}
@@ -25299,7 +25299,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bb0f362ccf0808f4eb192513d03cab0f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 73126b7c8a0cf445db524dd80e12e799, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -25330,8 +25330,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   categoryName: Crop
-  defaultSprite: {fileID: 21300000, guid: bb0f362ccf0808f4eb192513d03cab0f, type: 3}
-  selectedSprite: {fileID: 21300000, guid: b00ccd6a41311704aab1bd8d1a312a21, type: 3}
+  defaultSprite: {fileID: 21300000, guid: 73126b7c8a0cf445db524dd80e12e799, type: 3}
+  selectedSprite: {fileID: 21300000, guid: d018952c07aff42cca894b6e1642092c, type: 3}
 --- !u!1 &584091804
 GameObject:
   m_ObjectHideFlags: 0

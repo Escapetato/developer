@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d03ab3bb4aaf9e54ea50e8c2207288ec, type: 3}
   m_Name: fire
   m_EditorClassIdentifier: 
-  itemName: "\uBD88 \uC5D0\uB108\uC9C0"
+  itemName: "\uD0DC\uC591\uC758 \uC228\uACB0"
   description: 
   itemIcon: {fileID: 21300000, guid: 7823bfe80b5729b4ea9614a50a121ea5, type: 3}
+  itemIconOnVer: {fileID: 0}
   itemIconOffVer: {fileID: 0}
   itemCategory: Potion
   collectionCategory: 

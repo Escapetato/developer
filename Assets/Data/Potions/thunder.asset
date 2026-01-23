@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d03ab3bb4aaf9e54ea50e8c2207288ec, type: 3}
   m_Name: thunder
   m_EditorClassIdentifier: 
-  itemName: "\uBC88\uAC1C \uC5D0\uB108\uC9C0"
+  itemName: "\uCC9C\uB465\uC758 \uC815\uC218"
   description: 
   itemIcon: {fileID: 21300000, guid: 888f03a8e23c716419a74674b8abbc9b, type: 3}
+  itemIconOnVer: {fileID: 0}
   itemIconOffVer: {fileID: 0}
   itemCategory: Potion
   collectionCategory: 
