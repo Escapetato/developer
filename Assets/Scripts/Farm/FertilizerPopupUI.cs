@@ -80,6 +80,8 @@ public class FertilizerPopupUI : MonoBehaviour
                 appliedFieldImage.sprite = fieldSprite;
                 appliedFieldImage.enabled = true; // 컴포넌트가 꺼져있는지 확인
 
+                LayoutRebuilder.ForceRebuildLayoutImmediate(appliedFieldImage.rectTransform);
+
                 // UI Image의 경우 투명도(Alpha)가 0이면 안 보입니다.
                 Color c = appliedFieldImage.color;
                 c.a = 1f;

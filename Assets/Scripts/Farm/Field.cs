@@ -23,14 +23,14 @@ public class Field : MonoBehaviour
     // plantAnchor와 plantInstance 관련 변수는 더 이상 사용하지 않으므로 제거 가능하지만, 
     // 기존 구조 유지를 위해 변수 선언만 남겨두거나 삭제하셔도 됩니다.
     private ItemData plantedSeed;
-    private float remainingTime; 
+    private float remainingTime;
     private Coroutine growCoroutine;
 
     [Header("비료 상태")]
     public int fertilizerCount = 0;
     private const float BASE_SPEED_MULTIPLIER = 1f;
     private const float FFERTILIZER_EFFECT = 0.25f;
-    
+
     [Header("랜덤 씨앗 전용 비주얼")]
     public Sprite randomSeedReadySprite;
     private bool isFromRandomSeed = false; // 랜덤 씨앗으로 심어졌는지 여부
@@ -132,34 +132,34 @@ public class Field : MonoBehaviour
     }
 
     private void UpdateFieldVisual()
-{
-    if (fieldImage == null) return;
+    {
+        if (fieldImage == null) return;
 
-    // 현재 상태가 Ready(수확 가능)일 때만 랜덤 씨앗 체크
-    if (currentState == FieldState.Ready)
-    {
-        if (isFromRandomSeed && randomSeedReadySprite != null)
+        // 현재 상태가 Ready(수확 가능)일 때만 랜덤 씨앗 체크
+        if (currentState == FieldState.Ready)
         {
-            fieldImage.sprite = randomSeedReadySprite;
-            Debug.Log("랜덤 씨앗 전용 스프라이트 적용됨!");
+            if (isFromRandomSeed && randomSeedReadySprite != null)
+            {
+                fieldImage.sprite = randomSeedReadySprite;
+                Debug.Log("랜덤 씨앗 전용 스프라이트 적용됨!");
+            }
+            else
+            {
+                fieldImage.sprite = (plantedSeed != null && plantedSeed.readyFieldSprite != null)
+                                    ? plantedSeed.readyFieldSprite : readySprite;
+            }
         }
-        else
+        else // 성장 단계(Seed, Youth, Adult)일 때는 기존 스프라이트 사용
         {
-            fieldImage.sprite = (plantedSeed != null && plantedSeed.readyFieldSprite != null) 
-                                ? plantedSeed.readyFieldSprite : readySprite;
+            switch (currentState)
+            {
+                case FieldState.Empty: fieldImage.sprite = emptySprite; break;
+                case FieldState.Seed: fieldImage.sprite = seedSprite; break;
+                case FieldState.Youth: fieldImage.sprite = youthSprite; break;
+                case FieldState.Adult: fieldImage.sprite = adultSprite; break;
+            }
         }
     }
-    else // 성장 단계(Seed, Youth, Adult)일 때는 기존 스프라이트 사용
-    {
-        switch (currentState)
-        {
-            case FieldState.Empty: fieldImage.sprite = emptySprite; break;
-            case FieldState.Seed: fieldImage.sprite = seedSprite; break;
-            case FieldState.Youth: fieldImage.sprite = youthSprite; break;
-            case FieldState.Adult: fieldImage.sprite = adultSprite; break;
-        }
-    }
-}
 
     private void OnMouseDown()
     {
@@ -198,18 +198,72 @@ public class Field : MonoBehaviour
         // 퀘스트 진행도: 비료 주입
         QuestManager.Instance?.NotifyAction(QuestConditionType.UseFertilizer, null, count);
     }
-
     public void Harvest()
     {
         if (currentState != FieldState.Ready) return;
-        if (HarvestToolManager.Instance.currentToolTier == plantedSeed.requiredToolTier)
+
+        int myTier = HarvestToolManager.Instance.currentToolTier;
+        int requiredTier = plantedSeed.requiredToolTier;
+
+        if (myTier >= requiredTier)
         {
+            // 1. 수확할 아이템의 아이콘 미리 저장
+            Sprite itemIcon = plantedSeed.harvestItem.itemIcon;
+
+            // 2. 아이템 지급
             InventoryManager.Instance.AddItem(plantedSeed.harvestItem, 1);
-            // 퀘스트 진행도: 수확(특정 작물 필터는 conditionItems로 처리)
-            QuestManager.Instance?.NotifyAction(QuestConditionType.HarvestCrop, plantedSeed.harvestItem, 1);
-            // 식물 오브젝트 삭제(Destroy) 코드 삭제
+
+            // 3. 수확 애니메이션 실행 (완성된 밭 이미지가 아니라 '아이템 아이콘'을 넘김)
+            StartCoroutine(HarvestPopUpRoutine(itemIcon));
+
+            // 4. 상태 초기화
             plantedSeed = null;
+            isFromRandomSeed = false;
             SetState(FieldState.Empty);
         }
+    }
+
+    private IEnumerator HarvestPopUpRoutine(Sprite iconSprite)
+    {
+        // 수확물 이미지를 보여줄 임시 오브젝트 생성
+        GameObject popUp = new GameObject("HarvestPopUp");
+        popUp.transform.position = transform.position + Vector3.up * 0.8f; // 밭보다 살짝 위
+
+        // 이미지 컴포넌트 추가 및 설정
+        SpriteRenderer sr = popUp.AddComponent<SpriteRenderer>();
+        sr.sprite = iconSprite;
+        sr.sortingOrder = 50; // 밭보다 훨씬 앞에 보이도록
+
+        float duration = 0.6f; // 전체 애니메이션 시간
+        float elapsed = 0f;
+
+        Vector3 startPos = popUp.transform.position;
+        Vector3 targetPos = startPos + Vector3.up * 1.4f; // 위로 1.2유닛만큼 이동
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // 1. 위치 이동: Lerp로 부드럽게 위로
+            popUp.transform.position = Vector3.Lerp(startPos, targetPos, t);
+
+            // 2. 크기 조절: 0에서 시작해서 1.5배까지 커졌다가 1로 수렴 (뾰롱!)
+            // 애니메이션 커브 느낌을 내기 위해 Sin 함수 사용
+            float scale = Mathf.Sin(t * Mathf.PI) * 0.3f + 1.0f;
+            popUp.transform.localScale = Vector3.one * scale;
+
+            // 3. 투명도 조절: 절반 이후부터 서서히 사라짐
+            if (t > 0.5f)
+            {
+                Color c = sr.color;
+                c.a = 1f - ((t - 0.5f) * 2f);
+                sr.color = c;
+            }
+
+            yield return null;
+        }
+
+        Destroy(popUp);
     }
 }
