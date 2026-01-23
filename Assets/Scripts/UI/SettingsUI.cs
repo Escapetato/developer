@@ -87,7 +87,11 @@ public class SettingsUI : MonoBehaviour
     {
         if (settingsPopup == null) return;
         settingsPopup.SetActive(true);
-        // 열 때도 상태 반영 (혹시 다른 곳에서 바뀌었을 수 있음)
+
+        if (settingsButton != null)
+        settingsButton.interactable = false;
+
+        SoundManager.Instance?.PlaySFX("open");
         SyncAudioUI();
     }
 
@@ -95,6 +99,11 @@ public class SettingsUI : MonoBehaviour
     {
         if (settingsPopup == null) return;
         settingsPopup.SetActive(false);
+
+        if (settingsButton != null)
+        settingsButton.interactable = true;
+
+        SoundManager.Instance?.PlaySFX("close");
     }
 
     // =====================
