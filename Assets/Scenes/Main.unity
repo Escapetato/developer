@@ -51281,6 +51281,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sfxSource: {fileID: 1246507289}
   bgmSource: {fileID: 1246507288}
+  bgmVolume: 0.4
+  sfxVolume: 1
   fadeDuration: 0.3
   sfxList:
   - soundName: open
@@ -51314,22 +51316,16 @@ MonoBehaviour:
   - soundName: button
     clip: {fileID: 8300000, guid: a0a62882d928645239fea7aff9616ba7, type: 3}
   bgmList:
-  - soundName: candy
-    clip: {fileID: 8300000, guid: 25cc2225e435897429edc1d2d07361fe, type: 3}
-  - soundName: candy1
-    clip: {fileID: 8300000, guid: 0e84dcb149c27a140995b957647d56cf, type: 3}
-  - soundName: lab
-    clip: {fileID: 8300000, guid: d9e89ab4704ab6c4f995f1b9957461f6, type: 3}
   - soundName: mainfarm
     clip: {fileID: 8300000, guid: 42a96c86ff25a5c469bbd528dae7b6d0, type: 3}
-  - soundName: moonlight1
-    clip: {fileID: 8300000, guid: 516c6be70729ec24986ebc0e7743de44, type: 3}
-  - soundName: moonlight
-    clip: {fileID: 8300000, guid: c04b39aadd879484c913e1b0c7e2af65, type: 3}
   - soundName: store
     clip: {fileID: 8300000, guid: 1423e4dda2da0db42819a6815d9e3616, type: 3}
+  - soundName: lab
+    clip: {fileID: 8300000, guid: 485760cd53c564644b964d313c166838, type: 3}
+  - soundName: candy
+    clip: {fileID: 8300000, guid: f0e4402c6b245446aaf373f3e06348d4, type: 3}
   - soundName: winter
-    clip: {fileID: 8300000, guid: 359ae11356e22614e83f689c044a3c78, type: 3}
+    clip: {fileID: 8300000, guid: 239cdcc0c29df4d0dbc138b93b6142e9, type: 3}
 --- !u!82 &1246507288
 AudioSource:
   m_ObjectHideFlags: 0
@@ -51342,7 +51338,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.4
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -67583,7 +67579,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1241922993}
   m_HandleRect: {fileID: 1241922992}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -69507,7 +69503,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.0005702356, y: 0.0000033858555}
+  m_AnchoredPosition: {x: -0.0005702356, y: 0.000070957794}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1691086043
