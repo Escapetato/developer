@@ -4,7 +4,6 @@ using TMPro;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
-using Google;
 using System.Threading.Tasks;
 using System.Collections;
 
@@ -29,14 +28,12 @@ public class AuthManager : MonoBehaviour
     public Button goToLoginButton;
 
     [Header("=== Common UI (공통) ===")]
-    public Button googleLoginButton;
     public TextMeshProUGUI statusText;
 
     [Header("Google Login")]
     public string webClientId;
 
     private FirebaseAuth auth;
-    private GoogleSignInConfiguration googleConfig;
     private bool initialized = false;
 
     private bool loggedAuthNotReady = false;
@@ -56,7 +53,6 @@ public class AuthManager : MonoBehaviour
     {
         if (loginButton) loginButton.onClick.AddListener(TryLogin);
         if (registerButton) registerButton.onClick.AddListener(TryRegister);
-        if (googleLoginButton) googleLoginButton.onClick.AddListener(TryGoogleLogin);
 
         if (goToRegisterButton) goToRegisterButton.onClick.AddListener(ShowRegisterPanel);
         if (goToLoginButton) goToLoginButton.onClick.AddListener(ShowLoginPanel);
@@ -128,17 +124,6 @@ public class AuthManager : MonoBehaviour
     {
         if (initialized) return;
         if (auth == null) auth = FirebaseAuth.DefaultInstance;
-
-        if (!string.IsNullOrEmpty(webClientId))
-        {
-            googleConfig = new GoogleSignInConfiguration
-            {
-                WebClientId = webClientId,
-                RequestIdToken = true,
-                RequestEmail = true,
-                UseGameSignIn = false
-            };
-        }
         initialized = true;
     }
 
@@ -282,42 +267,6 @@ public class AuthManager : MonoBehaviour
         }
     }
 
-    public void TryGoogleLogin()
-    {
-        EnsureInitialized();
-        if (!initialized || auth == null) return;
-
-        SetStatusMessage("Google 로그인 시도 중...", false);
-        GoogleSignIn.Configuration = googleConfig;
-        GoogleSignIn.DefaultInstance.SignOut();
-
-        GoogleSignIn.DefaultInstance.SignIn().ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled || task.IsFaulted)
-            {
-                SetStatusMessage("Google 로그인 실패", true);
-                return;
-            }
-
-            GoogleSignInUser googleUser = task.Result;
-            Credential credential = GoogleAuthProvider.GetCredential(googleUser.IdToken, null);
-
-            auth.SignInWithCredentialAsync(credential).ContinueWithOnMainThread(fbTask =>
-            {
-                if (fbTask.IsCanceled || fbTask.IsFaulted)
-                {
-                    SetStatusMessage("Firebase 연결 실패", true);
-                    return;
-                }
-
-                FirebaseUser firebaseUser = fbTask.Result;
-
-                // 성공 시 -> 깃발 들기
-                loginUserIdTemp = firebaseUser.UserId;
-                isLoginSuccess = true;
-            });
-        });
-    }
 
     void SetStatusMessage(string msg, bool isError)
     {
