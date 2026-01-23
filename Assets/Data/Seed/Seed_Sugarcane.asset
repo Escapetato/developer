@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uC0AC\uD0D5\uC218\uC218 \uC528\uC557"
   description: 
-  itemIcon: {fileID: 21300000, guid: 2b9886edbd6543348a982d1566a975ed, type: 3}
+  itemIcon: {fileID: 21300000, guid: 3f2320356a1cf1b479c6fff476468a10, type: 3}
   itemIconOffVer: {fileID: 21300000, guid: a7db3d922dafe664c8572becebc08e76, type: 3}
   itemCategory: Seed
   collectionCategory: 

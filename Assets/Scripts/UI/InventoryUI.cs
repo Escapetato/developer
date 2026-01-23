@@ -268,6 +268,10 @@ public class InventoryUI : MonoBehaviour
     public void OnRealSellClick()
     {
         if (selectedItem == null) return;
+
+        // ▼▼▼ [수정] 버튼을 누르자마자 비활성화해서 중복 클릭 원천 차단! ▼▼▼
+        sellButton.interactable = false;
+
         if (selectedItem.itemCategory != "Crop") return;
 
         int totalEarnings = selectedItem.price * currentSellQuantity;
