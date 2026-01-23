@@ -52,6 +52,10 @@ public class StoreUI : MonoBehaviour
     private string currentCategory = "All";
     private int currentBuyQuantity = 1;
 
+    [Header("Tool Lock Components")]
+    public MonoBehaviour sickleLockComponent;
+    public MonoBehaviour trowelLockComponent; 
+    public MonoBehaviour secatrursLockComponent;
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -339,6 +343,11 @@ public class StoreUI : MonoBehaviour
                 PoingManager.Instance.DecreasePoing(totalCost);
                 InventoryManager.Instance.AddItem(selectedItem, currentBuyQuantity);
 
+                if (selectedItem.itemCategory == "Tool")
+            {
+                UnlockToolComponent(selectedItem.itemName);
+            }
+
                 NotifyPurchaseToQuest(selectedItem, currentBuyQuantity);
 
                 UIManager.Instance.ShowAlertPopup("구매 완료!");
@@ -347,6 +356,24 @@ public class StoreUI : MonoBehaviour
                 UpdateDetailPanel(selectedItem, true);
             }
         );
+    }
+
+    // 도구 이름에 따라 컴포넌트를 끄는 함수
+    private void UnlockToolComponent(string toolName)
+    {
+        switch (toolName)
+        {
+            case "낫":
+                if (sickleLockComponent != null) sickleLockComponent.gameObject.SetActive(false);
+                break;
+            case "삽":
+                if (trowelLockComponent != null) trowelLockComponent.gameObject.SetActive(false);
+                break;
+            case "전지가위":
+                if (secatrursLockComponent != null) secatrursLockComponent.gameObject.SetActive(false);
+                break;
+        }
+        Debug.Log($"{toolName} 해금 완료!");
     }
 
     public void ClearSelection()
