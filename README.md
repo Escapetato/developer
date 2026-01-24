@@ -73,3 +73,7 @@
 
 ## 🎥 시연영상
 https://drive.google.com/file/d/1-rtY5uWgW6IE5pb5Hn5tVtAR6nsgg_3L/view?usp=sharing
+
+
+👉 [게임 해보러 가기](https://drive.google.com/file/d/1dP9Q-V9O2qbAE9nGyTsHmJEQQpLCcO6f/view?usp=sharing)
+(구글 드라이브 실행파일로 연결됩니다)
