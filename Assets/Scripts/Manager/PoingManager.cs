@@ -23,7 +23,7 @@ public class PoingManager : MonoBehaviour
     {
         if (currentPoing <= 0)
         {
-            currentPoing = 5000;
+            currentPoing = 1000;
         }
         OnPoingChanged?.Invoke(currentPoing);
     }
@@ -47,11 +47,9 @@ public class PoingManager : MonoBehaviour
     // DB에서 불러온 돈을 적용하는 함수 (DBManager가 호출함)
     public void SetLoadedPoing(int loadedPoing)
     {
-        // ▼▼▼ [수정] 서버에서 0원(혹은 그 이하)이 오면 5000원으로 강제 교체! ▼▼▼
         if (loadedPoing <= 0)
         {
-            currentPoing = 5000;
-            // 기왕 바꾼 거, 서버에도 5000원으로 다시 저장해버리기
+            currentPoing = 1000;
             SaveToDB();
         }
         else
