@@ -12,17 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d03ab3bb4aaf9e54ea50e8c2207288ec, type: 3}
   m_Name: thunder
   m_EditorClassIdentifier: 
-  itemName: "\uBC88\uAC1C \uC5D0\uB108\uC9C0"
+  itemName: "\uCC9C\uB465\uC758 \uC815\uC218"
   description: 
-  itemIcon: {fileID: 21300000, guid: 50b83ab0d6f74b14384768075222c7b0, type: 3}
+  itemIcon: {fileID: 21300000, guid: 888f03a8e23c716419a74674b8abbc9b, type: 3}
+  itemIconOnVer: {fileID: 0}
+  itemIconOffVer: {fileID: 0}
   itemCategory: Potion
   collectionCategory: 
-  price: 150
+  price: 200
   seedCategory: 0
-  plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
+  readyFieldSprite: {fileID: 0}
   growTimeDisplay: "1\uBD84"
   harvestToolName: "\uD638\uBBF8"
   toolTier: 0

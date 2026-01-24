@@ -15,11 +15,11 @@ MonoBehaviour:
   itemName: "\uBCC4\uC0AC\uD0D5"
   description: 
   itemIcon: {fileID: 21300000, guid: e5d2018daa66a0c46b55dc0d8f9a73e7, type: 3}
+  itemIconOffVer: {fileID: 0}
   itemCategory: Crop
   collectionCategory: 
-  price: 1600
+  price: 1750
   seedCategory: 0
-  plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1

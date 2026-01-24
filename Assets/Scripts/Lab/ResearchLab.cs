@@ -133,19 +133,42 @@ public class ResearchLab : MonoBehaviour
         if (InventoryManager.Instance == null) return;
         Dictionary<ItemData, int> allItems = InventoryManager.Instance.items;
         int i = 0;
+
         foreach (KeyValuePair<ItemData, int> itemPair in allItems)
         {
-            if (currentCategory == "All" || itemPair.Key.itemCategory == currentCategory)
+            ItemData item = itemPair.Key;
+
+            // 1. 카테고리 체크 (기본 로직)
+            if (currentCategory != "All" && item.itemCategory != currentCategory) continue;
+
+            // 2. [핵심] 이 아이템이 '진화 결과물'인지 확인
+            // DB에 등록된 모든 레시피를 뒤져서, 현재 아이템이 결과물(resultItem)로 등록된 적이 있는지 찾습니다.
+            bool isEvolutionResult = false;
+            if (DBManager.Instance != null)
             {
-                if (i < inventorySlots.Count)
-                {
-                    inventorySlots[i].gameObject.SetActive(true);
-                    inventorySlots[i].SetSlot(itemPair.Key, itemPair.Value);
-                    if (selectedSlot == inventorySlots[i]) selectedSlot.SetSelected(true);
-                    i++;
-                }
+                isEvolutionResult = DBManager.Instance.allGameRecipes.Exists(recipe => recipe.resultItem == item);
+            }
+
+            // 3. 필터링 조건: (진화 결과물임) 이면서 (이미 도감에 해금됨) 인 경우에만 숨기기
+            // 이렇게 하면 기본 작물(재료)은 도감에 등록되어 있어도 isEvolutionResult가 false라 계속 보입니다.
+            bool isUnlocked = GameProgressionManager.Instance.unlockedItems.Contains(item);
+
+            if (isEvolutionResult && isUnlocked)
+            {
+                continue; // 목록에서 제외하고 다음 아이템으로 넘어감
+            }
+
+            // 4. 슬롯 표시 (나머지 아이템들)
+            if (i < inventorySlots.Count)
+            {
+                inventorySlots[i].gameObject.SetActive(true);
+                inventorySlots[i].SetSlot(item, itemPair.Value);
+                if (selectedSlot == inventorySlots[i]) selectedSlot.SetSelected(true);
+                i++;
             }
         }
+
+        // 사용하지 않는 남은 슬롯들 끄기
         for (int j = i; j < inventorySlots.Count; j++)
         {
             inventorySlots[j].ClearSlot();
@@ -211,13 +234,13 @@ public class ResearchLab : MonoBehaviour
             UIManager.Instance.ShowAlertPopup("포잉이 부족합니다!");
             return;
         }
+        materialSlot.ClearSlot();
+        potionSlot.ClearSlot();
 
         PoingManager.Instance.DecreasePoing(currentEvolutionCost);
         if (materialSlot.item != null) InventoryManager.Instance.RemoveItem(materialSlot.item, 1);
         if (potionSlot.item != null) InventoryManager.Instance.RemoveItem(potionSlot.item, 1);
-        materialSlot.ClearSlot();
-        potionSlot.ClearSlot();
-
+        
         StartCoroutine(ProcessEvolutionRoutine());
     }
 

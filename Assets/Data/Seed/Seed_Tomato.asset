@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uD1A0\uB9C8\uD1A0 \uC528\uC557"
   description: 
-  itemIcon: {fileID: 21300000, guid: f73f285ea54002d43975fddcbfc52413, type: 3}
-  itemIconOffVer: {fileID: 21300000, guid: b4121f9ed6f8d5a46968657fc95a00ae, type: 3}
+  itemIcon: {fileID: 21300000, guid: 35620b4a25ecaf446a716f2bbbabe0b3, type: 3}
+  itemIconOnVer: {fileID: 21300000, guid: 93bc970b561a3de4386f2105e539e24d, type: 3}
+  itemIconOffVer: {fileID: 21300000, guid: e42cb67d08d069947b9a470eea497b9a, type: 3}
   itemCategory: Seed
   collectionCategory: 
-  price: 300
+  price: 100
   seedCategory: 1
   growTime: 60
   harvestItem: {fileID: 11400000, guid: 0189d90933e11354faf6ba4ffb34e421, type: 2}

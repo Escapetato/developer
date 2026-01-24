@@ -26,9 +26,9 @@ public class InventoryManager : MonoBehaviour
 
     void Start()
     {
-        if (testItem != null) AddItem(testItem, 10);
+/*        if (testItem != null) AddItem(testItem, 10);
         if (testPotion != null) AddItem(testPotion, 10);
-        if (Tools != null) AddItem(Tools, 1);
+        if (Tools != null) AddItem(Tools, 1);*/
     }
 
     void Update()
@@ -83,6 +83,8 @@ public class InventoryManager : MonoBehaviour
 
     public int GetItemCount(ItemData item)
     {
+        if (item == null) return 0;
+
         if (items.ContainsKey(item)) return items[item];
         return 0;
     }

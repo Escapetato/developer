@@ -67,6 +67,7 @@ public class QuestListController : MonoBehaviour
         // 패널이 켜졌을 때만 퀘스트 변경 이벤트를 받는다
         if (QuestManager.Instance != null)
             QuestManager.Instance.OnQuestChanged += HandleQuestChanged;
+        SelectSlot(currentSelectedSlot, false);
 
     }
 

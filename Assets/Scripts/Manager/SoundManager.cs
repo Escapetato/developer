@@ -17,6 +17,10 @@ public class SoundManager : MonoBehaviour
     public AudioSource sfxSource;
     public AudioSource bgmSource;
 
+    [Header("Volume Settings")]
+    [Range(0f, 1f)] public float bgmVolume = 0.3f;
+    [Range(0f, 1f)] public float sfxVolume = 1f;
+
     [Range(0.1f, 3.0f)]
     public float fadeDuration = 0.3f;
 
@@ -34,17 +38,26 @@ public class SoundManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+
+            // ▼▼▼ [이 줄 추가!] 부모(@Managers) 밑에 있으면 같이 죽으니까 탈출! ▼▼▼
+            transform.SetParent(null);
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
             DontDestroyOnLoad(gameObject);
             InitSoundDictionary();
+
+            if (bgmSource != null) bgmSource.volume = bgmVolume;
+            if (sfxSource != null) sfxSource.volume = sfxVolume;
 
             if (bgmSource != null)
             {
                 bgmSource.loop = true;
-                bgmSource.volume = 1f; // 시작 볼륨 확실하게 설정
             }
         }
         else
         {
+            // 이미 Auth 씬에서 만들어진 SoundManager가 넘어왔다면,
+            // Main 씬에 원래 있던 놈은 파괴
             Destroy(gameObject);
         }
     }
@@ -111,12 +124,12 @@ public class SoundManager : MonoBehaviour
         bgmSource.Play();
 
         // 3단계: 새 음악 페이드 인 (볼륨 0 -> 1)
-        while (bgmSource.volume < 1f)
+        while (bgmSource.volume < bgmVolume)
         {
             bgmSource.volume += Time.deltaTime / fadeDuration;
             yield return null;
         }
 
-        bgmSource.volume = 1f; // 볼륨 확실하게 1로 고정
+        bgmSource.volume = bgmVolume;
     }
 }

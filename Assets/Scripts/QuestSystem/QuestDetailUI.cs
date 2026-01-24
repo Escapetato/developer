@@ -604,7 +604,10 @@ public class QuestDetailUI : MonoBehaviour
     // 보상 아이콘 찾기 (on, off)
     private Sprite TryGetItemIcon(ItemData item)
     {
-        return item != null ? item.itemIcon : null;
+        if (item == null) return null;
+
+        // 퀘스트용 on 이미지가 있으면 우선 사용, 없으면 기본 이미지
+        return item.itemIconOnVer != null ? item.itemIconOnVer : item.itemIcon;
     }
 
     private Sprite TryGetItemIconOff(ItemData item)

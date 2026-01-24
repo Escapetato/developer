@@ -21,6 +21,10 @@ public class PoingManager : MonoBehaviour
 
     void Start()
     {
+        if (currentPoing <= 0)
+        {
+            currentPoing = 1000;
+        }
         OnPoingChanged?.Invoke(currentPoing);
     }
 
@@ -43,9 +47,19 @@ public class PoingManager : MonoBehaviour
     // DB에서 불러온 돈을 적용하는 함수 (DBManager가 호출함)
     public void SetLoadedPoing(int loadedPoing)
     {
-        currentPoing = loadedPoing;
+        if (loadedPoing <= 0)
+        {
+            currentPoing = 1000;
+            SaveToDB();
+        }
+        else
+        {
+            currentPoing = loadedPoing;
+        }
+        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
         OnPoingChanged?.Invoke(currentPoing);
-        Debug.Log("서버에서 불러온 포잉 적용 완료: " + currentPoing);
+        Debug.Log("서버 데이터 적용 완료: " + currentPoing);
     }
 
     public void AddPoing(int amount)

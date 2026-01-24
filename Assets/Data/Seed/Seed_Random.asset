@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uB79C\uB364 \uC528\uC557"
   description: 
-  itemIcon: {fileID: 21300000, guid: 9fd0567db076b4f459209de36e08df45, type: 3}
+  itemIcon: {fileID: 21300000, guid: c6a6c6f71a998e843a616299a9b362da, type: 3}
   itemIconOffVer: {fileID: 0}
   itemCategory: Seed
   collectionCategory: 
-  price: 500
+  price: 450
   seedCategory: 0
   growTime: 0
   harvestItem: {fileID: 0}

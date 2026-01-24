@@ -57,6 +57,7 @@ public class FertilizerPopupUI : MonoBehaviour
         closeButton.onClick.AddListener(() =>
         {
             Debug.Log("닫기 버튼 클릭됨");
+            SoundManager.Instance.PlaySFX("close");
             gameObject.SetActive(false); // 직접 끄거나 UIManager 호출
             // UIManager.Instance.CloseAllPopups(); // 원래 사용하던 방식 유지
         });
@@ -80,10 +81,7 @@ public class FertilizerPopupUI : MonoBehaviour
                 appliedFieldImage.sprite = fieldSprite;
                 appliedFieldImage.enabled = true; // 컴포넌트가 꺼져있는지 확인
 
-                // UI Image의 경우 투명도(Alpha)가 0이면 안 보입니다.
-                Color c = appliedFieldImage.color;
-                c.a = 1f;
-                appliedFieldImage.color = c;
+                LayoutRebuilder.ForceRebuildLayoutImmediate(appliedFieldImage.rectTransform);
 
                 Debug.Log($"팝업에 이미지 적용 성공: {fieldSprite.name}");
             }
