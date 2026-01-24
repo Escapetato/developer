@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uB0AB"
   description: 
-  itemIcon: {fileID: 21300000, guid: 1ed233a806c24054ca8d7b703811a8a9, type: 3}
+  itemIcon: {fileID: 21300000, guid: 9c477f2fcaab0430db41aab4b5d757ac, type: 3}
   itemIconOnVer: {fileID: 0}
   itemIconOffVer: {fileID: 0}
   itemCategory: Tool

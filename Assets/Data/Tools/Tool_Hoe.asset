@@ -14,15 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uD638\uBBF8"
   description: 
-  itemIcon: {fileID: 21300000, guid: 13fbb18e5d22fd746b9e2e1108d2bfb9, type: 3}
+  itemIcon: {fileID: 21300000, guid: 5e8f5db6c965d4d60aefe8cfe18cbc86, type: 3}
+  itemIconOnVer: {fileID: 0}
+  itemIconOffVer: {fileID: 0}
   itemCategory: Tool
   collectionCategory: 
   price: 0
   seedCategory: 0
-  plantPrefab: {fileID: 0}
   growTime: 0
   harvestItem: {fileID: 0}
   requiredToolTier: 1
+  readyFieldSprite: {fileID: 0}
   growTimeDisplay: "1\uBD84"
   harvestToolName: "\uD638\uBBF8"
   toolTier: 1
