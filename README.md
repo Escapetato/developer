@@ -76,4 +76,5 @@ https://drive.google.com/file/d/1-rtY5uWgW6IE5pb5Hn5tVtAR6nsgg_3L/view?usp=shari
 
 
 👉 [게임 해보러 가기](https://drive.google.com/file/d/1dP9Q-V9O2qbAE9nGyTsHmJEQQpLCcO6f/view?usp=sharing)
-(구글 드라이브 실행파일로 연결됩니다)
+
+(Google Drive 실행파일로 연결됩니다. Google Drive에서 다운로드되는 실행 파일은 보안 경고가 표시될 수 있습니다.)
