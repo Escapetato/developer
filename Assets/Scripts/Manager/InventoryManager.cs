@@ -83,6 +83,8 @@ public class InventoryManager : MonoBehaviour
 
     public int GetItemCount(ItemData item)
     {
+        if (item == null) return 0;
+
         if (items.ContainsKey(item)) return items[item];
         return 0;
     }

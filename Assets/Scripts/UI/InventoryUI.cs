@@ -264,42 +264,50 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
-    // ▼▼▼ [핵심] 판매 확인 팝업 추가됨 ▼▼▼
+
     public void OnRealSellClick()
     {
         if (selectedItem == null) return;
-
-        // ▼▼▼ [수정] 버튼을 누르자마자 비활성화해서 중복 클릭 원천 차단! ▼▼▼
-        sellButton.interactable = false;
-
         if (selectedItem.itemCategory != "Crop") return;
 
-        int totalEarnings = selectedItem.price * currentSellQuantity;
+        // 1. [안전장치] 판매할 아이템과 정보를 로컬 변수에 미리 복사 (에러 방지 핵심)
+        ItemData itemToSell = selectedItem;
+        int quantityToSell = currentSellQuantity;
+        int totalEarnings = itemToSell.price * quantityToSell;
 
-        // 팝업 띄우기
+        // 2. 버튼 비활성화 (중복 클릭 방지)
+        sellButton.interactable = false;
+
+        // 3. 확인 팝업 띄우기
         UIManager.Instance.ShowConfirmPopup(
             $"{totalEarnings} 포잉에 판매하시겠습니까?",
-            () =>
+            () => // [네] 눌렀을 때
             {
-                // [진짜 판매 로직 - 네 눌렀을 때]
-                InventoryManager.Instance.RemoveItem(selectedItem, currentSellQuantity);
+                // 미리 저장해둔 itemToSell 정보를 사용합니다.
+                InventoryManager.Instance.RemoveItem(itemToSell, quantityToSell);
                 PoingManager.Instance.IncreasePoing(totalEarnings);
 
                 if (QuestManager.Instance != null)
-                    QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, selectedItem, currentSellQuantity);
+                    QuestManager.Instance.NotifyAction(QuestConditionType.SellItem, itemToSell, quantityToSell);
 
                 UIManager.Instance.ShowAlertPopup($"판매 완료! (+{totalEarnings} 포잉)");
 
-                // 판매 후 수량이나 선택 상태 갱신
-                if (InventoryManager.Instance.GetItemCount(selectedItem) > 0)
+                // [수정] 현재 선택된 아이템이 아직 남아있는지 체크 (null 여부 포함)
+                if (selectedItem != null && InventoryManager.Instance.GetItemCount(selectedItem) > 0)
                 {
                     currentSellQuantity = 1;
                     UpdateDetailPanel(selectedItem);
+                    sellButton.interactable = true; // 남은 게 있으면 버튼 다시 활성화
                 }
                 else
                 {
-                    ClearSelection();
+                    ClearSelection(); // 다 팔았으면 패널 닫기
                 }
+            },
+            () => // [아니오] 눌렀을 때 (취소)
+            {
+                // 판매를 안 하기로 했으니 버튼을 다시 활성화해줍니다.
+                sellButton.interactable = true;
             }
         );
     }

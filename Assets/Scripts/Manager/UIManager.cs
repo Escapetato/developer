@@ -79,32 +79,40 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // ... (ShowConfirmPopup 등은 기존과 동일) ...
-    public void ShowConfirmPopup(string message, Action onConfirm)
+    // UIManager.cs 수정
+
+    public void ShowConfirmPopup(string message, Action onConfirm, Action onCancel = null)
     {
         if (confirmPopup == null) return;
+
         confirmPopup.SetActive(true);
         if (confirmText != null) confirmText.text = message;
 
+        // '네' 버튼 설정
         if (confirmYesButton != null)
         {
             confirmYesButton.onClick.RemoveAllListeners();
             confirmYesButton.onClick.AddListener(() =>
             {
-                onConfirm();
+                onConfirm?.Invoke(); // '네' 로직 실행
                 confirmPopup.SetActive(false);
                 SoundManager.Instance.PlaySFX("button");
             });
         }
+
+        // '아니오' 버튼 설정
         if (confirmNoButton != null)
         {
             confirmNoButton.onClick.RemoveAllListeners();
             confirmNoButton.onClick.AddListener(() =>
             {
+                // [추가] '아니오'를 눌렀을 때 실행할 취소 로직(예: 버튼 복구)을 호출합니다.
+                onCancel?.Invoke();
                 confirmPopup.SetActive(false);
                 SoundManager.Instance.PlaySFX("button");
             });
         }
+
         SoundManager.Instance.PlaySFX("PopupOpen");
     }
 
