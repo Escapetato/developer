@@ -27,6 +27,19 @@ public class SideMenuUI : MonoBehaviour
         CloseMenu();
     }
 
+    // 외부(UIManager)에서 이 UI를 통째로 켜고 끄게 해주는 함수 
+    public void SetVisible(bool isVisible)
+    {
+        // 1. 만약 숨기는 거라면(false), 열려있던 메뉴도 닫아주면 좋음
+        if (isVisible == false)
+        {
+            CloseMenu();
+        }
+
+        // 2. 오브젝트 자체를 껐다 켜기
+        gameObject.SetActive(isVisible);
+    }
+
     public void OnClickToggle()
     {
         isExpanded = !isExpanded;
